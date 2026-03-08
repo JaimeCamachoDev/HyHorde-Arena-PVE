@@ -55,6 +55,7 @@ extends AbstractPlayerCommand {
         playerRef.sendMessage(Message.raw((String)"4) /hordapve start -> inicia la horda"));
         playerRef.sendMessage(Message.raw((String)"5) /hordapve stop -> detiene la horda"));
         playerRef.sendMessage(Message.raw((String)"Comandos: /hordapve status, /hordapve logs, /hordapve hud, /hordapve enemy <tipo>, /hordapve tipos, /hordapve role <rolNpc|auto>, /hordapve roles, /hordapve reward <rondas>, /hordareload config"));
+        playerRef.sendMessage(Message.raw((String)"Alias compatible: /hordepve (mismos subcomandos que /hordapve)."));
         playerRef.sendMessage(Message.raw((String)"Tipos: auto, random, bandit, goblin, skeleton, zombie, spider, wolf, wraith, void, demon, beast"));
     }
 }

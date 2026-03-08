@@ -53,6 +53,8 @@ public final class HordeService {
     private static final List<String> ENEMY_TYPE_OPTIONS = new ArrayList<String>(ENEMY_TYPE_HINTS.keySet());
     private static final List<String> RANDOM_ENEMY_TYPE_OPTIONS = HordeService.buildRandomEnemyTypePool();
     private static final List<String> REWARD_ITEM_SUGGESTIONS = HordeService.buildRewardItemSuggestions();
+    private static final String[] BLOCKED_ENEMY_ROLE_HINTS = new String[]{"kitten", "feline"};
+    private static final int START_COUNTDOWN_SECONDS = 3;
     private static final int MIN_ROUNDS = 1;
     private static final int MAX_ROUNDS = 200;
     private static final int MIN_ENEMIES_PER_ROUND = 1;
@@ -220,6 +222,9 @@ public final class HordeService {
         if (resolvedRole == null) {
             return OperationResult.fail("Rol NPC no encontrado: '" + raw + "'. Usa /hordapve roles.");
         }
+        if (HordeService.isBlockedEnemyRole(resolvedRole)) {
+            return OperationResult.fail("El rol '" + resolvedRole + "' esta bloqueado para hordas (mascota/no hostil).");
+        }
         this.config.npcRole = resolvedRole;
         this.saveConfig();
         return OperationResult.ok("Rol NPC forzado a: " + resolvedRole);
@@ -370,13 +375,13 @@ public final class HordeService {
         if (selectedRole == null) {
             return OperationResult.fail("No se pudo resolver un rol NPC compatible para iniciar la horda.");
         }
-        this.session = newSession = new HordeSession(world, store, selectedRole, selectedEnemyType, new ArrayList<String>(roles), this.config.playerMultiplier, forcedRole, supportedEnemyTypes);
-        newSession.ticker = HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> this.tickSession(newSession), 1000L, 1000L, TimeUnit.MILLISECONDS);
+        Vector3f startRotation = new Vector3f(startedBy.getTransform().getRotation());
+        this.session = newSession = new HordeSession(world, store, selectedRole, selectedEnemyType, new ArrayList<String>(roles), this.config.playerMultiplier, forcedRole, supportedEnemyTypes, startRotation, START_COUNTDOWN_SECONDS);
+        newSession.ticker = HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> this.tickSession(newSession), 0L, 1000L, TimeUnit.MILLISECONDS);
         String roleSuffix = forcedRole == null ? selectedRole : selectedRole + " (forzado)";
-        world.sendMessage(Message.raw((String)String.format(Locale.ROOT, "Horda PVE iniciada en %.2f %.2f %.2f | %d rondas | tipo: %s | rol: %s | jugadores x%d", this.config.spawnX, this.config.spawnY, this.config.spawnZ, this.config.rounds, selectedEnemyType, roleSuffix, this.config.playerMultiplier)));
+        world.sendMessage(Message.raw((String)String.format(Locale.ROOT, "Horda PVE preparada en %.2f %.2f %.2f | %d rondas | tipo: %s | rol: %s | jugadores x%d | inicio en %ds", this.config.spawnX, this.config.spawnY, this.config.spawnZ, this.config.rounds, selectedEnemyType, roleSuffix, this.config.playerMultiplier, START_COUNTDOWN_SECONDS)));
         this.broadcastHordeStartAnnouncement(selectedEnemyType, selectedRole, this.config.playerMultiplier);
-        this.spawnNextRound(newSession, new Vector3f(startedBy.getTransform().getRotation()));
-        return OperationResult.ok("Horda iniciada.");
+        return OperationResult.ok("Horda iniciada. Cuenta atras: 3..2..1.");
     }
 
     public synchronized OperationResult stop(boolean cleanupAliveEnemies) {
@@ -415,6 +420,20 @@ public final class HordeService {
                 if (removed > 0) {
                     trackedSession.totalKilled += removed;
                 }
+                if (!trackedSession.roundActive && trackedSession.currentRound == 0 && trackedSession.startCountdownSeconds >= 0) {
+                    if (trackedSession.startCountdownSeconds > 0) {
+                        this.broadcastHordeCountdownAnnouncement(trackedSession.startCountdownSeconds, trackedSession.enemyType, trackedSession.role);
+                        trackedSession.world.sendMessage(Message.raw((String)("La horda comienza en " + trackedSession.startCountdownSeconds + "...")));
+                        trackedSession.startCountdownSeconds = trackedSession.startCountdownSeconds - 1;
+                        trackedSession.nextRoundAtMillis = System.currentTimeMillis() + 1000L;
+                    } else {
+                        this.broadcastHordeCountdownGoAnnouncement(1, this.config.rounds);
+                        trackedSession.startCountdownSeconds = -1;
+                        this.spawnNextRound(trackedSession, new Vector3f(trackedSession.startRotation));
+                    }
+                    this.refreshStatusHud(trackedSession);
+                    return;
+                }
                 if (trackedSession.roundActive && trackedSession.activeEnemies.isEmpty()) {
                     trackedSession.roundActive = false;
                     this.grantRoundRewards(trackedSession, trackedSession.currentRound);
@@ -423,7 +442,9 @@ public final class HordeService {
                         return;
                     }
                     trackedSession.nextRoundAtMillis = System.currentTimeMillis() + (long)this.config.waveDelaySeconds * 1000L;
+                    boolean rewardUnlocked = trackedSession.currentRound > 0 && this.config.rewardEveryRounds > 0 && trackedSession.currentRound % this.config.rewardEveryRounds == 0;
                     world.sendMessage(Message.raw((String)("Ronda " + trackedSession.currentRound + " completada. La siguiente ronda empieza en " + this.config.waveDelaySeconds + "s.")));
+                    this.broadcastRoundCompleteAnnouncement(trackedSession.currentRound, this.config.rounds, this.config.waveDelaySeconds, trackedSession.totalKilled, trackedSession.totalSpawned, rewardUnlocked);
                 }
                 if (!trackedSession.roundActive && trackedSession.currentRound < this.config.rounds && System.currentTimeMillis() >= trackedSession.nextRoundAtMillis) {
                     this.spawnNextRound(trackedSession, Vector3f.ZERO);
@@ -514,12 +535,46 @@ public final class HordeService {
 
     private void broadcastHordeStartAnnouncement(String enemyType, String role, int playerMultiplier) {
         try {
-            String titleText = "HORDA PVE INICIADA";
-            String subtitleText = String.format(Locale.ROOT, "Tipo: %s | Rol: %s | Rondas: %d | Jugadores x%d", enemyType, role, this.config.rounds, playerMultiplier);
+            String titleText = "HORDA PVE PREPARADA";
+            String subtitleText = String.format(Locale.ROOT, "Tipo: %s | Rol: %s | Rondas: %d | Jugadores x%d | Inicio en %ds", enemyType, role, this.config.rounds, playerMultiplier, START_COUNTDOWN_SECONDS);
             EventTitleUtil.showEventTitleToUniverse(Message.raw((String)titleText), Message.raw((String)subtitleText), true, "", 4.0f, 1.0f, 1.0f);
         }
         catch (Exception ex) {
             this.plugin.getLogger().at(Level.WARNING).log("No se pudo mostrar anuncio global de inicio de horda: %s", (Object)ex.getMessage());
+        }
+    }
+
+    private void broadcastHordeCountdownAnnouncement(int secondsRemaining, String enemyType, String role) {
+        try {
+            String titleText = "HORDA EN " + secondsRemaining + "...";
+            String subtitleText = String.format(Locale.ROOT, "Tipo: %s | Rol: %s", enemyType, role);
+            EventTitleUtil.showEventTitleToUniverse(Message.raw((String)titleText), Message.raw((String)subtitleText), true, "", 0.8f, 0.15f, 0.15f);
+        }
+        catch (Exception ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo mostrar countdown de horda: %s", (Object)ex.getMessage());
+        }
+    }
+
+    private void broadcastHordeCountdownGoAnnouncement(int round, int totalRounds) {
+        try {
+            String titleText = "A LUCHAR";
+            String subtitleText = String.format(Locale.ROOT, "Ronda %d/%d iniciada", round, totalRounds);
+            EventTitleUtil.showEventTitleToUniverse(Message.raw((String)titleText), Message.raw((String)subtitleText), true, "", 2.2f, 0.25f, 0.35f);
+        }
+        catch (Exception ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo mostrar anuncio GO de horda: %s", (Object)ex.getMessage());
+        }
+    }
+
+    private void broadcastRoundCompleteAnnouncement(int completedRound, int totalRounds, int nextDelaySeconds, int totalKilled, int totalSpawned, boolean rewardUnlocked) {
+        try {
+            String titleText = String.format(Locale.ROOT, "RONDA %d/%d COMPLETADA", completedRound, totalRounds);
+            String rewardText = rewardUnlocked ? " | Recompensa desbloqueada" : "";
+            String subtitleText = String.format(Locale.ROOT, "Siguiente en %ds | Kills: %d | Spawn: %d%s", nextDelaySeconds, totalKilled, totalSpawned, rewardText);
+            EventTitleUtil.showEventTitleToUniverse(Message.raw((String)titleText), Message.raw((String)subtitleText), true, "", 2.8f, 0.4f, 0.5f);
+        }
+        catch (Exception ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo mostrar anuncio de ronda completada: %s", (Object)ex.getMessage());
         }
     }
 
@@ -635,7 +690,7 @@ public final class HordeService {
         if (fallbackRole != null) {
             return fallbackRole;
         }
-        return roles.get(0);
+        return HordeService.findFirstAllowedRole(roles);
     }
 
     private static List<String> findSupportedEnemyTypes(List<String> roles) {
@@ -661,12 +716,14 @@ public final class HordeService {
         }
         for (String hint : hints) {
             for (String role : roles) {
+                if (HordeService.isBlockedEnemyRole(role)) continue;
                 if (!role.equalsIgnoreCase(hint)) continue;
                 return role;
             }
         }
         for (String hint : hints) {
             for (String role : roles) {
+                if (HordeService.isBlockedEnemyRole(role)) continue;
                 if (!role.toLowerCase(Locale.ROOT).contains(hint)) continue;
                 return role;
             }
@@ -679,6 +736,7 @@ public final class HordeService {
             return null;
         }
         for (String role : roles) {
+            if (HordeService.isBlockedEnemyRole(role)) continue;
             if (!role.equalsIgnoreCase(requestedRole)) {
                 continue;
             }
@@ -694,12 +752,39 @@ public final class HordeService {
         }
         String normalizedToken = token.trim().toLowerCase(Locale.ROOT);
         for (String role : roles) {
+            if (HordeService.isBlockedEnemyRole(role)) continue;
             if (!role.toLowerCase(Locale.ROOT).contains(normalizedToken)) {
                 continue;
             }
             matches.add(role);
         }
         return matches;
+    }
+
+    private static String findFirstAllowedRole(List<String> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return null;
+        }
+        for (String role : roles) {
+            if (HordeService.isBlockedEnemyRole(role)) continue;
+            return role;
+        }
+        return null;
+    }
+
+    private static boolean isBlockedEnemyRole(String role) {
+        if (role == null || role.isBlank()) {
+            return true;
+        }
+        String normalizedRole = role.toLowerCase(Locale.ROOT);
+        if (normalizedRole.equals("cat") || normalizedRole.contains("/cat") || normalizedRole.contains("cat/") || normalizedRole.contains("-cat") || normalizedRole.contains("cat-") || normalizedRole.contains("_cat") || normalizedRole.contains("cat_")) {
+            return true;
+        }
+        for (String blockedHint : BLOCKED_ENEMY_ROLE_HINTS) {
+            if (!normalizedRole.contains(blockedHint)) continue;
+            return true;
+        }
+        return false;
     }
 
     private static String normalizeEnemyType(String input) {
@@ -1058,16 +1143,18 @@ public final class HordeService {
         private final List<String> availableRoles;
         private final List<String> randomEnemyTypes;
         private final int playerMultiplier;
+        private final Vector3f startRotation;
         private final Set<Ref<EntityStore>> activeEnemies;
         private int currentRound;
         private int totalSpawned;
         private int totalKilled;
         private boolean roundActive;
+        private int startCountdownSeconds;
         private long nextRoundAtMillis;
         private final long startedAtMillis;
         private ScheduledFuture<?> ticker;
 
-        private HordeSession(World world, Store<EntityStore> store, String role, String enemyType, List<String> availableRoles, int playerMultiplier, String forcedRole, List<String> randomEnemyTypes) {
+        private HordeSession(World world, Store<EntityStore> store, String role, String enemyType, List<String> availableRoles, int playerMultiplier, String forcedRole, List<String> randomEnemyTypes, Vector3f startRotation, int startCountdownSeconds) {
             this.world = world;
             this.store = store;
             this.role = role;
@@ -1076,11 +1163,13 @@ public final class HordeService {
             this.availableRoles = availableRoles == null ? new ArrayList<String>() : new ArrayList<String>(availableRoles);
             this.randomEnemyTypes = randomEnemyTypes == null ? new ArrayList<String>() : new ArrayList<String>(randomEnemyTypes);
             this.playerMultiplier = Math.max(MIN_PLAYER_MULTIPLIER, playerMultiplier);
+            this.startRotation = startRotation == null ? Vector3f.ZERO : new Vector3f(startRotation);
             this.activeEnemies = new HashSet<Ref<EntityStore>>();
             this.currentRound = 0;
             this.totalSpawned = 0;
             this.totalKilled = 0;
             this.roundActive = false;
+            this.startCountdownSeconds = Math.max(0, startCountdownSeconds);
             this.nextRoundAtMillis = 0L;
             this.startedAtMillis = System.currentTimeMillis();
         }

@@ -55,7 +55,7 @@ Group {
 
   Label #Step4 {
     Anchor: (Left: 94, Top: 430, Width: 706, Height: 28);
-    Text: "4) Guarda y pulsa iniciar horda (o /hordapve start).";
+    Text: "4) Guarda y pulsa iniciar horda (se anuncia 3..2..1).";
     Style: (FontSize: 15, TextColor: #d5e4f8, VerticalAlignment: Center);
   }
 
@@ -91,7 +91,7 @@ Group {
 
   Label #Cmd4 {
     Anchor: (Left: 94, Top: 618, Width: 706, Height: 24);
-    Text: "/hordapve reward <rondas> | /hordareload config";
+    Text: "/hordapve reward <rondas> | /hordareload config | alias: /hordepve";
     Style: (FontSize: 13, TextColor: #9db6d6, VerticalAlignment: Center);
   }
 

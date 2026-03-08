@@ -10,6 +10,8 @@ Mod de Hytale para crear hordas PVE por rondas con configuracion en UI.
 - Recompensas como `item` dropeado en el centro de la horda.
 - Escalado por jugadores (`playerMultiplier`).
 - Anuncio grande en pantalla al inicio y al final de la horda.
+- Cuenta atras global `3..2..1` antes de empezar la primera ronda.
+- Anuncio grande al completar cada ronda con datos clave (siguiente ronda, kills, spawn, recompensa).
 - Panel de estado opcional (`/hordapve hud`).
 
 ## Guia rapida (paso a paso)
@@ -31,6 +33,7 @@ Mod de Hytale para crear hordas PVE por rondas con configuracion en UI.
 - `/hordahelp` abre ayuda en UI.
 - `/hordahelp chat` envia ayuda en chat.
 - `/hordapve` abre UI de configuracion.
+- `/hordepve` alias de `/hordapve` (mismos subcomandos).
 - `/hordapve help` abre ayuda.
 - `/hordapve start`
 - `/hordapve stop`
@@ -66,6 +69,8 @@ No existen comandos `/cerrar` ni `/holi`.
 
 Importante: algunos tipos pueden no existir en todos los modpacks.  
 Usa `/hordapve tipos` para verificar en tu instalacion que rol real se detecta para cada tipo.
+
+Nota: los roles tipo gato/mascota se filtran para que no salgan como enemigos de horda.
 
 ## Recompensas
 
