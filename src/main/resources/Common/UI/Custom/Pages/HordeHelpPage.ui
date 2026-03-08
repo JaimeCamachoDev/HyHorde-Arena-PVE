@@ -49,7 +49,7 @@ Group {
 
   Label #Step3 {
     Anchor: (Left: 94, Top: 400, Width: 706, Height: 28);
-    Text: "3) Ajusta rondas, enemigos y recompensas de item.";
+    Text: "3) Ajusta rondas, enemigos y recompensas con los botones < >.";
     Style: (FontSize: 15, TextColor: #d5e4f8, VerticalAlignment: Center);
   }
 
@@ -79,19 +79,19 @@ Group {
 
   Label #Cmd2 {
     Anchor: (Left: 94, Top: 566, Width: 706, Height: 24);
-    Text: "/hordapve enemy <tipo> | /hordapve tipos";
+    Text: "/hordapve enemy <tipo> | /hordapve tipos (mapeo real)";
     Style: (FontSize: 14, TextColor: #c0d5ef, VerticalAlignment: Center);
   }
 
   Label #Cmd3 {
     Anchor: (Left: 94, Top: 592, Width: 706, Height: 24);
-    Text: "/hordapve reward <rondas> | /hordareload config";
+    Text: "/hordapve role <rolNpc|auto> | /hordapve roles";
     Style: (FontSize: 14, TextColor: #c0d5ef, VerticalAlignment: Center);
   }
 
   Label #Cmd4 {
     Anchor: (Left: 94, Top: 618, Width: 706, Height: 24);
-    Text: "Tipos: auto, random, bandit, goblin, skeleton, zombie, spider, wolf, wraith, void, demon, beast";
+    Text: "/hordapve reward <rondas> | /hordareload config";
     Style: (FontSize: 13, TextColor: #9db6d6, VerticalAlignment: Center);
   }
 

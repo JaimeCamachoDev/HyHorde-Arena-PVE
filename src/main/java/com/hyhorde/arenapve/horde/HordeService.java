@@ -106,8 +106,44 @@ public final class HordeService {
         return new ArrayList<String>(ENEMY_TYPE_OPTIONS);
     }
 
+    public synchronized List<String> getEnemyTypeOptionsForCurrentRoles() {
+        List<String> roles = this.getAvailableRoles();
+        if (roles.isEmpty()) {
+            return this.getEnemyTypeOptions();
+        }
+        ArrayList<String> options = new ArrayList<String>();
+        options.add("auto");
+        options.add("random");
+        options.addAll(HordeService.findSupportedEnemyTypes(roles));
+        return options;
+    }
+
+    public synchronized List<String> getEnemyTypeDiagnostics() {
+        List<String> roles = this.getAvailableRoles();
+        ArrayList<String> diagnostics = new ArrayList<String>();
+        for (String enemyType : ENEMY_TYPE_OPTIONS) {
+            if ("auto".equals(enemyType)) {
+                String autoRole = HordeService.resolveAutoRole(roles);
+                diagnostics.add(autoRole == null ? "auto -> sin rol compatible" : "auto -> " + autoRole);
+                continue;
+            }
+            if ("random".equals(enemyType)) {
+                List<String> supportedRandomTypes = HordeService.findSupportedEnemyTypes(roles);
+                diagnostics.add(supportedRandomTypes.isEmpty() ? "random -> sin tipos compatibles" : "random -> " + String.join((CharSequence)", ", supportedRandomTypes));
+                continue;
+            }
+            String mappedRole = HordeService.resolveRoleForEnemyType(roles, enemyType);
+            diagnostics.add(mappedRole == null ? enemyType + " -> NO DISPONIBLE" : enemyType + " -> " + mappedRole);
+        }
+        return diagnostics;
+    }
+
     public synchronized List<String> getRewardItemSuggestions() {
         return new ArrayList<String>(REWARD_ITEM_SUGGESTIONS);
+    }
+
+    public synchronized String getConfiguredNpcRole() {
+        return HordeService.safeRoleValue(this.config.npcRole);
     }
 
     public synchronized String getLogsPathHint() {
@@ -144,6 +180,12 @@ public final class HordeService {
         if (!ENEMY_TYPE_HINTS.containsKey(enemyType)) {
             return OperationResult.fail("Tipo invalido. Usa uno de: " + String.join((CharSequence)", ", ENEMY_TYPE_OPTIONS));
         }
+        if (!"auto".equals(enemyType) && !"random".equals(enemyType)) {
+            List<String> roles = this.getAvailableRoles();
+            if (!roles.isEmpty() && HordeService.resolveRoleForEnemyType(roles, enemyType) == null) {
+                return OperationResult.fail("El tipo '" + enemyType + "' no tiene rol compatible en este modpack. Usa /hordapve tipos para revisar.");
+            }
+        }
         this.config.enemyType = enemyType;
         this.saveConfig();
         if ("auto".equals(enemyType)) {
@@ -153,6 +195,34 @@ public final class HordeService {
             return OperationResult.ok("Tipo de enemigo en modo aleatorio por spawn.");
         }
         return OperationResult.ok("Tipo de enemigo configurado en: " + enemyType);
+    }
+
+    public synchronized OperationResult setNpcRole(String npcRoleInput) {
+        String raw = HordeService.safeRoleValue(npcRoleInput).trim();
+        if (raw.isEmpty() || "auto".equalsIgnoreCase(raw) || "clear".equalsIgnoreCase(raw) || "none".equalsIgnoreCase(raw) || "default".equalsIgnoreCase(raw)) {
+            this.config.npcRole = "";
+            this.saveConfig();
+            return OperationResult.ok("Override de rol NPC desactivado. Se volvera a usar enemyType.");
+        }
+        List<String> roles = this.getAvailableRoles();
+        if (roles.isEmpty()) {
+            return OperationResult.fail("No hay roles de NPC disponibles para validar '" + raw + "'.");
+        }
+        String resolvedRole = HordeService.findRoleByExactName(roles, raw);
+        if (resolvedRole == null) {
+            List<String> similarRoles = HordeService.findRolesByContains(roles, raw);
+            if (similarRoles.size() == 1) {
+                resolvedRole = similarRoles.get(0);
+            } else if (similarRoles.size() > 1) {
+                return OperationResult.fail("Rol ambiguo '" + raw + "'. Coincidencias: " + String.join((CharSequence)", ", similarRoles));
+            }
+        }
+        if (resolvedRole == null) {
+            return OperationResult.fail("Rol NPC no encontrado: '" + raw + "'. Usa /hordapve roles.");
+        }
+        this.config.npcRole = resolvedRole;
+        this.saveConfig();
+        return OperationResult.ok("Rol NPC forzado a: " + resolvedRole);
     }
 
     public synchronized OperationResult setRewardEveryRounds(int everyRounds) {
@@ -273,11 +343,37 @@ public final class HordeService {
             this.saveConfig();
         }
         String selectedEnemyType = HordeService.normalizeEnemyType(this.config.enemyType);
-        String roleTypeForStart = HordeService.isRandomEnemyType(selectedEnemyType) ? "auto" : selectedEnemyType;
-        String selectedRole = HordeService.chooseRole(roles, roleTypeForStart, this.config.npcRole);
-        this.session = newSession = new HordeSession(world, store, selectedRole, selectedEnemyType, new ArrayList<String>(roles), this.config.playerMultiplier);
+        String forcedRole = HordeService.findRoleByExactName(roles, this.config.npcRole);
+        if (forcedRole == null && this.config.npcRole != null && !this.config.npcRole.isBlank()) {
+            this.plugin.getLogger().at(Level.WARNING).log("El rol NPC forzado '%s' no existe. Se desactivara override.", (Object)this.config.npcRole);
+            this.config.npcRole = "";
+            this.saveConfig();
+        }
+        List<String> supportedEnemyTypes = HordeService.findSupportedEnemyTypes(roles);
+        String selectedRole = null;
+        if (forcedRole != null) {
+            selectedRole = forcedRole;
+        } else if (HordeService.isRandomEnemyType(selectedEnemyType)) {
+            String initialRandomType = HordeService.pickRandomEnemyType(supportedEnemyTypes);
+            selectedRole = HordeService.resolveRoleForEnemyType(roles, initialRandomType);
+            if (selectedRole == null) {
+                selectedRole = HordeService.resolveAutoRole(roles);
+            }
+        } else if ("auto".equals(selectedEnemyType)) {
+            selectedRole = HordeService.resolveAutoRole(roles);
+        } else {
+            selectedRole = HordeService.resolveRoleForEnemyType(roles, selectedEnemyType);
+            if (selectedRole == null) {
+                return OperationResult.fail("El tipo '" + selectedEnemyType + "' no tiene rol NPC compatible en este modpack. Usa /hordapve tipos.");
+            }
+        }
+        if (selectedRole == null) {
+            return OperationResult.fail("No se pudo resolver un rol NPC compatible para iniciar la horda.");
+        }
+        this.session = newSession = new HordeSession(world, store, selectedRole, selectedEnemyType, new ArrayList<String>(roles), this.config.playerMultiplier, forcedRole, supportedEnemyTypes);
         newSession.ticker = HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> this.tickSession(newSession), 1000L, 1000L, TimeUnit.MILLISECONDS);
-        world.sendMessage(Message.raw((String)String.format(Locale.ROOT, "Horda PVE iniciada en %.2f %.2f %.2f | %d rondas | tipo: %s | rol: %s | jugadores x%d", this.config.spawnX, this.config.spawnY, this.config.spawnZ, this.config.rounds, selectedEnemyType, selectedRole, this.config.playerMultiplier)));
+        String roleSuffix = forcedRole == null ? selectedRole : selectedRole + " (forzado)";
+        world.sendMessage(Message.raw((String)String.format(Locale.ROOT, "Horda PVE iniciada en %.2f %.2f %.2f | %d rondas | tipo: %s | rol: %s | jugadores x%d", this.config.spawnX, this.config.spawnY, this.config.spawnZ, this.config.rounds, selectedEnemyType, roleSuffix, this.config.playerMultiplier)));
         this.broadcastHordeStartAnnouncement(selectedEnemyType, selectedRole, this.config.playerMultiplier);
         this.spawnNextRound(newSession, new Vector3f(startedBy.getTransform().getRotation()));
         return OperationResult.ok("Horda iniciada.");
@@ -353,9 +449,17 @@ public final class HordeService {
             Vector3d spawnPosition = new Vector3d(center).add(offsetX, 0.0, offsetZ);
             try {
                 String roleForSpawn = sessionToAdvance.role;
-                if (HordeService.isRandomEnemyType(sessionToAdvance.enemyType)) {
-                    String randomEnemyType = HordeService.pickRandomEnemyType();
-                    roleForSpawn = HordeService.chooseRole(sessionToAdvance.availableRoles, randomEnemyType, this.config.npcRole);
+                if (sessionToAdvance.forcedRole != null && !sessionToAdvance.forcedRole.isBlank()) {
+                    roleForSpawn = sessionToAdvance.forcedRole;
+                } else if (HordeService.isRandomEnemyType(sessionToAdvance.enemyType)) {
+                    String randomEnemyType = HordeService.pickRandomEnemyType(sessionToAdvance.randomEnemyTypes);
+                    String resolvedRandomRole = HordeService.resolveRoleForEnemyType(sessionToAdvance.availableRoles, randomEnemyType);
+                    if (resolvedRandomRole != null) {
+                        roleForSpawn = resolvedRandomRole;
+                    }
+                }
+                if (roleForSpawn == null || roleForSpawn.isBlank()) {
+                    continue;
                 }
                 Pair created = NPCPlugin.get().spawnNPC(sessionToAdvance.store, roleForSpawn, null, spawnPosition, new Vector3f(baseRotation));
                 if (created == null || created.left() == null) continue;
@@ -508,30 +612,47 @@ public final class HordeService {
         this.statusPages.clear();
     }
 
-    private static String chooseRole(List<String> roles, String selectedEnemyType, String legacyConfiguredRole) {
+    private static String resolveRoleForEnemyType(List<String> roles, String selectedEnemyType) {
+        if (roles == null || roles.isEmpty()) {
+            return null;
+        }
         String normalizedType = HordeService.normalizeEnemyType(selectedEnemyType);
-        if ("random".equals(normalizedType)) {
-            normalizedType = "auto";
+        if ("auto".equals(normalizedType) || "random".equals(normalizedType)) {
+            return HordeService.resolveAutoRole(roles);
         }
         String[] preferredHints = ENEMY_TYPE_HINTS.get(normalizedType);
         if (preferredHints == null || preferredHints.length == 0) {
-            preferredHints = ENEMY_TYPE_HINTS.get("auto");
+            return null;
         }
-        String roleByType = HordeService.findRoleByHints(roles, preferredHints);
-        if (roleByType != null) {
-            return roleByType;
-        }
-        if (legacyConfiguredRole != null && !legacyConfiguredRole.isBlank()) {
-            for (String role : roles) {
-                if (!role.equalsIgnoreCase(legacyConfiguredRole)) continue;
-                return role;
-            }
+        return HordeService.findRoleByHints(roles, preferredHints);
+    }
+
+    private static String resolveAutoRole(List<String> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return null;
         }
         String fallbackRole = HordeService.findRoleByHints(roles, ENEMY_TYPE_HINTS.get("auto"));
         if (fallbackRole != null) {
             return fallbackRole;
         }
         return roles.get(0);
+    }
+
+    private static List<String> findSupportedEnemyTypes(List<String> roles) {
+        ArrayList<String> supported = new ArrayList<String>();
+        if (roles == null || roles.isEmpty()) {
+            return supported;
+        }
+        for (String enemyType : ENEMY_TYPE_OPTIONS) {
+            if ("auto".equals(enemyType) || "random".equals(enemyType)) {
+                continue;
+            }
+            if (HordeService.resolveRoleForEnemyType(roles, enemyType) == null) {
+                continue;
+            }
+            supported.add(enemyType);
+        }
+        return supported;
     }
 
     private static String findRoleByHints(List<String> roles, String[] hints) {
@@ -553,6 +674,34 @@ public final class HordeService {
         return null;
     }
 
+    private static String findRoleByExactName(List<String> roles, String requestedRole) {
+        if (roles == null || roles.isEmpty() || requestedRole == null || requestedRole.isBlank()) {
+            return null;
+        }
+        for (String role : roles) {
+            if (!role.equalsIgnoreCase(requestedRole)) {
+                continue;
+            }
+            return role;
+        }
+        return null;
+    }
+
+    private static List<String> findRolesByContains(List<String> roles, String token) {
+        ArrayList<String> matches = new ArrayList<String>();
+        if (roles == null || roles.isEmpty() || token == null || token.isBlank()) {
+            return matches;
+        }
+        String normalizedToken = token.trim().toLowerCase(Locale.ROOT);
+        for (String role : roles) {
+            if (!role.toLowerCase(Locale.ROOT).contains(normalizedToken)) {
+                continue;
+            }
+            matches.add(role);
+        }
+        return matches;
+    }
+
     private static String normalizeEnemyType(String input) {
         if (input == null || input.isBlank()) {
             return "auto";
@@ -571,16 +720,16 @@ public final class HordeService {
         LinkedHashMap<String, String[]> hints = new LinkedHashMap<String, String[]>();
         hints.put("auto", new String[]{"enemy", "hostile", "bandit", "goblin", "skeleton", "zombie", "spider", "wolf", "wraith", "void", "demon", "beast"});
         hints.put("random", new String[]{"enemy", "hostile", "bandit", "goblin", "skeleton", "zombie", "spider", "wolf", "wraith", "void", "demon", "beast"});
-        hints.put("bandit", new String[]{"bandit", "raider", "outlaw"});
+        hints.put("bandit", new String[]{"bandit", "raider", "outlaw", "brigand", "thug"});
         hints.put("goblin", new String[]{"goblin"});
         hints.put("skeleton", new String[]{"skeleton"});
-        hints.put("zombie", new String[]{"zombie", "undead"});
+        hints.put("zombie", new String[]{"zombie", "undead", "ghoul", "walker"});
         hints.put("spider", new String[]{"spider", "arachnid"});
-        hints.put("wolf", new String[]{"wolf", "direwolf"});
+        hints.put("wolf", new String[]{"wolf", "direwolf", "warg"});
         hints.put("wraith", new String[]{"wraith", "ghost", "specter"});
-        hints.put("void", new String[]{"void", "corrupt"});
+        hints.put("void", new String[]{"void", "corrupt", "corruption", "abyss"});
         hints.put("demon", new String[]{"demon", "fiend"});
-        hints.put("beast", new String[]{"beast", "monster"});
+        hints.put("beast", new String[]{"beast", "monster", "creature"});
         return hints;
     }
 
@@ -613,6 +762,14 @@ public final class HordeService {
 
     private static boolean isRandomEnemyType(String enemyType) {
         return "random".equals(HordeService.normalizeEnemyType(enemyType));
+    }
+
+    private static String pickRandomEnemyType(List<String> preferredTypes) {
+        if (preferredTypes != null && !preferredTypes.isEmpty()) {
+            int randomIndex = ThreadLocalRandom.current().nextInt(preferredTypes.size());
+            return preferredTypes.get(randomIndex);
+        }
+        return HordeService.pickRandomEnemyType();
     }
 
     private static String pickRandomEnemyType() {
@@ -704,7 +861,15 @@ public final class HordeService {
         }
         String appData = System.getenv("APPDATA");
         if (appData != null && !appData.isBlank()) {
-            return Path.of(appData, "Hytale", "UserData", "Saves", "Mod-Test", "logs").toString();
+            Path saveLogs = Path.of(appData, "Hytale", "UserData", "Saves", "Mod-Test", "logs");
+            if (Files.exists(saveLogs, new LinkOption[0])) {
+                return saveLogs.toString();
+            }
+            Path legacyLogs = Path.of(appData, "Hytale", "UserData", "Logs");
+            if (Files.exists(legacyLogs, new LinkOption[0])) {
+                return legacyLogs.toString();
+            }
+            return saveLogs.toString();
         }
         String userHome = System.getProperty("user.home", ".");
         return Path.of(userHome, "AppData", "Roaming", "Hytale", "UserData", "Saves", "Mod-Test", "logs").toString();
@@ -803,6 +968,9 @@ public final class HordeService {
             sanitized.enemyType = "auto";
         }
         sanitized.npcRole = HordeService.safeRoleValue(sanitized.npcRole).trim();
+        if ("auto".equalsIgnoreCase(sanitized.npcRole) || "none".equalsIgnoreCase(sanitized.npcRole) || "clear".equalsIgnoreCase(sanitized.npcRole) || "default".equalsIgnoreCase(sanitized.npcRole)) {
+            sanitized.npcRole = "";
+        }
         sanitized.worldName = sanitized.worldName == null || sanitized.worldName.isBlank() ? "default" : sanitized.worldName;
         return sanitized;
     }
@@ -885,8 +1053,10 @@ public final class HordeService {
         private final World world;
         private final Store<EntityStore> store;
         private final String role;
+        private final String forcedRole;
         private final String enemyType;
         private final List<String> availableRoles;
+        private final List<String> randomEnemyTypes;
         private final int playerMultiplier;
         private final Set<Ref<EntityStore>> activeEnemies;
         private int currentRound;
@@ -897,12 +1067,14 @@ public final class HordeService {
         private final long startedAtMillis;
         private ScheduledFuture<?> ticker;
 
-        private HordeSession(World world, Store<EntityStore> store, String role, String enemyType, List<String> availableRoles, int playerMultiplier) {
+        private HordeSession(World world, Store<EntityStore> store, String role, String enemyType, List<String> availableRoles, int playerMultiplier, String forcedRole, List<String> randomEnemyTypes) {
             this.world = world;
             this.store = store;
             this.role = role;
+            this.forcedRole = forcedRole;
             this.enemyType = enemyType;
             this.availableRoles = availableRoles == null ? new ArrayList<String>() : new ArrayList<String>(availableRoles);
+            this.randomEnemyTypes = randomEnemyTypes == null ? new ArrayList<String>() : new ArrayList<String>(randomEnemyTypes);
             this.playerMultiplier = Math.max(MIN_PLAYER_MULTIPLIER, playerMultiplier);
             this.activeEnemies = new HashSet<Ref<EntityStore>>();
             this.currentRound = 0;

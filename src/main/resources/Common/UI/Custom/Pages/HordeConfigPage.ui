@@ -3,45 +3,45 @@ Group {
 
   Panel #Overlay {
     Anchor: (Left: 0, Top: 0, Width: 1920, Height: 1080);
-    Background: #000000(0.52);
+    Background: #000000(0.42);
   }
 
   Panel #Card {
-    Anchor: (Left: 410, Top: 90, Width: 1100, Height: 930);
-    Background: #141f2e;
+    Anchor: (Left: 460, Top: 90, Width: 1000, Height: 900);
+    Background: #142131;
   }
 
   Panel #Header {
-    Anchor: (Left: 410, Top: 90, Width: 1100, Height: 110);
-    Background: #1f3147;
+    Anchor: (Left: 460, Top: 90, Width: 1000, Height: 96);
+    Background: #1f3249;
   }
 
   Label #TitleLabel {
-    Anchor: (Left: 448, Top: 120, Width: 700, Height: 40);
+    Anchor: (Left: 492, Top: 112, Width: 520, Height: 34);
     Text: "Horda PVE Config";
-    Style: (FontSize: 30, TextColor: #f4f7fc, RenderBold: true);
+    Style: (FontSize: 29, TextColor: #f1f7ff, RenderBold: true, VerticalAlignment: Center);
   }
 
   Label #SubTitleLabel {
-    Anchor: (Left: 448, Top: 162, Width: 780, Height: 26);
-    Text: "Configura rondas, spawn, tipo de enemigo y recompensas";
-    Style: (FontSize: 14, TextColor: #b9c8db);
+    Anchor: (Left: 492, Top: 146, Width: 740, Height: 24);
+    Text: "Config minima: centro, dificultad, enemigo y recompensa";
+    Style: (FontSize: 14, TextColor: #b8cadf, VerticalAlignment: Center);
   }
 
   Label #SpawnStateLabel {
-    Anchor: (Left: 448, Top: 220, Width: 1020, Height: 26);
+    Anchor: (Left: 492, Top: 206, Width: 936, Height: 24);
     Text: "";
-    Style: (FontSize: 14, TextColor: #c5d5e8, RenderBold: true);
+    Style: (FontSize: 13, TextColor: #cfe0f3, RenderBold: true, VerticalAlignment: Center);
   }
 
   Label #SpawnLabel {
-    Anchor: (Left: 448, Top: 262, Width: 220, Height: 28);
-    Text: "Spawn (X Y Z)";
-    Style: (FontSize: 16, TextColor: #dbe8f8, RenderBold: true, VerticalAlignment: Center);
+    Anchor: (Left: 492, Top: 240, Width: 170, Height: 28);
+    Text: "Centro (X Y Z)";
+    Style: (FontSize: 15, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextField #SpawnX {
-    Anchor: (Left: 674, Top: 262, Width: 140, Height: 34);
+    Anchor: (Left: 668, Top: 238, Width: 118, Height: 34);
     Value: "0.00";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -49,7 +49,7 @@ Group {
   }
 
   TextField #SpawnY {
-    Anchor: (Left: 826, Top: 262, Width: 140, Height: 34);
+    Anchor: (Left: 792, Top: 238, Width: 118, Height: 34);
     Value: "64.00";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -57,7 +57,7 @@ Group {
   }
 
   TextField #SpawnZ {
-    Anchor: (Left: 978, Top: 262, Width: 140, Height: 34);
+    Anchor: (Left: 916, Top: 238, Width: 118, Height: 34);
     Value: "0.00";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -65,7 +65,7 @@ Group {
   }
 
   TextButton #SetSpawnButton {
-    Anchor: (Left: 1130, Top: 262, Width: 330, Height: 34);
+    Anchor: (Left: 1044, Top: 238, Width: 384, Height: 34);
     Text: "Usar mi posicion actual";
     Style: TextButtonStyle(
       Default: (Background: #2e4565, LabelStyle: (FontSize: 13, TextColor: #f3f7ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -75,13 +75,13 @@ Group {
   }
 
   Label #RadiusLabel {
-    Anchor: (Left: 448, Top: 316, Width: 220, Height: 28);
+    Anchor: (Left: 492, Top: 284, Width: 170, Height: 28);
     Text: "Radio min / max";
-    Style: (FontSize: 16, TextColor: #dbe8f8, RenderBold: true, VerticalAlignment: Center);
+    Style: (FontSize: 15, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextField #MinRadius {
-    Anchor: (Left: 674, Top: 316, Width: 216, Height: 34);
+    Anchor: (Left: 668, Top: 282, Width: 182, Height: 34);
     Value: "5.00";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -89,7 +89,7 @@ Group {
   }
 
   TextField #MaxRadius {
-    Anchor: (Left: 902, Top: 316, Width: 216, Height: 34);
+    Anchor: (Left: 856, Top: 282, Width: 178, Height: 34);
     Value: "12.00";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -97,13 +97,13 @@ Group {
   }
 
   Label #RoundLabel {
-    Anchor: (Left: 448, Top: 370, Width: 220, Height: 28);
-    Text: "Total rondas";
-    Style: (FontSize: 16, TextColor: #dbe8f8, RenderBold: true, VerticalAlignment: Center);
+    Anchor: (Left: 492, Top: 338, Width: 150, Height: 24);
+    Text: "Rondas";
+    Style: (FontSize: 14, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextField #Rounds {
-    Anchor: (Left: 674, Top: 370, Width: 216, Height: 34);
+    Anchor: (Left: 492, Top: 362, Width: 136, Height: 34);
     Value: "5";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -111,13 +111,13 @@ Group {
   }
 
   Label #BaseEnemiesLabel {
-    Anchor: (Left: 448, Top: 424, Width: 220, Height: 28);
-    Text: "Enemigos base";
-    Style: (FontSize: 16, TextColor: #dbe8f8, RenderBold: true, VerticalAlignment: Center);
+    Anchor: (Left: 642, Top: 338, Width: 160, Height: 24);
+    Text: "Base ronda";
+    Style: (FontSize: 14, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextField #BaseEnemies {
-    Anchor: (Left: 674, Top: 424, Width: 216, Height: 34);
+    Anchor: (Left: 642, Top: 362, Width: 136, Height: 34);
     Value: "8";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -125,13 +125,13 @@ Group {
   }
 
   Label #EnemiesPerRoundLabel {
-    Anchor: (Left: 448, Top: 478, Width: 220, Height: 28);
-    Text: "Incremento por ronda";
-    Style: (FontSize: 16, TextColor: #dbe8f8, RenderBold: true, VerticalAlignment: Center);
+    Anchor: (Left: 792, Top: 338, Width: 180, Height: 24);
+    Text: "Inc. por ronda";
+    Style: (FontSize: 14, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextField #EnemiesPerRound {
-    Anchor: (Left: 674, Top: 478, Width: 216, Height: 34);
+    Anchor: (Left: 792, Top: 362, Width: 136, Height: 34);
     Value: "2";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -139,13 +139,13 @@ Group {
   }
 
   Label #WaveDelayLabel {
-    Anchor: (Left: 448, Top: 532, Width: 220, Height: 28);
-    Text: "Delay entre rondas (s)";
-    Style: (FontSize: 16, TextColor: #dbe8f8, RenderBold: true, VerticalAlignment: Center);
+    Anchor: (Left: 942, Top: 338, Width: 180, Height: 24);
+    Text: "Delay (s)";
+    Style: (FontSize: 14, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextField #WaveDelay {
-    Anchor: (Left: 674, Top: 532, Width: 216, Height: 34);
+    Anchor: (Left: 942, Top: 362, Width: 136, Height: 34);
     Value: "8";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -153,13 +153,13 @@ Group {
   }
 
   Label #PlayerMultiplierLabel {
-    Anchor: (Left: 902, Top: 532, Width: 180, Height: 28);
+    Anchor: (Left: 1092, Top: 338, Width: 170, Height: 24);
     Text: "Jugadores (x)";
-    Style: (FontSize: 16, TextColor: #dbe8f8, RenderBold: true, VerticalAlignment: Center);
+    Style: (FontSize: 14, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextField #PlayerMultiplier {
-    Anchor: (Left: 1088, Top: 532, Width: 120, Height: 34);
+    Anchor: (Left: 1092, Top: 362, Width: 136, Height: 34);
     Value: "1";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -167,13 +167,13 @@ Group {
   }
 
   Label #RoleLabel {
-    Anchor: (Left: 448, Top: 586, Width: 220, Height: 28);
+    Anchor: (Left: 492, Top: 422, Width: 200, Height: 28);
     Text: "Tipo enemigo";
-    Style: (FontSize: 16, TextColor: #dbe8f8, RenderBold: true, VerticalAlignment: Center);
+    Style: (FontSize: 16, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #EnemyTypePrevButton {
-    Anchor: (Left: 674, Top: 586, Width: 52, Height: 34);
+    Anchor: (Left: 668, Top: 422, Width: 46, Height: 34);
     Text: "<";
     Style: TextButtonStyle(
       Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -183,7 +183,7 @@ Group {
   }
 
   TextField #EnemyType {
-    Anchor: (Left: 732, Top: 586, Width: 288, Height: 34);
+    Anchor: (Left: 720, Top: 422, Width: 242, Height: 34);
     Value: "auto";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -191,7 +191,7 @@ Group {
   }
 
   TextButton #EnemyTypeNextButton {
-    Anchor: (Left: 1026, Top: 586, Width: 52, Height: 34);
+    Anchor: (Left: 968, Top: 422, Width: 46, Height: 34);
     Text: ">";
     Style: TextButtonStyle(
       Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -200,20 +200,30 @@ Group {
     );
   }
 
+  TextButton #RolesButton {
+    Anchor: (Left: 1020, Top: 422, Width: 132, Height: 34);
+    Text: "Ver tipos";
+    Style: TextButtonStyle(
+      Default: (Background: #2a3d58, LabelStyle: (FontSize: 13, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #38567b, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #4b74a5, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+    );
+  }
+
   Label #RoleHelpLabel {
-    Anchor: (Left: 1088, Top: 588, Width: 372, Height: 30);
-    Text: "auto, random, bandit, goblin, skeleton...";
-    Style: (FontSize: 13, TextColor: #9fb3cb, VerticalAlignment: Center);
+    Anchor: (Left: 668, Top: 458, Width: 760, Height: 22);
+    Text: "auto, random, bandit, goblin, skeleton, zombie, spider, wolf, wraith, void, demon, beast";
+    Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center);
   }
 
   Label #RewardEveryRoundsLabel {
-    Anchor: (Left: 448, Top: 640, Width: 220, Height: 28);
+    Anchor: (Left: 492, Top: 496, Width: 170, Height: 28);
     Text: "Recompensa cada";
-    Style: (FontSize: 16, TextColor: #dbe8f8, RenderBold: true, VerticalAlignment: Center);
+    Style: (FontSize: 16, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextField #RewardEveryRounds {
-    Anchor: (Left: 674, Top: 640, Width: 216, Height: 34);
+    Anchor: (Left: 668, Top: 494, Width: 136, Height: 34);
     Value: "2";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -221,43 +231,63 @@ Group {
   }
 
   Label #RewardCommandsLabel {
-    Anchor: (Left: 448, Top: 694, Width: 220, Height: 28);
+    Anchor: (Left: 492, Top: 544, Width: 170, Height: 28);
     Text: "Item recompensa";
-    Style: (FontSize: 16, TextColor: #dbe8f8, RenderBold: true, VerticalAlignment: Center);
+    Style: (FontSize: 16, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  TextButton #RewardItemPrevButton {
+    Anchor: (Left: 668, Top: 544, Width: 46, Height: 34);
+    Text: "<";
+    Style: TextButtonStyle(
+      Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #38567b, LabelStyle: (FontSize: 18, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #4b74a5, LabelStyle: (FontSize: 18, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+    );
   }
 
   TextField #RewardItemId {
-    Anchor: (Left: 674, Top: 694, Width: 550, Height: 34);
+    Anchor: (Left: 720, Top: 544, Width: 388, Height: 34);
     Value: "";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
     Background: #0f1825;
   }
 
-  TextButton #RewardTypesButton {
-    Anchor: (Left: 1236, Top: 694, Width: 224, Height: 34);
-    Text: "Ver rewards";
+  TextButton #RewardItemNextButton {
+    Anchor: (Left: 1114, Top: 544, Width: 46, Height: 34);
+    Text: ">";
     Style: TextButtonStyle(
-      Default: (Background: #2a3d58, LabelStyle: (FontSize: 14, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #38567b, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #4b74a5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+      Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #38567b, LabelStyle: (FontSize: 18, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #4b74a5, LabelStyle: (FontSize: 18, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+    );
+  }
+
+  TextButton #RewardTypesButton {
+    Anchor: (Left: 1166, Top: 544, Width: 120, Height: 34);
+    Text: "Ver lista";
+    Style: TextButtonStyle(
+      Default: (Background: #2a3d58, LabelStyle: (FontSize: 13, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #38567b, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #4b74a5, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
     );
   }
 
   Label #RewardCommandsHelpLabel {
-    Anchor: (Left: 674, Top: 731, Width: 360, Height: 22);
-    Text: "Ejemplo: item/weapon/sword-iron";
-    Style: (FontSize: 12, TextColor: #9fb3cb, VerticalAlignment: Center);
+    Anchor: (Left: 668, Top: 580, Width: 620, Height: 22);
+    Text: "Si no existe en tu pack, escribe un item id valido manualmente.";
+    Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center);
   }
 
   Label #RewardItemQuantityLabel {
-    Anchor: (Left: 1048, Top: 731, Width: 180, Height: 22);
-    Text: "Cantidad";
-    Style: (FontSize: 12, TextColor: #9fb3cb, VerticalAlignment: Center);
+    Anchor: (Left: 1294, Top: 548, Width: 80, Height: 22);
+    Text: "Cant.";
+    Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center);
   }
 
   TextField #RewardItemQuantity {
-    Anchor: (Left: 1228, Top: 726, Width: 232, Height: 28);
+    Anchor: (Left: 1376, Top: 544, Width: 52, Height: 34);
     Value: "1";
     Style: (FontSize: 14, TextColor: #e8f1ff);
     Padding: (Left: 8);
@@ -265,34 +295,24 @@ Group {
   }
 
   Label #StatusTitleLabel {
-    Anchor: (Left: 448, Top: 770, Width: 240, Height: 26);
+    Anchor: (Left: 492, Top: 620, Width: 220, Height: 26);
     Text: "Estado actual";
-    Style: (FontSize: 17, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
+    Style: (FontSize: 16, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
   Panel #StatusPanel {
-    Anchor: (Left: 448, Top: 800, Width: 1012, Height: 108);
+    Anchor: (Left: 492, Top: 648, Width: 936, Height: 130);
     Background: #0f1825;
   }
 
   Label #StatusLabel {
-    Anchor: (Left: 462, Top: 814, Width: 984, Height: 80);
+    Anchor: (Left: 506, Top: 662, Width: 908, Height: 102);
     Text: "";
-    Style: (FontSize: 14, TextColor: #d1e0f3, VerticalAlignment: Center);
-  }
-
-  TextButton #RolesButton {
-    Anchor: (Left: 448, Top: 930, Width: 180, Height: 44);
-    Text: "Ver tipos";
-    Style: TextButtonStyle(
-      Default: (Background: #2a3d58, LabelStyle: (FontSize: 15, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #38567b, LabelStyle: (FontSize: 15, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #4b74a5, LabelStyle: (FontSize: 15, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-    );
+    Style: (FontSize: 13, TextColor: #d1e0f3, VerticalAlignment: Center);
   }
 
   TextButton #SaveButton {
-    Anchor: (Left: 644, Top: 930, Width: 220, Height: 44);
+    Anchor: (Left: 492, Top: 810, Width: 220, Height: 44);
     Text: "Guardar config";
     Style: TextButtonStyle(
       Default: (Background: #265f3f, LabelStyle: (FontSize: 15, TextColor: #f4fff9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -302,7 +322,7 @@ Group {
   }
 
   TextButton #StartButton {
-    Anchor: (Left: 880, Top: 930, Width: 180, Height: 44);
+    Anchor: (Left: 728, Top: 810, Width: 200, Height: 44);
     Text: "Iniciar horda";
     Style: TextButtonStyle(
       Default: (Background: #1c7a4a, LabelStyle: (FontSize: 15, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -312,7 +332,7 @@ Group {
   }
 
   TextButton #StopButton {
-    Anchor: (Left: 880, Top: 930, Width: 180, Height: 44);
+    Anchor: (Left: 728, Top: 810, Width: 200, Height: 44);
     Text: "Detener horda";
     Visible: false;
     Style: TextButtonStyle(
@@ -323,7 +343,7 @@ Group {
   }
 
   TextButton #CloseButton {
-    Anchor: (Left: 1278, Top: 930, Width: 182, Height: 44);
+    Anchor: (Left: 1246, Top: 810, Width: 182, Height: 44);
     Text: "Cerrar";
     Style: TextButtonStyle(
       Default: (Background: #2a3d58, LabelStyle: (FontSize: 15, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),

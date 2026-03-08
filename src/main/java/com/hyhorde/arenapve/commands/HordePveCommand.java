@@ -76,17 +76,25 @@ extends AbstractPlayerCommand {
             case "enemy":
             case "enemigo":
             case "tipo":
-            case "enemytype":
-            case "role": {
+            case "enemytype": {
                 this.handleEnemyType(commandContext, playerRef);
                 return;
             }
             case "enemies":
             case "enemigos":
             case "tipos":
-            case "enemytypes":
-            case "roles": {
+            case "enemytypes": {
                 this.handleEnemyTypes(playerRef);
+                return;
+            }
+            case "role":
+            case "npcrole": {
+                this.handleRole(commandContext, playerRef);
+                return;
+            }
+            case "roles":
+            case "npcroles": {
+                this.handleRoles(playerRef);
                 return;
             }
             case "reward": {
@@ -126,12 +134,37 @@ extends AbstractPlayerCommand {
     }
 
     private void handleEnemyTypes(PlayerRef playerRef) {
-        List<String> enemyTypes = this.hordeService.getEnemyTypeOptions();
-        playerRef.sendMessage(Message.raw((String)("Tipos de enemigo disponibles: " + String.join(", ", enemyTypes))));
+        List<String> diagnostics = this.hordeService.getEnemyTypeDiagnostics();
+        playerRef.sendMessage(Message.raw((String)"Tipos de enemigo y rol detectado:"));
+        for (String entry : diagnostics) {
+            playerRef.sendMessage(Message.raw((String)(" - " + entry)));
+        }
     }
 
     private void sendHelp(PlayerRef playerRef) {
         HordeHelpCommand.sendChatHelp(playerRef);
+    }
+
+    private void handleRole(CommandContext commandContext, PlayerRef playerRef) {
+        if (!commandContext.provided(this.valueArg)) {
+            String currentRole = this.hordeService.getConfiguredNpcRole();
+            String roleState = currentRole == null || currentRole.isBlank() ? "sin override (auto por enemyType)" : currentRole;
+            playerRef.sendMessage(Message.raw((String)("Rol NPC actual: " + roleState)));
+            playerRef.sendMessage(Message.raw((String)"Uso: /hordapve role <rolNpc|auto>"));
+            return;
+        }
+        String requestedRole = (String)commandContext.get(this.valueArg);
+        playerRef.sendMessage(Message.raw((String)this.hordeService.setNpcRole(requestedRole).getMessage()));
+    }
+
+    private void handleRoles(PlayerRef playerRef) {
+        List<String> roles = this.hordeService.getAvailableRoles();
+        if (roles.isEmpty()) {
+            playerRef.sendMessage(Message.raw((String)"No hay roles NPC disponibles."));
+            return;
+        }
+        playerRef.sendMessage(Message.raw((String)("Roles NPC disponibles (" + roles.size() + "):")));
+        playerRef.sendMessage(Message.raw((String)String.join(", ", roles)));
     }
 
     private void handleReward(CommandContext commandContext, PlayerRef playerRef) {
