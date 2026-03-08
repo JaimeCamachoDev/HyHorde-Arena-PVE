@@ -1,65 +1,82 @@
 # HyHorde Arena PVE
 
-Mod de Hytale para crear hordas PVE por rondas con configuracion en UI.
+Mod para Hytale que crea hordas PVE por rondas, con configuracion por UI y comandos.
 
-## Que incluye
+## Que hace
 
 - Sistema de rondas con dificultad progresiva.
-- Centro de horda configurable (spawn de enemigos alrededor del centro).
-- Seleccion de tipo de enemigo simplificada (`auto`, `random` + 10 tipos comunes).
-- Recompensas como `item` dropeado en el centro de la horda.
+- Centro de spawn configurable.
 - Escalado por jugadores (`playerMultiplier`).
-- Anuncio grande en pantalla al inicio y al final de la horda.
-- Cuenta atras global `3..2..1` antes de empezar la primera ronda.
-- Anuncio grande al completar cada ronda con datos clave (siguiente ronda, kills, spawn, recompensa).
-- Panel de estado opcional (`/hordapve hud`) con:
-  - Contador `Quedan X enemigos`.
-  - Tabla de jugadores con kills/deaths durante la horda.
-  - Resumen personal (tus kills/deaths).
-- Selector de idioma `Espanol/English` con botones `< >` en la UI de configuracion.
-- Validacion reforzada de `rewardItemId` para evitar drops de items corruptos/Unknown.
+- Tipos de enemigo simplificados (`auto`, `random`, etc.) con deteccion dinamica de roles NPC disponibles.
+- Recompensas por rondas (drop de item en el centro).
+- Selector de idioma en la UI (`Espanol/English`).
+- Anuncios grandes en pantalla:
+  - Inicio de horda.
+  - Countdown `3..2..1` al inicio.
+  - Countdown final `3..2..1` antes de la siguiente ronda (si hay espera).
+  - Inicio de ronda.
+  - Fin de ronda.
+  - Fin de horda.
+- Si detienes con `/hordapve stop`, limpia los enemigos generados por esa horda.
+- Panel de estado (`/hordapve hud`) con enemigos vivos, progreso, kills/deaths y leaderboard.
 
-## Guia rapida (paso a paso)
+## Uso rapido
 
-1. Ejecuta `/hordahelp` para ver ayuda rapida.
-2. Ejecuta `/hordapve` para abrir **Horda PVE Config**.
-3. Define el centro con `Usar mi posicion actual` o `/hordapve setspawn`.
-4. Ajusta lo basico:
-   - `Rondas`, `Base ronda`, `Inc. por ronda`, `Delay (s)`, `Jugadores (x)`.
-   - `Tipo enemigo` con botones `< >` (la UI prioriza tipos compatibles detectados).
-   - `Idioma` con botones `< >` (`Espanol` / `English`).
-   - `Recompensa cada`, `Item recompensa` (tambien con `< >`) y `Cant.`.
-5. Pulsa `Guardar config`.
-6. Inicia con `Iniciar horda` o `/hordapve start`.
-7. Consulta estado con `/hordapve status` o `/hordapve hud`.
-8. Deten con `/hordapve stop`.
+1. Ejecuta `/hordapve` para abrir la UI de configuracion.
+2. Guarda el centro con `Usar mi posicion actual` o con `/hordapve setspawn`.
+3. Ajusta rondas, enemigos, delay, idioma y recompensas.
+4. Guarda con `Guardar config`.
+5. Inicia con `/hordapve start`.
+6. Revisa estado con `/hordapve status` o `/hordapve hud`.
+7. Deten con `/hordapve stop`.
 
-## Comandos reales
+## Ayuda
 
-- `/horda help` muestra ayuda de comandos en chat.
-- `/horda` comando rapido de pruebas para spawnear una horda simple alrededor del jugador.
-- `/hordahelp` abre ayuda en UI.
-- `/hordahelp chat` envia ayuda en chat.
-- `/hordapve` abre UI de configuracion.
-- `/hordepve` alias de `/hordapve` (mismos subcomandos).
-- `/hordapve help` abre ayuda.
-- `/hordapve start`
-- `/hordapve stop`
-- `/hordapve status`
-- `/hordapve logs` muestra ruta de logs.
-- `/hordapve hud` abre panel de estado.
-- `/hordapve setspawn`
-- `/hordapve enemy <tipo>` cambia tipo simplificado.
-- `/hordapve tipos` muestra tipos y su mapeo real a roles NPC detectados.
-- `/hordapve role <rolNpc|auto>` fuerza rol NPC exacto (modo avanzado).
-- `/hordapve roles` lista roles NPC disponibles.
-- `/hordapve reward <rondas>` cambia frecuencia de recompensa.
-- `/hordareload config` recarga `horde-config.json`.
-- `/hordareload mod` intenta recargar el plugin completo.
+- `/hordapve help` muestra ayuda en chat con descripciones.
+- `/hordapve helpui` abre la ventana de ayuda.
+- `/hordahelp` abre ayuda UI.
+- `/hordahelp chat` muestra ayuda en chat.
 
-No existen comandos `/cerrar` ni `/holi`.
+## Comandos disponibles
+
+### Comando base
+
+- `/hordapve` (abre UI)
+- Alias del comando base: `/hordepve`
+
+### Subcomandos de `/hordapve`
+
+- `help`, `ayuda`, `?`, `commands`, `comandos`
+- `helpui`, `ayudaui`, `uihelp`, `manual`
+- `start`
+- `stop`
+- `status`
+- `logs`, `log`
+- `hud`, `panel`
+- `setspawn`, `spawn`
+- `enemy`, `enemigo`, `tipo`, `enemytype`
+- `enemies`, `enemigos`, `tipos`, `enemytypes`
+- `role`, `npcrole`
+- `roles`, `npcroles`
+- `reward`
+
+Usos importantes:
+
+- `/hordapve enemy <tipo>`
+- `/hordapve role <rolNpc|auto>`
+- `/hordapve reward <rondas>`
+- `/hordapve tipos` (diagnostico de tipos y roles)
+
+### Otros comandos
+
+- `/horda` (comando legacy: horda simple de prueba alrededor del jugador)
+- `/horda help`
+- `/hordareload config`
+- `/hordareload mod` (tambien acepta `jar` y `plugin`)
 
 ## Tipos de enemigo simplificados
+
+Tipos definidos por el mod:
 
 - `auto`
 - `random`
@@ -69,37 +86,27 @@ No existen comandos `/cerrar` ni `/holi`.
 - `zombie`
 - `spider`
 - `wolf`
-- `wraith`
-- `void`
-- `demon`
-- `beast`
+- `slime`
+- `beetle`
 
-Importante: algunos tipos pueden no existir en todos los modpacks.  
-Usa `/hordapve tipos` para verificar en tu instalacion que rol real se detecta para cada tipo.
+Importante:
 
-Nota: los roles tipo gato/mascota se filtran para que no salgan como enemigos de horda.
+- No todos tienen por que existir en todos los modpacks.
+- Usa `/hordapve tipos` para ver `tipo -> rol real detectado` en tu servidor.
 
 ## Recompensas
 
-- Son items (no comandos).
-- Se configuran con:
-  - `rewardEveryRounds`
-  - `rewardItemId`
-  - `rewardItemQuantity`
-- El plugin normaliza y valida el ID antes de dropear para evitar `Unknown/corrupt`.
-- Al completar la ronda objetivo, el item valido se dropea en el centro de horda.
+Configuracion principal:
 
-## Logs
+- `rewardEveryRounds`
+- `rewardItemId`
+- `rewardItemQuantity`
 
-Ruta esperada en Windows (save `Mod-Test`):
-
-- `C:\Users\Jaime\AppData\Roaming\Hytale\UserData\Saves\Mod-Test\logs`
-
-Tambien puedes usar `/hordapve logs` para ver la ruta detectada.
+El plugin valida el `rewardItemId` antes de dropear para evitar items invalidos.
 
 ## Configuracion en disco
 
-Archivo: `horde-config.json` en la carpeta de datos del plugin.
+Archivo: `horde-config.json` (carpeta de datos del plugin).
 
 Campos principales:
 
@@ -107,8 +114,8 @@ Campos principales:
 - `minSpawnRadius`, `maxSpawnRadius`
 - `rounds`, `baseEnemiesPerRound`, `enemiesPerRoundIncrement`, `waveDelaySeconds`
 - `playerMultiplier`
-- `enemyType`
-- `npcRole` (override opcional)
+- `enemyType`, `npcRole`
+- `language`
 - `rewardEveryRounds`, `rewardItemId`, `rewardItemQuantity`
 
 ## Build
@@ -117,6 +124,6 @@ Campos principales:
 .\gradlew.bat clean jar
 ```
 
-Jar esperado:
+Salida esperada:
 
 - `build/libs/HyHorde-Arena-PVE-<version>.jar`

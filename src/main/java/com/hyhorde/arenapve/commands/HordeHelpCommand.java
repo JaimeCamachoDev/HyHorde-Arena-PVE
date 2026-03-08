@@ -61,25 +61,43 @@ extends AbstractPlayerCommand {
             }
         }
         if (HordeService.isEnglishLanguage(language)) {
-            playerRef.sendMessage(Message.raw((String)"[Horde PVE] Quick guide"));
-            playerRef.sendMessage(Message.raw((String)"1) /hordapve -> opens config menu"));
-            playerRef.sendMessage(Message.raw((String)"2) /hordapve setspawn -> saves horde center"));
-            playerRef.sendMessage(Message.raw((String)"3) Adjust rounds, enemies and rewards in the UI, then save"));
-            playerRef.sendMessage(Message.raw((String)"4) /hordapve start -> starts the horde"));
-            playerRef.sendMessage(Message.raw((String)"5) /hordapve stop -> stops the horde"));
-            playerRef.sendMessage(Message.raw((String)"Commands: /horda help, /hordapve status, /hordapve logs, /hordapve hud, /hordapve enemy <type>, /hordapve tipos, /hordapve role <npcRole|auto>, /hordapve roles, /hordapve reward <rounds>, /hordareload config"));
-            playerRef.sendMessage(Message.raw((String)"Compatible alias: /hordepve (same subcommands as /hordapve)."));
-            playerRef.sendMessage(Message.raw((String)("Types: " + availableTypes)));
+            playerRef.sendMessage(Message.raw((String)"[Horde PVE] Commands and descriptions"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve or /hordepve - opens config UI"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve help - shows this chat help (recommended)"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve helpui - opens help window UI"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve start - starts horde with current config"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve stop - stops horde and cleans generated enemies"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve status - current horde summary"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve hud - opens live status panel"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve setspawn - saves horde center from your position"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve enemy <type> - sets enemy type"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve tipos - shows type -> real role diagnostics"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve role <npcRole|auto> - force exact NPC role"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve roles - lists available NPC roles"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve reward <rounds> - reward frequency"));
+            playerRef.sendMessage(Message.raw((String)"/hordapve logs - shows detected logs path"));
+            playerRef.sendMessage(Message.raw((String)"/hordahelp [chat] - opens help UI or chat"));
+            playerRef.sendMessage(Message.raw((String)"/hordareload config|mod - reloads config/plugin"));
+            playerRef.sendMessage(Message.raw((String)("Available enemy types now: " + availableTypes)));
             return;
         }
-        playerRef.sendMessage(Message.raw((String)"[Horda PVE] Guia rapida"));
-        playerRef.sendMessage(Message.raw((String)"1) /hordapve -> abre menu de configuracion"));
-        playerRef.sendMessage(Message.raw((String)"2) /hordapve setspawn -> guarda centro de la horda"));
-        playerRef.sendMessage(Message.raw((String)"3) Ajusta rondas, tipo, recompensas en la UI y guarda"));
-        playerRef.sendMessage(Message.raw((String)"4) /hordapve start -> inicia la horda"));
-        playerRef.sendMessage(Message.raw((String)"5) /hordapve stop -> detiene la horda"));
-        playerRef.sendMessage(Message.raw((String)"Comandos: /horda help, /hordapve status, /hordapve logs, /hordapve hud, /hordapve enemy <tipo>, /hordapve tipos, /hordapve role <rolNpc|auto>, /hordapve roles, /hordapve reward <rondas>, /hordareload config"));
-        playerRef.sendMessage(Message.raw((String)"Alias compatible: /hordepve (mismos subcomandos que /hordapve)."));
-        playerRef.sendMessage(Message.raw((String)("Tipos: " + availableTypes)));
+        playerRef.sendMessage(Message.raw((String)"[Horda PVE] Comandos y descripciones"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve o /hordepve - abre UI de configuracion"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve help - muestra esta ayuda en chat (recomendado)"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve helpui - abre la ventana UI de ayuda"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve start - inicia la horda con la config actual"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve stop - detiene la horda y limpia enemigos generados"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve status - resumen actual de la horda"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve hud - abre panel de estado en vivo"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve setspawn - guarda el centro desde tu posicion"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve enemy <tipo> - configura tipo de enemigo"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve tipos - diagnostico tipo -> rol real"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve role <rolNpc|auto> - fuerza rol NPC exacto"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve roles - lista roles NPC disponibles"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve reward <rondas> - frecuencia de recompensa"));
+        playerRef.sendMessage(Message.raw((String)"/hordapve logs - muestra ruta de logs detectada"));
+        playerRef.sendMessage(Message.raw((String)"/hordahelp [chat] - abre ayuda UI o chat"));
+        playerRef.sendMessage(Message.raw((String)"/hordareload config|mod - recarga config/plugin"));
+        playerRef.sendMessage(Message.raw((String)("Tipos disponibles ahora: " + availableTypes)));
     }
 }

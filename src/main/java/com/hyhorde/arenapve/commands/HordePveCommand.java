@@ -42,7 +42,16 @@ extends AbstractPlayerCommand {
             }
             case "help":
             case "ayuda":
-            case "?": {
+            case "?":
+            case "commands":
+            case "comandos": {
+                this.sendHelp(playerRef);
+                return;
+            }
+            case "helpui":
+            case "ayudaui":
+            case "uihelp":
+            case "manual": {
                 this.openHelp(store, ref, playerRef);
                 return;
             }
