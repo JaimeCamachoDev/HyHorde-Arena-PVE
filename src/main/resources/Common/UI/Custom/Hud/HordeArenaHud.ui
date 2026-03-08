@@ -1,0 +1,70 @@
+Group #Panel {
+  Anchor: (Right: 20, Top: 410, Height: 176, Width: 350);
+  Background: #12203478;
+  Padding: (Horizontal: 10, Vertical: 8);
+  LayoutMode: Top;
+
+  Label #TitleLabel {
+    Text: "HORDA PVE";
+    Style: (
+      FontSize: 15,
+      TextColor: #f7fbff,
+      RenderBold: true
+    );
+    Anchor: (Left: 0, Top: 0);
+  }
+
+  Label #StateLine {
+    Text: "Estado: Inactiva";
+    Style: (
+      FontSize: 13,
+      TextColor: #d9e8fb
+    );
+    Anchor: (Left: 0, Top: 0);
+  }
+
+  Label #RoundLine {
+    Text: "Ronda: 0/0";
+    Style: (
+      FontSize: 13,
+      TextColor: #ffffff
+    );
+    Anchor: (Left: 0, Top: 0);
+  }
+
+  Label #EnemiesLine {
+    Text: "Enemigos vivos: 0";
+    Style: (
+      FontSize: 13,
+      TextColor: #ffffff
+    );
+    Anchor: (Left: 0, Top: 0);
+  }
+
+  Label #KillsLine {
+    Text: "Bajas: 0 | Muertes: 0";
+    Style: (
+      FontSize: 13,
+      TextColor: #ffffff
+    );
+    Anchor: (Left: 0, Top: 0);
+  }
+
+  Label #NextLine {
+    Text: "Siguiente: -";
+    Style: (
+      FontSize: 13,
+      TextColor: #ffffff
+    );
+    Anchor: (Left: 0, Top: 0);
+  }
+
+  Label #RewardLine {
+    Text: "Recompensa: ninguno x1";
+    Style: (
+      FontSize: 13,
+      TextColor: #ffe5a9
+    );
+    Anchor: (Left: 0, Top: 0);
+  }
+}

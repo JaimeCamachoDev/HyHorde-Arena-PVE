@@ -43,8 +43,14 @@ Nota: los roles reales dependen de tu modpack. Verificalo con `/hordapve tipos`.
 ## Recompensas
 
 - La UI permite configurar `RewardItemId` y `RewardItemQuantity`.
+- `RewardItemId` acepta `random` para soltar un item aleatorio valido en cada recompensa.
 - Si `RewardItemId` esta vacio o invalido, el sistema elige automaticamente un item de test validado para tu modpack.
 - Si no encuentra ningun item valido, avisa en chat y en logs.
+
+## HUD de horda
+
+- Durante una horda activa, aparece un HUD emergente con estado, ronda, enemigos vivos, kills y recompensa.
+- Se actualiza periodicamente en tiempo real.
 
 ## Flujo rapido
 

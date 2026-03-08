@@ -145,12 +145,19 @@ extends CustomUIPage {
         int total = suggestions.size();
         int previewCount = Math.min(24, total);
         List<String> preview = suggestions.subList(0, previewCount);
+        String safeTestItem = suggestions.get(0);
+        for (String candidate : suggestions) {
+            if ("random".equalsIgnoreCase(candidate)) continue;
+            safeTestItem = candidate;
+            break;
+        }
         this.playerRef.sendMessage(Message.raw((String)("Items recompensa detectados: " + total + ".")));
-        this.playerRef.sendMessage(Message.raw((String)("Item de test recomendado (seguro): " + suggestions.get(0))));
+        this.playerRef.sendMessage(Message.raw((String)("Item de test recomendado (seguro): " + safeTestItem)));
         this.playerRef.sendMessage(Message.raw((String)("Preview (" + previewCount + "): " + String.join(", ", preview))));
         if (total > previewCount) {
             this.playerRef.sendMessage(Message.raw((String)("Hay +" + (total - previewCount) + " IDs. Usa los botones < > para recorrer mas opciones.")));
         }
+        this.playerRef.sendMessage(Message.raw((String)"Tip extra: usa 'random' en RewardItemId para loot aleatorio por cada recompensa."));
         this.playerRef.sendMessage(Message.raw((String)"Tambien puedes pegar una linea completa de ItemDumper y se intentara extraer el ID automaticamente."));
     }
 
@@ -259,7 +266,7 @@ extends CustomUIPage {
                 .set("#RewardEveryRoundsLabel.Text", english ? "Reward every round(s)" : "Recompensa por ronda(s)")
                 .set("#RewardCommandsLabel.Text", english ? "Reward item" : "Item recompensa")
                 .set("#RewardTypesButton.Text", english ? "View loot" : "Ver loot")
-                .set("#RewardCommandsHelpLabel.Text", english ? "Tip: you can paste ItemDumper lines; the ID is auto-extracted." : "Tip: puedes pegar lineas de ItemDumper; se extrae el ID automaticamente.")
+                .set("#RewardCommandsHelpLabel.Text", english ? "Tip: use 'random' or paste ItemDumper lines (auto-extract)." : "Tip: usa 'random' o pega lineas de ItemDumper (auto-extrae).")
                 .set("#RewardItemQuantityLabel.Text", english ? "Qty." : "Cant.")
                 .set("#StatusTitleLabel.Text", english ? "Current status" : "Estado actual")
                 .set("#SaveButton.Text", english ? "Save config" : "Guardar config")
