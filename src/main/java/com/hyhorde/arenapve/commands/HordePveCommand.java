@@ -13,7 +13,6 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hyhorde.arenapve.horde.HordeConfigPage;
-import com.hyhorde.arenapve.horde.HordeHelpPage;
 import com.hyhorde.arenapve.horde.HordeService;
 import java.util.List;
 import java.util.Locale;
@@ -33,26 +32,13 @@ extends AbstractPlayerCommand {
     }
 
     protected void execute(@Nonnull CommandContext commandContext, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
-        String action;
-        switch (action = commandContext.provided(this.actionArg) ? ((String)commandContext.get(this.actionArg)).toLowerCase(Locale.ROOT) : "menu") {
-            case "menu": 
+        String[] actionAndValue = this.resolveActionAndValue(commandContext);
+        String action = actionAndValue[0];
+        String value = actionAndValue[1];
+        switch (action) {
+            case "menu":
             case "ui": {
                 this.openUi(store, ref, playerRef);
-                return;
-            }
-            case "help":
-            case "ayuda":
-            case "?":
-            case "commands":
-            case "comandos": {
-                this.sendHelp(playerRef);
-                return;
-            }
-            case "helpui":
-            case "ayudaui":
-            case "uihelp":
-            case "manual": {
-                this.openHelp(store, ref, playerRef);
                 return;
             }
             case "start": {
@@ -72,12 +58,7 @@ extends AbstractPlayerCommand {
                 playerRef.sendMessage(Message.raw((String)("Ruta de logs: " + this.hordeService.getLogsPathHint())));
                 return;
             }
-            case "hud": 
-            case "panel": {
-                playerRef.sendMessage(Message.raw((String)this.hordeService.openStatusHud(ref, store, playerRef, world).getMessage()));
-                return;
-            }
-            case "setspawn": 
+            case "setspawn":
             case "spawn": {
                 playerRef.sendMessage(Message.raw((String)this.hordeService.setSpawnFromPlayer(playerRef, world).getMessage()));
                 return;
@@ -86,7 +67,7 @@ extends AbstractPlayerCommand {
             case "enemigo":
             case "tipo":
             case "enemytype": {
-                this.handleEnemyType(commandContext, playerRef);
+                this.handleEnemyType(value, playerRef);
                 return;
             }
             case "enemies":
@@ -98,7 +79,7 @@ extends AbstractPlayerCommand {
             }
             case "role":
             case "npcrole": {
-                this.handleRole(commandContext, playerRef);
+                this.handleRole(value, playerRef);
                 return;
             }
             case "roles":
@@ -107,40 +88,32 @@ extends AbstractPlayerCommand {
                 return;
             }
             case "reward": {
-                this.handleReward(commandContext, playerRef);
+                this.handleReward(value, playerRef);
                 return;
             }
+            default: {
+                playerRef.sendMessage(Message.raw((String)("Subcomando no valido: " + action + ". Usa /horda help.")));
+            }
         }
-        this.sendHelp(playerRef);
     }
 
     private void openUi(Store<EntityStore> store, Ref<EntityStore> playerEntityRef, PlayerRef playerRef) {
         Player player = (Player)store.getComponent(playerEntityRef, Player.getComponentType());
         if (player == null) {
-            playerRef.sendMessage(Message.raw((String)"No se pudo abrir la interfaz ahora mismo. Prueba /hordahelp."));
+            playerRef.sendMessage(Message.raw((String)"No se pudo abrir la interfaz ahora mismo. Usa /horda help."));
             return;
         }
         HordeConfigPage.open(playerEntityRef, store, player, playerRef, this.hordeService);
     }
 
-    private void openHelp(Store<EntityStore> store, Ref<EntityStore> playerEntityRef, PlayerRef playerRef) {
-        Player player = (Player)store.getComponent(playerEntityRef, Player.getComponentType());
-        if (player == null) {
-            playerRef.sendMessage(Message.raw((String)"No se pudo abrir la ayuda en ventana. Mostrando ayuda por chat."));
-            this.sendHelp(playerRef);
-            return;
-        }
-        HordeHelpPage.open(playerEntityRef, store, player, playerRef, this.hordeService);
-    }
-
-    private void handleEnemyType(CommandContext commandContext, PlayerRef playerRef) {
-        if (!commandContext.provided(this.valueArg)) {
+    private void handleEnemyType(String value, PlayerRef playerRef) {
+        String enemyType = value == null ? "" : value.trim();
+        if (enemyType.isBlank()) {
             List<String> options = this.hordeService.getEnemyTypeOptionsForCurrentRoles();
             String usage = options.isEmpty() ? "auto|random" : String.join("|", options);
             playerRef.sendMessage(Message.raw((String)("Uso: /hordapve enemy <" + usage + ">")));
             return;
         }
-        String enemyType = (String)commandContext.get(this.valueArg);
         playerRef.sendMessage(Message.raw((String)this.hordeService.setEnemyType(enemyType).getMessage()));
     }
 
@@ -152,19 +125,15 @@ extends AbstractPlayerCommand {
         }
     }
 
-    private void sendHelp(PlayerRef playerRef) {
-        HordeHelpCommand.sendChatHelp(playerRef, this.hordeService);
-    }
-
-    private void handleRole(CommandContext commandContext, PlayerRef playerRef) {
-        if (!commandContext.provided(this.valueArg)) {
+    private void handleRole(String value, PlayerRef playerRef) {
+        String requestedRole = value == null ? "" : value.trim();
+        if (requestedRole.isBlank()) {
             String currentRole = this.hordeService.getConfiguredNpcRole();
             String roleState = currentRole == null || currentRole.isBlank() ? "sin override (auto por enemyType)" : currentRole;
             playerRef.sendMessage(Message.raw((String)("Rol NPC actual: " + roleState)));
             playerRef.sendMessage(Message.raw((String)"Uso: /hordapve role <rolNpc|auto>"));
             return;
         }
-        String requestedRole = (String)commandContext.get(this.valueArg);
         playerRef.sendMessage(Message.raw((String)this.hordeService.setNpcRole(requestedRole).getMessage()));
     }
 
@@ -178,15 +147,15 @@ extends AbstractPlayerCommand {
         playerRef.sendMessage(Message.raw((String)String.join(", ", roles)));
     }
 
-    private void handleReward(CommandContext commandContext, PlayerRef playerRef) {
+    private void handleReward(String value, PlayerRef playerRef) {
         int everyRounds;
-        if (!commandContext.provided(this.valueArg)) {
+        String raw = value == null ? "" : value.trim();
+        if (raw.isBlank()) {
             playerRef.sendMessage(Message.raw((String)"Uso: /hordapve reward <rondas>"));
             return;
         }
-        String raw = (String)commandContext.get(this.valueArg);
         try {
-            everyRounds = Integer.parseInt(raw.trim());
+            everyRounds = Integer.parseInt(raw);
         }
         catch (Exception ex) {
             playerRef.sendMessage(Message.raw((String)"El valor de reward debe ser un numero entero positivo."));
@@ -194,6 +163,45 @@ extends AbstractPlayerCommand {
         }
         playerRef.sendMessage(Message.raw((String)this.hordeService.setRewardEveryRounds(everyRounds).getMessage()));
     }
+
+    private String[] resolveActionAndValue(CommandContext commandContext) {
+        String actionRaw = HordePveCommand.readOptionalArgText(commandContext, this.actionArg);
+        String valueRaw = HordePveCommand.readOptionalArgText(commandContext, this.valueArg);
+        if (actionRaw.isBlank()) {
+            return new String[]{"menu", ""};
+        }
+        String action = actionRaw.trim();
+        int separator = action.indexOf(32);
+        if (separator >= 0) {
+            String actionToken = action.substring(0, separator).trim().toLowerCase(Locale.ROOT);
+            String extraValue = action.substring(separator + 1).trim();
+            if (valueRaw.isBlank()) {
+                valueRaw = extraValue;
+            }
+            return new String[]{actionToken, valueRaw.trim()};
+        }
+        return new String[]{action.toLowerCase(Locale.ROOT), valueRaw.trim()};
+    }
+
+    private static String readOptionalArgText(CommandContext commandContext, OptionalArg<String> optionalArg) {
+        try {
+            CharSequence[] input = commandContext.getInput(optionalArg);
+            if (input != null && input.length > 0) {
+                return String.join((CharSequence)" ", input).trim();
+            }
+        }
+        catch (Exception exception) {
+            // fallback below
+        }
+        try {
+            if (commandContext.provided(optionalArg)) {
+                Object raw = commandContext.get(optionalArg);
+                return raw == null ? "" : raw.toString().trim();
+            }
+        }
+        catch (Exception exception) {
+            // no-op
+        }
+        return "";
+    }
 }
-
-

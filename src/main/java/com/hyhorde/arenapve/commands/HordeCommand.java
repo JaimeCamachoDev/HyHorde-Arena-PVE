@@ -37,12 +37,10 @@ extends AbstractPlayerCommand {
     }
 
     protected void execute(@Nonnull CommandContext commandContext, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
-        if (commandContext.provided(this.actionArg)) {
-            String action = ((String)commandContext.get(this.actionArg)).trim().toLowerCase(Locale.ROOT);
-            if ("help".equals(action) || "ayuda".equals(action) || "?".equals(action)) {
-                HordeHelpCommand.sendChatHelp(playerRef, this.hordeService);
-                return;
-            }
+        String action = HordeCommand.readAction(commandContext, this.actionArg);
+        if (!action.isBlank()) {
+            playerRef.sendMessage(Message.raw((String)"El comando /horda no usa subcomandos. Usa /hordahelp."));
+            return;
         }
         NPCPlugin npcPlugin = NPCPlugin.get();
         List spawnableRoles = npcPlugin.getRoleTemplateNames(true);
@@ -93,6 +91,42 @@ extends AbstractPlayerCommand {
         }
         return roles.get(0);
     }
+
+    private static String readAction(CommandContext commandContext, OptionalArg<String> actionArg) {
+        try {
+            CharSequence[] input = commandContext.getInput(actionArg);
+            if (input != null && input.length > 0) {
+                for (CharSequence part : input) {
+                    if (part == null) {
+                        continue;
+                    }
+                    String trimmedPart = part.toString().trim();
+                    if (trimmedPart.isBlank()) {
+                        continue;
+                    }
+                    int separator = trimmedPart.indexOf(32);
+                    String token = separator >= 0 ? trimmedPart.substring(0, separator) : trimmedPart;
+                    return token.toLowerCase(Locale.ROOT);
+                }
+            }
+        }
+        catch (Exception exception) {
+            // fallback below
+        }
+        try {
+            if (commandContext.provided(actionArg)) {
+                Object raw = commandContext.get(actionArg);
+                if (raw != null) {
+                    return raw.toString().trim().toLowerCase(Locale.ROOT);
+                }
+            }
+        }
+        catch (Exception exception) {
+            // ignore
+        }
+        return "";
+    }
+
 }
 
 
