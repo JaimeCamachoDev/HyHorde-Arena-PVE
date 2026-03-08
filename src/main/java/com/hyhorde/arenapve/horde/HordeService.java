@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public final class HordeService {
-    private static final List<String> PREFERRED_REWARD_TEST_ITEMS = List.of("item/resource/wood", "item/resource/stone", "item/consumable/apple", "item/material/iron_ingot", "item/weapon/sword_iron");
+    private static final List<String> PREFERRED_REWARD_TEST_ITEMS = List.of("Armor_Bronze_Chest", "Armor_Copper_Chest", "Armor_Iron_Chest", "Tool_Watering_Can_State_Filled_Water", "*Container_Bucket_State_Filled_Water", "item/resource/wood", "item/resource/stone", "item/consumable/apple", "item/material/iron_ingot", "item/weapon/sword_iron");
     private static final Map<String, String[]> ENEMY_TYPE_HINTS = HordeService.buildEnemyTypeHints();
     private static final List<String> ENEMY_TYPE_OPTIONS = new ArrayList<String>(ENEMY_TYPE_HINTS.keySet());
     private static final List<String> RANDOM_ENEMY_TYPE_OPTIONS = HordeService.buildRandomEnemyTypePool();
@@ -1109,34 +1109,21 @@ public final class HordeService {
         if (guaranteedTestItem != null && !guaranteedTestItem.isBlank()) {
             suggestions.add(guaranteedTestItem);
         }
-        suggestions.addAll(PREFERRED_REWARD_TEST_ITEMS);
-        suggestions.add("item/weapon/bow_wood");
-        suggestions.add("item/armor/chestplate_iron");
-        suggestions.add("item/consumable/potion_health_small");
-        suggestions.add("item/material/gold_ingot");
-        suggestions.add("item/tool/pickaxe_iron");
+        HordeService.addUsableRewardSuggestions(suggestions, PREFERRED_REWARD_TEST_ITEMS);
+        HordeService.addUsableRewardSuggestions(suggestions, HordeService.buildFallbackRewardSuggestions());
         return new ArrayList<String>(suggestions);
     }
 
     private static List<String> buildResolvedRewardSuggestions() {
+        if (!REWARD_ITEM_SUGGESTIONS.isEmpty()) {
+            return new ArrayList<String>(REWARD_ITEM_SUGGESTIONS);
+        }
         LinkedHashSet<String> resolved = new LinkedHashSet<String>();
         String guaranteedTestItem = HordeService.resolveGuaranteedRewardTestItemId(1);
-        if (guaranteedTestItem != null && !guaranteedTestItem.isBlank() && HordeService.isUsableRewardItemId(guaranteedTestItem, 1)) {
+        if (guaranteedTestItem != null && !guaranteedTestItem.isBlank()) {
             resolved.add(guaranteedTestItem);
         }
-        for (String suggestion : REWARD_ITEM_SUGGESTIONS) {
-            String normalized = HordeService.normalizeRewardItemId(suggestion);
-            if (!HordeService.isUsableRewardItemId(normalized, 1)) continue;
-            resolved.add(normalized);
-        }
-        if (resolved.isEmpty()) {
-            for (String fallback : HordeService.buildFallbackRewardSuggestions()) {
-                String normalized = HordeService.normalizeRewardItemId(fallback);
-                if (!HordeService.isUsableRewardItemId(normalized, 1)) continue;
-                resolved.add(normalized);
-                if (resolved.size() >= 16) break;
-            }
-        }
+        HordeService.addUsableRewardSuggestions(resolved, HordeService.buildFallbackRewardSuggestions());
         return new ArrayList<String>(resolved);
     }
 
@@ -1175,29 +1162,165 @@ public final class HordeService {
         if (raw.isBlank()) {
             return "";
         }
-        LinkedHashSet<String> candidates = new LinkedHashSet<String>();
-        candidates.add(raw);
-        candidates.add(raw.toLowerCase(Locale.ROOT));
-        if (!raw.startsWith("item/")) {
-            candidates.add("item/" + raw);
-            candidates.add("item/" + raw.toLowerCase(Locale.ROOT));
-        }
-        if (raw.contains("-")) {
-            candidates.add(raw.replace('-', '_'));
-            candidates.add(raw.replace('-', '_').toLowerCase(Locale.ROOT));
-        }
-        if (raw.contains("_")) {
-            candidates.add(raw.replace('_', '-'));
-            candidates.add(raw.replace('_', '-').toLowerCase(Locale.ROOT));
-        }
+        LinkedHashSet<String> candidates = HordeService.buildRewardItemIdCandidates(raw);
+        String firstCandidate = "";
         for (String candidate : candidates) {
-            if (!HordeService.isUsableRewardItemId(candidate, 1)) continue;
+            if (candidate == null || candidate.isBlank()) {
+                continue;
+            }
+            if (firstCandidate.isBlank()) {
+                firstCandidate = candidate;
+            }
+            String resolved = HordeService.resolveRewardItemAssetId(candidate);
+            if (HordeService.isUsableRewardItemIdRaw(resolved, 1)) {
+                return resolved;
+            }
+        }
+        return firstCandidate.isBlank() ? raw : firstCandidate;
+    }
+
+    private static LinkedHashSet<String> buildRewardItemIdCandidates(String rawInput) {
+        LinkedHashSet<String> candidates = new LinkedHashSet<String>();
+        if (rawInput == null || rawInput.isBlank()) {
+            return candidates;
+        }
+        String raw = rawInput.trim();
+        HordeService.addRewardItemCandidateVariants(candidates, raw);
+        String withoutIndex = raw.replaceFirst("^\\d+\\.\\s*", "");
+        HordeService.addRewardItemCandidateVariants(candidates, withoutIndex);
+        String withoutTypeLabel = withoutIndex.replaceFirst("^\\[[^\\]]+\\]\\s*", "");
+        HordeService.addRewardItemCandidateVariants(candidates, withoutTypeLabel);
+        int metadataStart = withoutTypeLabel.indexOf(" [");
+        if (metadataStart > 0) {
+            HordeService.addRewardItemCandidateVariants(candidates, withoutTypeLabel.substring(0, metadataStart).trim());
+        }
+        String[] tokens = withoutTypeLabel.split("\\s+");
+        for (String token : tokens) {
+            HordeService.addRewardItemCandidateVariants(candidates, token);
+        }
+        return candidates;
+    }
+
+    private static void addRewardItemCandidateVariants(Set<String> candidates, String rawCandidate) {
+        if (rawCandidate == null || rawCandidate.isBlank()) {
+            return;
+        }
+        String candidate = HordeService.cleanRewardToken(rawCandidate);
+        if (candidate.isBlank() || candidate.matches("\\d+") || candidate.contains(" ")) {
+            return;
+        }
+        if (candidate.startsWith("server.") || candidate.startsWith("client.") || candidate.endsWith(".name")) {
+            return;
+        }
+        candidates.add(candidate);
+        String lower = candidate.toLowerCase(Locale.ROOT);
+        candidates.add(lower);
+        if (candidate.startsWith("*")) {
+            String noStar = candidate.substring(1).trim();
+            if (!noStar.isBlank()) {
+                candidates.add(noStar);
+                candidates.add(noStar.toLowerCase(Locale.ROOT));
+            }
+        } else {
+            candidates.add("*" + candidate);
+            candidates.add("*" + lower);
+        }
+        if (!candidate.startsWith("item/")) {
+            candidates.add("item/" + candidate);
+            candidates.add("item/" + lower);
+        }
+        if (candidate.contains("-")) {
+            String underscored = candidate.replace('-', '_');
+            candidates.add(underscored);
+            candidates.add(underscored.toLowerCase(Locale.ROOT));
+        }
+        if (candidate.contains("_")) {
+            String dashed = candidate.replace('_', '-');
+            candidates.add(dashed);
+            candidates.add(dashed.toLowerCase(Locale.ROOT));
+        }
+    }
+
+    private static String cleanRewardToken(String value) {
+        if (value == null) {
+            return "";
+        }
+        String cleaned = value.trim();
+        while (!cleaned.isEmpty() && HordeService.isRewardTokenDelimiter(cleaned.charAt(0))) {
+            cleaned = cleaned.substring(1).trim();
+        }
+        while (!cleaned.isEmpty() && HordeService.isRewardTokenDelimiter(cleaned.charAt(cleaned.length() - 1))) {
+            cleaned = cleaned.substring(0, cleaned.length() - 1).trim();
+        }
+        return cleaned;
+    }
+
+    private static boolean isRewardTokenDelimiter(char value) {
+        return Character.isWhitespace(value) || value == '[' || value == ']' || value == '(' || value == ')' || value == '{' || value == '}' || value == ',' || value == ';' || value == '"' || value == '\'' || value == '`' || value == '.';
+    }
+
+    private static String resolveRewardItemAssetId(String candidate) {
+        if (candidate == null || candidate.isBlank()) {
+            return "";
+        }
+        String normalizedCandidate = candidate.trim();
+        try {
+            Map<String, Item> items = Item.getAssetMap().getAssetMap();
+            if (items == null || items.isEmpty()) {
+                return normalizedCandidate;
+            }
+            String exact = HordeService.findRewardAssetKey(items, normalizedCandidate);
+            if (exact != null) {
+                return exact;
+            }
+            if (normalizedCandidate.startsWith("*")) {
+                String noStar = normalizedCandidate.substring(1);
+                if (!noStar.isBlank()) {
+                    String resolvedNoStar = HordeService.findRewardAssetKey(items, noStar);
+                    if (resolvedNoStar != null) {
+                        return resolvedNoStar;
+                    }
+                }
+            } else {
+                String withStar = "*" + normalizedCandidate;
+                String resolvedWithStar = HordeService.findRewardAssetKey(items, withStar);
+                if (resolvedWithStar != null) {
+                    return resolvedWithStar;
+                }
+            }
+            return normalizedCandidate;
+        }
+        catch (Exception ex) {
+            return normalizedCandidate;
+        }
+    }
+
+    private static String findRewardAssetKey(Map<String, Item> items, String candidate) {
+        if (candidate == null || candidate.isBlank()) {
+            return null;
+        }
+        Item direct = items.get(candidate);
+        if (direct != null && direct != Item.UNKNOWN) {
             return candidate;
         }
-        return raw;
+        for (Map.Entry<String, Item> entry : items.entrySet()) {
+            String key = entry.getKey();
+            Item value = entry.getValue();
+            if (key == null || value == null || value == Item.UNKNOWN || !key.equalsIgnoreCase(candidate)) continue;
+            return key;
+        }
+        return null;
     }
 
     private static boolean isUsableRewardItemId(String itemId, int quantity) {
+        if (itemId == null || itemId.isBlank()) {
+            return false;
+        }
+        String resolved = HordeService.resolveRewardItemAssetId(itemId);
+        return HordeService.isUsableRewardItemIdRaw(resolved, quantity);
+    }
+
+    private static boolean isUsableRewardItemIdRaw(String itemId, int quantity) {
         if (itemId == null || itemId.isBlank()) {
             return false;
         }
@@ -1218,18 +1341,33 @@ public final class HordeService {
         }
     }
 
+    private static void addUsableRewardSuggestions(Set<String> target, List<String> candidates) {
+        if (target == null || candidates == null || candidates.isEmpty()) {
+            return;
+        }
+        for (String candidate : candidates) {
+            String normalized = HordeService.normalizeRewardItemId(candidate);
+            if (normalized.isBlank() || !HordeService.isUsableRewardItemIdRaw(normalized, 1)) continue;
+            target.add(normalized);
+        }
+    }
+
     private static List<String> buildFallbackRewardSuggestions() {
         ArrayList<String> fallback = new ArrayList<String>();
         try {
             Map<String, Item> items = Item.getAssetMap().getAssetMap();
+            if (items == null || items.isEmpty()) {
+                return fallback;
+            }
             for (Map.Entry<String, Item> entry : items.entrySet()) {
                 String itemId = entry.getKey();
-                if (itemId == null || itemId.isBlank() || !itemId.startsWith("item/")) continue;
-                String normalized = itemId.toLowerCase(Locale.ROOT);
-                if (!normalized.contains("weapon") && !normalized.contains("tool") && !normalized.contains("consumable") && !normalized.contains("material") && !normalized.contains("resource") && !normalized.contains("armor")) continue;
-                fallback.add(itemId);
-                if (fallback.size() >= 64) break;
+                Item asset = entry.getValue();
+                if (itemId == null || itemId.isBlank() || asset == null || asset == Item.UNKNOWN) continue;
+                String resolved = HordeService.resolveRewardItemAssetId(itemId);
+                if (resolved.isBlank() || !HordeService.isUsableRewardItemIdRaw(resolved, 1)) continue;
+                fallback.add(resolved);
             }
+            fallback.sort(String.CASE_INSENSITIVE_ORDER);
         }
         catch (Exception exception) {
             // ignore and keep fallback empty

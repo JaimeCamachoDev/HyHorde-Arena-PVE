@@ -142,9 +142,16 @@ extends CustomUIPage {
             this.playerRef.sendMessage(Message.raw((String)"No hay items recompensa validos detectados en este modpack."));
             return;
         }
+        int total = suggestions.size();
+        int previewCount = Math.min(24, total);
+        List<String> preview = suggestions.subList(0, previewCount);
+        this.playerRef.sendMessage(Message.raw((String)("Items recompensa detectados: " + total + ".")));
         this.playerRef.sendMessage(Message.raw((String)("Item de test recomendado (seguro): " + suggestions.get(0))));
-        this.playerRef.sendMessage(Message.raw((String)("Sugerencias de items recompensa: " + String.join(", ", suggestions))));
-        this.playerRef.sendMessage(Message.raw((String)"Si un item no existe en tu pack, usa otro ID valido en RewardItemId."));
+        this.playerRef.sendMessage(Message.raw((String)("Preview (" + previewCount + "): " + String.join(", ", preview))));
+        if (total > previewCount) {
+            this.playerRef.sendMessage(Message.raw((String)("Hay +" + (total - previewCount) + " IDs. Usa los botones < > para recorrer mas opciones.")));
+        }
+        this.playerRef.sendMessage(Message.raw((String)"Tambien puedes pegar una linea completa de ItemDumper y se intentara extraer el ID automaticamente."));
     }
 
     private HordeService.OperationResult cycleEnemyType(Map<String, String> values, World world, int offset) {
@@ -252,7 +259,7 @@ extends CustomUIPage {
                 .set("#RewardEveryRoundsLabel.Text", english ? "Reward every round(s)" : "Recompensa por ronda(s)")
                 .set("#RewardCommandsLabel.Text", english ? "Reward item" : "Item recompensa")
                 .set("#RewardTypesButton.Text", english ? "View loot" : "Ver loot")
-                .set("#RewardCommandsHelpLabel.Text", english ? "Tip: first suggestion is a tested item for this modpack." : "Tip: la primera sugerencia es un item testado para este modpack.")
+                .set("#RewardCommandsHelpLabel.Text", english ? "Tip: you can paste ItemDumper lines; the ID is auto-extracted." : "Tip: puedes pegar lineas de ItemDumper; se extrae el ID automaticamente.")
                 .set("#RewardItemQuantityLabel.Text", english ? "Qty." : "Cant.")
                 .set("#StatusTitleLabel.Text", english ? "Current status" : "Estado actual")
                 .set("#SaveButton.Text", english ? "Save config" : "Guardar config")
