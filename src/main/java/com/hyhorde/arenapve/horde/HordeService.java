@@ -494,6 +494,53 @@ public final class HordeService {
         return OperationResult.ok("Horda detenida.");
     }
 
+    public synchronized OperationResult skipToNextRound(World world) {
+        if (this.session == null) {
+            return OperationResult.fail("No hay horda activa para saltar.");
+        }
+        HordeSession trackedSession = this.session;
+        if (world != null && trackedSession.world != world) {
+            return OperationResult.fail("La horda activa esta en otro mundo.");
+        }
+        if (!trackedSession.world.isAlive()) {
+            return OperationResult.fail("No se puede saltar ronda: el mundo activo no esta disponible.");
+        }
+        int previousRound = trackedSession.currentRound;
+        int cleanedEnemies = this.cleanupAndResetTrackedEnemies(trackedSession);
+        if (trackedSession.roundActive) {
+            trackedSession.roundActive = false;
+            this.grantRoundRewards(trackedSession, previousRound);
+            if (previousRound >= this.config.rounds) {
+                this.endSession(trackedSession, "Horda finalizada manualmente al saltar la ultima ronda.", false);
+                return OperationResult.ok("Ultima ronda forzada. Enemigos limpiados: " + cleanedEnemies + ".");
+            }
+            trackedSession.nextRoundAtMillis = 0L;
+            trackedSession.lastIntermissionCountdownAnnouncement = -1;
+            this.spawnNextRound(trackedSession, Vector3f.ZERO);
+            trackedSession.world.sendMessage(Message.raw((String)("Ronda " + previousRound + " forzada manualmente. Enemigos limpiados: " + cleanedEnemies + ".")));
+            this.refreshStatusHud(trackedSession);
+            return OperationResult.ok("Ronda saltada. Iniciada ronda " + trackedSession.currentRound + ".");
+        }
+        if (previousRound == 0 && trackedSession.nextRoundAtMillis > 0L) {
+            trackedSession.nextRoundAtMillis = 0L;
+            trackedSession.lastStartCountdownAnnouncement = 0;
+            this.spawnNextRound(trackedSession, new Vector3f(trackedSession.startRotation));
+            trackedSession.world.sendMessage(Message.raw((String)"Cuenta atras omitida. Ronda 1 iniciada manualmente."));
+            this.refreshStatusHud(trackedSession);
+            return OperationResult.ok("Cuenta atras omitida. Ronda 1 iniciada.");
+        }
+        if (previousRound >= this.config.rounds) {
+            this.endSession(trackedSession, "Horda finalizada manualmente.", false);
+            return OperationResult.ok("La horda ya estaba en su ronda final y se finalizo manualmente.");
+        }
+        trackedSession.nextRoundAtMillis = 0L;
+        trackedSession.lastIntermissionCountdownAnnouncement = -1;
+        this.spawnNextRound(trackedSession, Vector3f.ZERO);
+        trackedSession.world.sendMessage(Message.raw((String)("Intermedio omitido manualmente. Ronda " + trackedSession.currentRound + " iniciada.")));
+        this.refreshStatusHud(trackedSession);
+        return OperationResult.ok("Intermedio omitido. Iniciada ronda " + trackedSession.currentRound + ".");
+    }
+
     public synchronized void shutdown() {
         if (this.session == null) {
             this.closeAllStatusPages();
@@ -830,6 +877,17 @@ public final class HordeService {
                 // ignore individual remove failures and continue cleanup
             }
         }
+        return cleaned;
+    }
+
+    private int cleanupAndResetTrackedEnemies(HordeSession trackedSession) {
+        int cleaned = this.cleanupTrackedEnemies(trackedSession);
+        if (cleaned > 0) {
+            trackedSession.totalKilled += cleaned;
+        }
+        trackedSession.activeEnemies.clear();
+        trackedSession.spawnedEnemies.clear();
+        trackedSession.accountedEnemyDeaths.clear();
         return cleaned;
     }
 
@@ -1214,7 +1272,7 @@ public final class HordeService {
 
     private static Map<String, String[]> buildEnemyTypeHints() {
         LinkedHashMap<String, String[]> hints = new LinkedHashMap<String, String[]>();
-        hints.put("undead", new String[]{"Chicken_Undead", "Cow_Undead", "Aberrant_Zombie", "Burnt_Zombie", "Burnt_Skeleton_Soldier", "Burnt_Skeleton_Archer", "Burnt_Skeleton_Gunner", "Burnt_Skeleton_Lancer", "Burnt_Skeleton_Knight", "Burnt_Skeleton_Praetorian", "Burnt_Skeleton_Wizard", "Dungeon_Skeleton_Sand_Archer", "Dungeon_Skeleton_Sand_Assassin", "Dungeon_Skeleton_Sand_Mage", "Armored_Skeleton_Horse"});
+        hints.put("undead", new String[]{"Aberrant_Zombie", "Burnt_Zombie", "Burnt_Skeleton_Soldier", "Burnt_Skeleton_Archer", "Burnt_Skeleton_Gunner", "Burnt_Skeleton_Lancer", "Burnt_Skeleton_Knight", "Burnt_Skeleton_Praetorian", "Burnt_Skeleton_Wizard", "Dungeon_Skeleton_Sand_Archer", "Dungeon_Skeleton_Sand_Assassin", "Dungeon_Skeleton_Sand_Mage", "Armored_Skeleton_Horse"});
         hints.put("goblins", new String[]{"Goblin_Scavenger", "Goblin_Thief", "Goblin_Scrapper", "Goblin_Miner", "Goblin_Lobber", "Goblin_Ogre", "Goblin_Hermit", "Goblin_Duke"});
         hints.put("scarak", new String[]{"Dungeon_Scarak_Fighter", "Dungeon_Scarak_Defender", "Dungeon_Scarak_Seeker", "Dungeon_Scarak_Louse", "Dungeon_Scarak_Broodmother_Young"});
         hints.put("void", new String[]{"Crawler_Void", "VoidSpawn", "VoidTaken"});

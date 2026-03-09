@@ -376,6 +376,17 @@ Group {
     );
   }
 
+  TextButton #SkipRoundButton {
+    Anchor: (Left: 944, Top: 810, Width: 286, Height: 44);
+    Text: "Pasar ronda";
+    Visible: false;
+    Style: TextButtonStyle(
+      Default: (Background: #7b5a1f, LabelStyle: (FontSize: 15, TextColor: #fff7e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #9a7329, LabelStyle: (FontSize: 15, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #5f4518, LabelStyle: (FontSize: 15, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+    );
+  }
+
   TextButton #CloseButton {
     Anchor: (Left: 1246, Top: 810, Width: 182, Height: 44);
     Text: "Cerrar";
