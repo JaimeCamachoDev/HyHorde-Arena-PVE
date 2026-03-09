@@ -16,6 +16,9 @@ import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
+import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
+import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
+import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.plugin.PluginBase;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -28,6 +31,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -55,6 +60,8 @@ public final class HordeService {
     private static final List<String> PREFERRED_REWARD_TEST_ITEMS = List.of("Armor_Bronze_Chest", "Armor_Copper_Chest", "Armor_Iron_Chest", "Tool_Watering_Can_State_Filled_Water", "*Container_Bucket_State_Filled_Water", "item/resource/wood", "item/resource/stone", "item/consumable/apple", "item/material/iron_ingot", "item/weapon/sword_iron");
     private static final String DEFAULT_ENEMY_TYPE = "undead";
     private static final Map<String, String[]> ENEMY_TYPE_HINTS = HordeService.buildEnemyTypeHints();
+    private static final String[] FINAL_BOSS_ROLE_HINTS = new String[]{"Goblin_Ogre", "Cave_Rex", "Earthen_Golem", "Ember_Golem", "Frost_Elemental", "Fire_Elemental", "Burnt_Skeleton_Praetorian", "Burnt_Skeleton_Knight", "Dungeon_Scarak_Broodmother_Young", "Feran_Longtooth", "Feran_Sharptooth", "Armored_Skeleton_Horse"};
+    private static final String[] FINAL_BOSS_ROLE_KEYWORDS = new String[]{"ogre", "rex", "golem", "elemental", "praetorian", "broodmother", "duke", "knight", "longtooth", "sharptooth", "behemoth", "giant", "brute", "warlord", "titan"};
     private static final List<String> ENEMY_TYPE_OPTIONS = HordeService.buildEnemyTypeOptions();
     private static final List<String> RANDOM_ENEMY_TYPE_OPTIONS = HordeService.buildRandomEnemyTypePool();
     private static final List<String> REWARD_ITEM_SUGGESTIONS = HordeService.buildRewardItemSuggestions();
@@ -77,6 +84,12 @@ public final class HordeService {
     private static final int MAX_WAVE_DELAY_SECONDS = 300;
     private static final int MIN_REWARD_ITEM_QUANTITY = 1;
     private static final int MAX_REWARD_ITEM_QUANTITY = 9999;
+    private static final int MIN_ENEMY_LEVEL = 1;
+    private static final int MAX_ENEMY_LEVEL = 200;
+    private static final int FINAL_BOSS_LEVEL_BONUS = 2;
+    private static final float ENEMY_LEVEL_HEALTH_STEP = 0.1f;
+    private static final float ENEMY_LEVEL_HEALTH_MAX_MULTIPLIER = 6.0f;
+    private static final float FINAL_BOSS_HEALTH_MULTIPLIER = 1.35f;
     private static final double MIN_RADIUS = 1.0;
     private static final double MAX_RADIUS = 128.0;
     private static final String LANGUAGE_SPANISH = "es";
@@ -86,6 +99,7 @@ public final class HordeService {
     private final Gson gson;
     private final Path configPath;
     private final Map<UUID, HordeStatusPage> statusPages;
+    private boolean pluginReloadInProgress;
     private HordeConfig config;
     private HordeSession session;
 
@@ -118,11 +132,12 @@ public final class HordeService {
         int alive = HordeService.countAlive(this.session.activeEnemies);
         int totalDeaths = HordeService.getTotalDeaths(this.session.playerStats);
         String rewardInfo = HordeService.formatRewardInfo(this.config.rewardItemId, this.config.rewardItemQuantity, false);
+        String finalBossInfo = this.config.finalBossEnabled ? (HordeService.isEnglishLanguage(language) ? "on" : "si") : (HordeService.isEnglishLanguage(language) ? "off" : "no");
         if (HordeService.isEnglishLanguage(language)) {
             rewardInfo = HordeService.formatRewardInfo(this.config.rewardItemId, this.config.rewardItemQuantity, true);
-            return "Horde active | Round " + this.session.currentRound + "/" + this.config.rounds + " | Remaining enemies: " + alive + " | Total spawned: " + this.session.totalSpawned + " | Kills detected: " + this.session.totalKilled + " | Player deaths: " + totalDeaths + " | Type: " + this.session.enemyType + " | Real role: " + this.session.role + " | Players x" + this.session.playerMultiplier + " | Reward every: " + this.config.rewardEveryRounds + " round(s) | Item: " + rewardInfo;
+            return "Horde active | Round " + this.session.currentRound + "/" + this.config.rounds + " | Remaining enemies: " + alive + " | Total spawned: " + this.session.totalSpawned + " | Kills detected: " + this.session.totalKilled + " | Player deaths: " + totalDeaths + " | Type: " + this.session.enemyType + " | Real role: " + this.session.role + " | Players x" + this.session.playerMultiplier + " | Levels: " + this.config.enemyLevelMin + "-" + this.config.enemyLevelMax + " | Final boss: " + finalBossInfo + " | Reward every: " + this.config.rewardEveryRounds + " round(s) | Item: " + rewardInfo;
         }
-        return "Horda activa | Ronda " + this.session.currentRound + "/" + this.config.rounds + " | Enemigos vivos: " + alive + " | Spawn total: " + this.session.totalSpawned + " | Kills detectadas: " + this.session.totalKilled + " | Muertes de jugadores: " + totalDeaths + " | Tipo: " + this.session.enemyType + " | Rol real: " + this.session.role + " | Jugadores x" + this.session.playerMultiplier + " | Recompensa por cada: " + this.config.rewardEveryRounds + " ronda(s) | Item: " + rewardInfo;
+        return "Horda activa | Ronda " + this.session.currentRound + "/" + this.config.rounds + " | Enemigos vivos: " + alive + " | Spawn total: " + this.session.totalSpawned + " | Kills detectadas: " + this.session.totalKilled + " | Muertes de jugadores: " + totalDeaths + " | Tipo: " + this.session.enemyType + " | Rol real: " + this.session.role + " | Jugadores x" + this.session.playerMultiplier + " | Niveles: " + this.config.enemyLevelMin + "-" + this.config.enemyLevelMax + " | Boss final: " + finalBossInfo + " | Recompensa por cada: " + this.config.rewardEveryRounds + " ronda(s) | Item: " + rewardInfo;
     }
 
     public synchronized List<String> getAvailableRoles() {
@@ -238,7 +253,88 @@ public final class HordeService {
         this.refreshStatusHud(this.session);
     }
 
+    public synchronized OperationResult reloadPlugin() {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "A plugin reload is already in progress." : "Ya hay una recarga del plugin en progreso.");
+        }
+        String pluginIdText = String.valueOf(this.plugin.getIdentifier());
+        this.pluginReloadInProgress = true;
+        try {
+            if (this.session != null) {
+                this.stop(true);
+            }
+            this.closeAllStatusPages();
+        }
+        catch (Exception ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo preparar la recarga del plugin de horda: %s", (Object)ex.getMessage());
+        }
+        this.plugin.getLogger().at(Level.INFO).log("Solicitando recarga del plugin %s...", (Object)pluginIdText);
+        HytaleServer.SCHEDULED_EXECUTOR.schedule(() -> {
+            boolean reloaded = false;
+            try {
+                reloaded = this.invokePluginReload();
+                if (reloaded) {
+                    this.plugin.getLogger().at(Level.INFO).log("Plugin %s recargado correctamente.", (Object)pluginIdText);
+                } else {
+                    this.plugin.getLogger().at(Level.WARNING).log("Plugin %s no se pudo recargar (PluginManager.reload devolvio false).", (Object)pluginIdText);
+                }
+            }
+            catch (Exception ex) {
+                this.plugin.getLogger().at(Level.WARNING).log("No se pudo recargar el plugin %s: %s", (Object)pluginIdText, (Object)ex.getMessage());
+            }
+            finally {
+                synchronized (this) {
+                    this.pluginReloadInProgress = false;
+                }
+            }
+        }, 500L, TimeUnit.MILLISECONDS);
+        if (english) {
+            return OperationResult.ok("Plugin reload scheduled. Close the UI and wait a few seconds.");
+        }
+        return OperationResult.ok("Recarga del plugin programada. Cierra la UI y espera unos segundos.");
+    }
+
+    public synchronized boolean isPluginReloadInProgress() {
+        return this.pluginReloadInProgress;
+    }
+
+    private boolean invokePluginReload() {
+        try {
+            Class<?> pluginManagerClass = Class.forName("com.hypixel.hytale.server.core.plugin.PluginManager");
+            Method getMethod = pluginManagerClass.getMethod("get", new Class[0]);
+            Object pluginManager = getMethod.invoke(null, new Object[0]);
+            if (pluginManager == null) {
+                return false;
+            }
+            Object identifier = this.plugin.getIdentifier();
+            for (Method method : pluginManagerClass.getMethods()) {
+                if (!"reload".equals(method.getName()) || method.getParameterCount() != 1) {
+                    continue;
+                }
+                Class<?> parameterType = method.getParameterTypes()[0];
+                if (identifier != null && !parameterType.isAssignableFrom(identifier.getClass()) && parameterType != Object.class) {
+                    continue;
+                }
+                Object reloadResult = method.invoke(pluginManager, identifier);
+                Class<?> returnType = method.getReturnType();
+                if (returnType == Boolean.TYPE || returnType == Boolean.class) {
+                    return Boolean.TRUE.equals(reloadResult);
+                }
+                return true;
+            }
+        }
+        catch (Exception ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo invocar recarga de plugin por reflexion: %s", (Object)ex.getMessage());
+        }
+        return false;
+    }
+
     public synchronized OperationResult reloadConfigFromDisk() {
+        if (this.pluginReloadInProgress) {
+            boolean english = HordeService.isEnglishLanguage(this.config.language);
+            return OperationResult.fail(english ? "Cannot reload config while plugin reload is in progress." : "No se puede recargar la configuracion mientras el plugin se esta recargando.");
+        }
         this.loadConfig();
         this.refreshStatusHud(this.session);
         boolean english = HordeService.isEnglishLanguage(this.config.language);
@@ -247,6 +343,9 @@ public final class HordeService {
 
     public synchronized OperationResult openStatusHud(Ref<EntityStore> playerEntityRef, Store<EntityStore> store, PlayerRef playerRef, World world) {
         boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
         Player player = (Player)store.getComponent(playerEntityRef, Player.getComponentType());
         if (player == null) {
             return OperationResult.fail(english ? "Could not open the status panel right now." : "No se pudo abrir el panel de estado ahora mismo.");
@@ -354,6 +453,9 @@ public final class HordeService {
     public synchronized OperationResult applyUiConfig(Map<String, String> values, World world) {
         HordeConfig updated = this.config.copy();
         boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
         try {
             updated.spawnX = HordeService.parseDouble(values.get("spawnX"), updated.spawnX, "spawnX", english);
             updated.spawnY = HordeService.parseDouble(values.get("spawnY"), updated.spawnY, "spawnY", english);
@@ -366,6 +468,14 @@ public final class HordeService {
             updated.waveDelaySeconds = HordeService.parseInt(values.get("waveDelay"), updated.waveDelaySeconds, "waveDelay", english);
             updated.playerMultiplier = HordeService.parseInt(values.get("playerMultiplier"), updated.playerMultiplier, "playerMultiplier", english);
             updated.rewardEveryRounds = HordeService.parseInt(values.get("rewardEveryRounds"), updated.rewardEveryRounds, "rewardEveryRounds", english);
+            updated.enemyLevelMin = HordeService.parseInt(values.get("enemyLevelMin"), updated.enemyLevelMin, "enemyLevelMin", english);
+            updated.enemyLevelMax = HordeService.parseInt(values.get("enemyLevelMax"), updated.enemyLevelMax, "enemyLevelMax", english);
+        }
+        catch (IllegalArgumentException ex) {
+            return OperationResult.fail(ex.getMessage());
+        }
+        try {
+            updated.finalBossEnabled = HordeService.parseBoolean(values.get("finalBossEnabled"), updated.finalBossEnabled, "finalBossEnabled", english);
         }
         catch (IllegalArgumentException ex) {
             return OperationResult.fail(ex.getMessage());
@@ -437,6 +547,15 @@ public final class HordeService {
         if (updated.waveDelaySeconds < MIN_WAVE_DELAY_SECONDS || updated.waveDelaySeconds > MAX_WAVE_DELAY_SECONDS) {
             return OperationResult.fail(english ? "waveDelay must be between " + MIN_WAVE_DELAY_SECONDS + " and " + MAX_WAVE_DELAY_SECONDS + " seconds." : "waveDelay debe estar entre " + MIN_WAVE_DELAY_SECONDS + " y " + MAX_WAVE_DELAY_SECONDS + " segundos.");
         }
+        if (updated.enemyLevelMin < MIN_ENEMY_LEVEL || updated.enemyLevelMin > MAX_ENEMY_LEVEL) {
+            return OperationResult.fail(english ? "enemyLevelMin must be between " + MIN_ENEMY_LEVEL + " and " + MAX_ENEMY_LEVEL + "." : "enemyLevelMin debe estar entre " + MIN_ENEMY_LEVEL + " y " + MAX_ENEMY_LEVEL + ".");
+        }
+        if (updated.enemyLevelMax < MIN_ENEMY_LEVEL || updated.enemyLevelMax > MAX_ENEMY_LEVEL) {
+            return OperationResult.fail(english ? "enemyLevelMax must be between " + MIN_ENEMY_LEVEL + " and " + MAX_ENEMY_LEVEL + "." : "enemyLevelMax debe estar entre " + MIN_ENEMY_LEVEL + " y " + MAX_ENEMY_LEVEL + ".");
+        }
+        if (updated.enemyLevelMax < updated.enemyLevelMin) {
+            return OperationResult.fail(english ? "enemyLevelMax must be greater than or equal to enemyLevelMin." : "enemyLevelMax debe ser mayor o igual a enemyLevelMin.");
+        }
         updated.spawnConfigured = true;
         updated.worldName = world.getName();
         this.config = updated;
@@ -447,6 +566,9 @@ public final class HordeService {
     public synchronized OperationResult start(Store<EntityStore> store, PlayerRef startedBy, World world) {
         HordeSession newSession;
         boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
         if (this.session != null) {
             return OperationResult.fail(english ? "There is already an active horde." : "Ya hay una horda activa.");
         }
@@ -495,10 +617,11 @@ public final class HordeService {
         this.syncSessionPlayers(newSession);
         newSession.ticker = HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> this.tickSession(newSession), 0L, SESSION_TICK_INTERVAL_MILLIS, TimeUnit.MILLISECONDS);
         String roleSuffix = forcedRole == null ? selectedRole : selectedRole + (english ? " (forced)" : " (forzado)");
+        String finalBossState = this.config.finalBossEnabled ? (english ? "on" : "si") : (english ? "off" : "no");
         if (english) {
-            world.sendMessage(Message.raw((String)String.format(Locale.ROOT, "Horde PVE prepared at %.2f %.2f %.2f | %d rounds | type: %s | role: %s | players x%d | starts in %ds", this.config.spawnX, this.config.spawnY, this.config.spawnZ, this.config.rounds, selectedEnemyType, roleSuffix, this.config.playerMultiplier, START_COUNTDOWN_TOTAL_SECONDS)));
+            world.sendMessage(Message.raw((String)String.format(Locale.ROOT, "Horde PVE prepared at %.2f %.2f %.2f | %d rounds | type: %s | role: %s | players x%d | levels: %d-%d | final boss: %s | starts in %ds", this.config.spawnX, this.config.spawnY, this.config.spawnZ, this.config.rounds, selectedEnemyType, roleSuffix, this.config.playerMultiplier, this.config.enemyLevelMin, this.config.enemyLevelMax, finalBossState, START_COUNTDOWN_TOTAL_SECONDS)));
         } else {
-            world.sendMessage(Message.raw((String)String.format(Locale.ROOT, "Horda PVE preparada en %.2f %.2f %.2f | %d rondas | tipo: %s | rol: %s | jugadores x%d | inicio en %ds", this.config.spawnX, this.config.spawnY, this.config.spawnZ, this.config.rounds, selectedEnemyType, roleSuffix, this.config.playerMultiplier, START_COUNTDOWN_TOTAL_SECONDS)));
+            world.sendMessage(Message.raw((String)String.format(Locale.ROOT, "Horda PVE preparada en %.2f %.2f %.2f | %d rondas | tipo: %s | rol: %s | jugadores x%d | niveles: %d-%d | boss final: %s | inicio en %ds", this.config.spawnX, this.config.spawnY, this.config.spawnZ, this.config.rounds, selectedEnemyType, roleSuffix, this.config.playerMultiplier, this.config.enemyLevelMin, this.config.enemyLevelMax, finalBossState, START_COUNTDOWN_TOTAL_SECONDS)));
         }
         this.broadcastHordeStartAnnouncement(selectedEnemyType, selectedRole, this.config.playerMultiplier);
         return OperationResult.ok(english ? "Horde started. Countdown: 3..2..1." : "Horda iniciada. Cuenta atras: 3..2..1.");
@@ -662,10 +785,18 @@ public final class HordeService {
         int playerMultiplier = Math.max(MIN_PLAYER_MULTIPLIER, sessionToAdvance.playerMultiplier);
         int baseCount = this.config.baseEnemiesPerRound + (nextRound - 1) * this.config.enemiesPerRoundIncrement;
         int targetCount = Math.max(1, baseCount * playerMultiplier);
+        int levelMin = Math.max(MIN_ENEMY_LEVEL, Math.min(this.config.enemyLevelMin, this.config.enemyLevelMax));
+        int levelMax = Math.min(MAX_ENEMY_LEVEL, Math.max(this.config.enemyLevelMin, this.config.enemyLevelMax));
+        boolean finalRound = nextRound >= this.config.rounds;
+        boolean spawnFinalBoss = finalRound && this.config.finalBossEnabled;
+        int spawnGoal = targetCount + (spawnFinalBoss ? 1 : 0);
         Vector3d center = new Vector3d(this.config.spawnX, this.config.spawnY, this.config.spawnZ);
         ThreadLocalRandom random = ThreadLocalRandom.current();
         int spawned = 0;
-        for (int i = 0; i < targetCount; ++i) {
+        boolean bossSpawned = false;
+        String bossRoleUsed = "";
+        for (int i = 0; i < spawnGoal; ++i) {
+            boolean bossSpawn = spawnFinalBoss && i == spawnGoal - 1;
             double angle = random.nextDouble(0.0, Math.PI * 2);
             double distance = random.nextDouble(this.config.minSpawnRadius, this.config.maxSpawnRadius);
             double offsetX = Math.cos(angle) * distance;
@@ -687,6 +818,12 @@ public final class HordeService {
                         roleForSpawn = resolvedCategoryRole;
                     }
                 }
+                if (bossSpawn) {
+                    String finalBossRole = HordeService.pickFinalBossRole(sessionToAdvance.availableRoles);
+                    if (finalBossRole != null && !finalBossRole.isBlank()) {
+                        roleForSpawn = finalBossRole;
+                    }
+                }
                 if (roleForSpawn == null || roleForSpawn.isBlank()) {
                     continue;
                 }
@@ -695,8 +832,14 @@ public final class HordeService {
                 Ref<EntityStore> enemyRef = (Ref<EntityStore>)((Ref)created.left());
                 sessionToAdvance.activeEnemies.add(enemyRef);
                 sessionToAdvance.spawnedEnemies.add(enemyRef);
+                int enemyLevel = this.rollEnemyLevel(levelMin, levelMax, bossSpawn);
+                this.applyEnemyLevelIfSupported(sessionToAdvance.store, enemyRef, enemyLevel, bossSpawn);
                 ++sessionToAdvance.totalSpawned;
                 ++spawned;
+                if (bossSpawn) {
+                    bossSpawned = true;
+                    bossRoleUsed = roleForSpawn;
+                }
                 continue;
             }
             catch (Exception exception) {
@@ -711,9 +854,11 @@ public final class HordeService {
         sessionToAdvance.roundActive = true;
         sessionToAdvance.nextRoundAtMillis = 0L;
         if (english) {
-            sessionToAdvance.world.sendMessage(Message.raw((String)("Round " + nextRound + "/" + this.config.rounds + " started: " + spawned + " enemies (x" + playerMultiplier + " players).")));
+            String bossSuffix = spawnFinalBoss ? (bossSpawned ? " | Final boss spawned" + (bossRoleUsed.isBlank() ? "." : " (" + bossRoleUsed + ").") : " | Final boss requested but could not spawn.") : "";
+            sessionToAdvance.world.sendMessage(Message.raw((String)("Round " + nextRound + "/" + this.config.rounds + " started: " + spawned + " enemies (x" + playerMultiplier + " players, lvl " + levelMin + "-" + levelMax + ")." + bossSuffix)));
         } else {
-            sessionToAdvance.world.sendMessage(Message.raw((String)("Ronda " + nextRound + "/" + this.config.rounds + " iniciada: " + spawned + " enemigos (x" + playerMultiplier + " jugadores).")));
+            String bossSuffix = spawnFinalBoss ? (bossSpawned ? " | Boss final invocado" + (bossRoleUsed.isBlank() ? "." : " (" + bossRoleUsed + ").") : " | Boss final solicitado pero no se pudo invocar.") : "";
+            sessionToAdvance.world.sendMessage(Message.raw((String)("Ronda " + nextRound + "/" + this.config.rounds + " iniciada: " + spawned + " enemigos (x" + playerMultiplier + " jugadores, nivel " + levelMin + "-" + levelMax + ")." + bossSuffix)));
         }
         this.broadcastRoundStartAnnouncement(nextRound, this.config.rounds, spawned, playerMultiplier);
     }
@@ -796,7 +941,8 @@ public final class HordeService {
         try {
             boolean english = HordeService.isEnglishLanguage(this.config.language);
             String titleText = english ? "HORDE PVE READY" : "HORDA PVE PREPARADA";
-            String subtitleText = english ? String.format(Locale.ROOT, "Type: %s | Role: %s | Rounds: %d | Players x%d | Starts in %ds", enemyType, role, this.config.rounds, playerMultiplier, START_COUNTDOWN_TOTAL_SECONDS) : String.format(Locale.ROOT, "Tipo: %s | Rol: %s | Rondas: %d | Jugadores x%d | Inicio en %ds", enemyType, role, this.config.rounds, playerMultiplier, START_COUNTDOWN_TOTAL_SECONDS);
+            String bossState = this.config.finalBossEnabled ? (english ? "on" : "si") : (english ? "off" : "no");
+            String subtitleText = english ? String.format(Locale.ROOT, "Type: %s | Role: %s | Rounds: %d | Players x%d | Lvl %d-%d | Final boss %s | Starts in %ds", enemyType, role, this.config.rounds, playerMultiplier, this.config.enemyLevelMin, this.config.enemyLevelMax, bossState, START_COUNTDOWN_TOTAL_SECONDS) : String.format(Locale.ROOT, "Tipo: %s | Rol: %s | Rondas: %d | Jugadores x%d | Niv %d-%d | Boss final %s | Inicio en %ds", enemyType, role, this.config.rounds, playerMultiplier, this.config.enemyLevelMin, this.config.enemyLevelMax, bossState, START_COUNTDOWN_TOTAL_SECONDS);
             EventTitleUtil.showEventTitleToUniverse(Message.raw((String)titleText), Message.raw((String)subtitleText), true, "", 1.2f, 0.1f, 0.15f);
         }
         catch (Exception ex) {
@@ -1114,6 +1260,45 @@ public final class HordeService {
         }
         int randomIndex = ThreadLocalRandom.current().nextInt(matches.size());
         return matches.get(randomIndex);
+    }
+
+    private static String pickFinalBossRole(List<String> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return null;
+        }
+        LinkedHashSet<String> candidates = new LinkedHashSet<String>();
+        for (String hint : FINAL_BOSS_ROLE_HINTS) {
+            if (hint == null || hint.isBlank()) {
+                continue;
+            }
+            for (String role : roles) {
+                if (HordeService.isBlockedEnemyRole(role)) {
+                    continue;
+                }
+                if (role.equalsIgnoreCase(hint)) {
+                    candidates.add(role);
+                }
+            }
+        }
+        for (String role : roles) {
+            if (HordeService.isBlockedEnemyRole(role)) {
+                continue;
+            }
+            String normalizedRole = role.toLowerCase(Locale.ROOT);
+            for (String keyword : FINAL_BOSS_ROLE_KEYWORDS) {
+                if (keyword == null || keyword.isBlank() || !normalizedRole.contains(keyword)) {
+                    continue;
+                }
+                candidates.add(role);
+                break;
+            }
+        }
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        ArrayList<String> ordered = new ArrayList<String>(candidates);
+        int randomIndex = ThreadLocalRandom.current().nextInt(ordered.size());
+        return ordered.get(randomIndex);
     }
 
     private static List<String> findSupportedEnemyTypes(List<String> roles) {
@@ -1666,6 +1851,352 @@ public final class HordeService {
         return RANDOM_ENEMY_TYPE_OPTIONS.get(randomIndex);
     }
 
+    private int rollEnemyLevel(int minLevel, int maxLevel, boolean bossSpawn) {
+        int safeMin = Math.max(MIN_ENEMY_LEVEL, Math.min(minLevel, maxLevel));
+        int safeMax = Math.min(MAX_ENEMY_LEVEL, Math.max(minLevel, maxLevel));
+        int rolled = safeMin >= safeMax ? safeMin : ThreadLocalRandom.current().nextInt(safeMin, safeMax + 1);
+        if (!bossSpawn) {
+            return rolled;
+        }
+        return Math.min(MAX_ENEMY_LEVEL, Math.max(rolled, safeMax) + FINAL_BOSS_LEVEL_BONUS);
+    }
+
+    private void applyEnemyLevelIfSupported(Store<EntityStore> store, Ref<EntityStore> enemyRef, int level, boolean bossSpawn) {
+        if (store == null || enemyRef == null || !enemyRef.isValid()) {
+            return;
+        }
+        boolean appliedWithLevelComponent = false;
+        String[] candidateComponentClasses = new String[]{
+            "com.hypixel.hytale.server.core.modules.entity.stats.LevelComponent",
+            "com.hypixel.hytale.server.core.modules.entity.stats.EntityLevelComponent",
+            "com.hypixel.hytale.server.core.modules.entity.npc.NpcLevelComponent",
+            "com.hypixel.hytale.server.core.modules.entity.npc.NPCLevelComponent"
+        };
+        for (String className : candidateComponentClasses) {
+            try {
+                Class<?> componentClass = Class.forName(className);
+                Method getComponentType = componentClass.getMethod("getComponentType", new Class[0]);
+                Object componentType = getComponentType.invoke(null, new Object[0]);
+                Object component = this.invokeStoreGetComponent(store, enemyRef, componentType);
+                if (component == null) {
+                    continue;
+                }
+                if (this.trySetLevelWithMethod(component, level)) {
+                    appliedWithLevelComponent = true;
+                    break;
+                }
+                if (this.trySetLevelWithField(component, level)) {
+                    appliedWithLevelComponent = true;
+                    break;
+                }
+            }
+            catch (ClassNotFoundException classNotFoundException) {
+                // optional component not available in this runtime
+            }
+            catch (Exception exception) {
+                // keep horde flow alive even if level assignment fails
+            }
+        }
+        if (!appliedWithLevelComponent) {
+            this.applyEnemyHealthScalingFallback(store, enemyRef, level, bossSpawn);
+        }
+    }
+
+    private void applyEnemyHealthScalingFallback(Store<EntityStore> store, Ref<EntityStore> enemyRef, int level, boolean bossSpawn) {
+        try {
+            EntityStatMap statMap = (EntityStatMap)store.getComponent(enemyRef, EntityStatMap.getComponentType());
+            if (statMap == null) {
+                return;
+            }
+            EntityStatValue health = statMap.get(DefaultEntityStatTypes.getHealth());
+            if (health == null) {
+                return;
+            }
+            float currentHealth = Math.max(1.0f, health.get());
+            float multiplier = this.computeEnemyHealthMultiplier(level, bossSpawn);
+            float scaledHealth = Math.max(1.0f, currentHealth * multiplier);
+            boolean applied = this.trySetEntityStatValue(health, scaledHealth);
+            if (!applied) {
+                this.trySetHealthOnStatMap(statMap, health, scaledHealth);
+            }
+        }
+        catch (Exception exception) {
+            // keep horde flow alive if stat fallback is unavailable in this runtime
+        }
+    }
+
+    private float computeEnemyHealthMultiplier(int level, boolean bossSpawn) {
+        int clampedLevel = Math.max(MIN_ENEMY_LEVEL, Math.min(level, MAX_ENEMY_LEVEL));
+        float multiplier = 1.0f + (float)(clampedLevel - MIN_ENEMY_LEVEL) * ENEMY_LEVEL_HEALTH_STEP;
+        multiplier = Math.min(ENEMY_LEVEL_HEALTH_MAX_MULTIPLIER, multiplier);
+        if (bossSpawn) {
+            multiplier = Math.min(ENEMY_LEVEL_HEALTH_MAX_MULTIPLIER, multiplier * FINAL_BOSS_HEALTH_MULTIPLIER);
+        }
+        return Math.max(1.0f, multiplier);
+    }
+
+    private boolean trySetEntityStatValue(EntityStatValue statValue, float value) {
+        if (statValue == null) {
+            return false;
+        }
+        String[] candidateSetters = new String[]{"setMax", "setMaxValue", "setBase", "setBaseValue", "set", "setValue", "setCurrent", "setCurrentValue"};
+        boolean changed = false;
+        for (String setter : candidateSetters) {
+            if (this.tryInvokeNumericSetter(statValue, setter, value)) {
+                changed = true;
+            }
+        }
+        if (changed) {
+            return true;
+        }
+        String[] candidateFields = new String[]{"max", "maxValue", "base", "baseValue", "value", "current", "currentValue"};
+        for (String fieldName : candidateFields) {
+            if (this.trySetNumericField(statValue, fieldName, value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean trySetHealthOnStatMap(EntityStatMap statMap, EntityStatValue currentHealth, float value) {
+        if (statMap == null) {
+            return false;
+        }
+        Object healthType = DefaultEntityStatTypes.getHealth();
+        if (healthType == null) {
+            return false;
+        }
+        String[] candidateSetters = new String[]{"set", "setValue", "setCurrent", "setCurrentValue", "setBase", "setBaseValue", "put", "replace"};
+        for (String setter : candidateSetters) {
+            if (this.tryInvokeStatMapSetter(statMap, setter, healthType, currentHealth, value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean tryInvokeStatMapSetter(Object statMap, String methodName, Object statType, EntityStatValue currentStatValue, float value) {
+        if (statMap == null || methodName == null || methodName.isBlank() || statType == null) {
+            return false;
+        }
+        for (Method method : statMap.getClass().getMethods()) {
+            if (!methodName.equals(method.getName()) || method.getParameterCount() != 2) {
+                continue;
+            }
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            if (!parameterTypes[0].isAssignableFrom(statType.getClass())) {
+                continue;
+            }
+            Object numericArg = this.toNumericArgument(parameterTypes[1], value);
+            try {
+                if (numericArg != null) {
+                    method.invoke(statMap, statType, numericArg);
+                    return true;
+                }
+                if (currentStatValue != null && parameterTypes[1].isAssignableFrom(currentStatValue.getClass())) {
+                    method.invoke(statMap, statType, currentStatValue);
+                    return true;
+                }
+            }
+            catch (Exception exception) {
+                // try next overload
+            }
+        }
+        for (Method method : statMap.getClass().getDeclaredMethods()) {
+            if (!methodName.equals(method.getName()) || method.getParameterCount() != 2) {
+                continue;
+            }
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            if (!parameterTypes[0].isAssignableFrom(statType.getClass())) {
+                continue;
+            }
+            method.setAccessible(true);
+            Object numericArg = this.toNumericArgument(parameterTypes[1], value);
+            try {
+                if (numericArg != null) {
+                    method.invoke(statMap, statType, numericArg);
+                    return true;
+                }
+                if (currentStatValue != null && parameterTypes[1].isAssignableFrom(currentStatValue.getClass())) {
+                    method.invoke(statMap, statType, currentStatValue);
+                    return true;
+                }
+            }
+            catch (Exception exception) {
+                // try next overload
+            }
+        }
+        return false;
+    }
+
+    private Object toNumericArgument(Class<?> parameterType, float value) {
+        if (parameterType == null) {
+            return null;
+        }
+        if (parameterType == Float.TYPE || parameterType == Float.class) {
+            return Float.valueOf(value);
+        }
+        if (parameterType == Double.TYPE || parameterType == Double.class) {
+            return Double.valueOf(value);
+        }
+        if (parameterType == Integer.TYPE || parameterType == Integer.class) {
+            return Integer.valueOf(Math.round(value));
+        }
+        if (parameterType == Long.TYPE || parameterType == Long.class) {
+            return Long.valueOf(Math.round(value));
+        }
+        if (parameterType == Number.class || parameterType == Object.class || parameterType.isAssignableFrom(Float.class)) {
+            return Float.valueOf(value);
+        }
+        return null;
+    }
+
+    private boolean tryInvokeNumericSetter(Object target, String methodName, float value) {
+        if (target == null || methodName == null || methodName.isBlank()) {
+            return false;
+        }
+        for (Method method : target.getClass().getMethods()) {
+            if (!methodName.equals(method.getName()) || method.getParameterCount() != 1) {
+                continue;
+            }
+            Class<?> parameterType = method.getParameterTypes()[0];
+            try {
+                if (parameterType == Float.TYPE || parameterType == Float.class) {
+                    method.invoke(target, Float.valueOf(value));
+                    return true;
+                }
+                if (parameterType == Double.TYPE || parameterType == Double.class) {
+                    method.invoke(target, Double.valueOf(value));
+                    return true;
+                }
+                if (parameterType == Integer.TYPE || parameterType == Integer.class) {
+                    method.invoke(target, Integer.valueOf(Math.round(value)));
+                    return true;
+                }
+                if (parameterType == Long.TYPE || parameterType == Long.class) {
+                    method.invoke(target, Long.valueOf(Math.round(value)));
+                    return true;
+                }
+            }
+            catch (Exception exception) {
+                // try next overload
+            }
+        }
+        for (Method method : target.getClass().getDeclaredMethods()) {
+            if (!methodName.equals(method.getName()) || method.getParameterCount() != 1) {
+                continue;
+            }
+            method.setAccessible(true);
+            Class<?> parameterType = method.getParameterTypes()[0];
+            try {
+                if (parameterType == Float.TYPE || parameterType == Float.class) {
+                    method.invoke(target, Float.valueOf(value));
+                    return true;
+                }
+                if (parameterType == Double.TYPE || parameterType == Double.class) {
+                    method.invoke(target, Double.valueOf(value));
+                    return true;
+                }
+                if (parameterType == Integer.TYPE || parameterType == Integer.class) {
+                    method.invoke(target, Integer.valueOf(Math.round(value)));
+                    return true;
+                }
+                if (parameterType == Long.TYPE || parameterType == Long.class) {
+                    method.invoke(target, Long.valueOf(Math.round(value)));
+                    return true;
+                }
+            }
+            catch (Exception exception) {
+                // try next overload
+            }
+        }
+        return false;
+    }
+
+    private boolean trySetNumericField(Object target, String fieldName, float value) {
+        if (target == null || fieldName == null || fieldName.isBlank()) {
+            return false;
+        }
+        try {
+            Field field = target.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            Class<?> fieldType = field.getType();
+            if (fieldType == Float.TYPE || fieldType == Float.class) {
+                field.set(target, Float.valueOf(value));
+                return true;
+            }
+            if (fieldType == Double.TYPE || fieldType == Double.class) {
+                field.set(target, Double.valueOf(value));
+                return true;
+            }
+            if (fieldType == Integer.TYPE || fieldType == Integer.class) {
+                field.set(target, Integer.valueOf(Math.round(value)));
+                return true;
+            }
+            if (fieldType == Long.TYPE || fieldType == Long.class) {
+                field.set(target, Long.valueOf(Math.round(value)));
+                return true;
+            }
+        }
+        catch (Exception exception) {
+            // try next field
+        }
+        return false;
+    }
+
+    private Object invokeStoreGetComponent(Store<EntityStore> store, Ref<EntityStore> enemyRef, Object componentType) throws Exception {
+        if (componentType == null) {
+            return null;
+        }
+        for (Method method : store.getClass().getMethods()) {
+            if (!"getComponent".equals(method.getName()) || method.getParameterCount() != 2) {
+                continue;
+            }
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            if (!parameterTypes[0].isAssignableFrom(enemyRef.getClass())) {
+                continue;
+            }
+            if (!parameterTypes[1].isAssignableFrom(componentType.getClass())) {
+                continue;
+            }
+            return method.invoke(store, enemyRef, componentType);
+        }
+        return null;
+    }
+
+    private boolean trySetLevelWithMethod(Object component, int level) {
+        String[] candidateSetters = new String[]{"setLevel", "setLvl", "setNpcLevel", "setEntityLevel"};
+        for (String setter : candidateSetters) {
+            try {
+                Method method = component.getClass().getMethod(setter, Integer.TYPE);
+                method.invoke(component, level);
+                return true;
+            }
+            catch (Exception exception) {
+                // try next setter
+            }
+        }
+        return false;
+    }
+
+    private boolean trySetLevelWithField(Object component, int level) {
+        String[] candidateFields = new String[]{"level", "lvl", "npcLevel", "entityLevel"};
+        for (String fieldName : candidateFields) {
+            try {
+                Field field = component.getClass().getDeclaredField(fieldName);
+                field.setAccessible(true);
+                if (field.getType() == Integer.TYPE || field.getType() == Integer.class) {
+                    field.set(component, level);
+                    return true;
+                }
+            }
+            catch (Exception exception) {
+                // try next field
+            }
+        }
+        return false;
+    }
+
     private static int removeInvalidRefs(Set<Ref<EntityStore>> refs, Set<Ref<EntityStore>> accountedEnemyDeaths) {
         int removed = 0;
         HashSet<Ref<EntityStore>> stale = new HashSet<Ref<EntityStore>>();
@@ -1714,6 +2245,40 @@ public final class HordeService {
         catch (NumberFormatException ex) {
             throw new IllegalArgumentException(english ? name + " must be a valid decimal number. Received value: " + input : name + " debe ser un numero decimal valido. Valor recibido: " + input);
         }
+    }
+
+    private static boolean parseBoolean(String input, boolean currentValue, String name, boolean english) {
+        if (input == null || input.isBlank()) {
+            return currentValue;
+        }
+        String normalized = input.trim().toLowerCase(Locale.ROOT);
+        normalized = normalized.replace('\u00e1', 'a').replace('\u00e9', 'e').replace('\u00ed', 'i').replace('\u00f3', 'o').replace('\u00fa', 'u');
+        switch (normalized) {
+            case "1":
+            case "true":
+            case "yes":
+            case "y":
+            case "on":
+            case "si":
+            case "enabled":
+            case "enable":
+            case "activo":
+            case "activado": {
+                return true;
+            }
+            case "0":
+            case "false":
+            case "no":
+            case "n":
+            case "off":
+            case "disabled":
+            case "disable":
+            case "inactivo":
+            case "desactivado": {
+                return false;
+            }
+        }
+        throw new IllegalArgumentException(english ? name + " must be true/false (on/off)." : name + " debe ser true/false (on/off).");
     }
 
     private static String normalizeNumberInput(String input, boolean decimal) {
@@ -1851,6 +2416,21 @@ public final class HordeService {
         } else if (sanitized.rewardItemQuantity > MAX_REWARD_ITEM_QUANTITY) {
             sanitized.rewardItemQuantity = MAX_REWARD_ITEM_QUANTITY;
         }
+        if (sanitized.enemyLevelMin < MIN_ENEMY_LEVEL) {
+            sanitized.enemyLevelMin = HordeConfig.defaults().enemyLevelMin;
+        } else if (sanitized.enemyLevelMin > MAX_ENEMY_LEVEL) {
+            sanitized.enemyLevelMin = MAX_ENEMY_LEVEL;
+        }
+        if (sanitized.enemyLevelMax < MIN_ENEMY_LEVEL) {
+            sanitized.enemyLevelMax = HordeConfig.defaults().enemyLevelMax;
+        } else if (sanitized.enemyLevelMax > MAX_ENEMY_LEVEL) {
+            sanitized.enemyLevelMax = MAX_ENEMY_LEVEL;
+        }
+        if (sanitized.enemyLevelMax < sanitized.enemyLevelMin) {
+            int swap = sanitized.enemyLevelMin;
+            sanitized.enemyLevelMin = sanitized.enemyLevelMax;
+            sanitized.enemyLevelMax = swap;
+        }
         String safeRewardItemId = HordeService.resolveGuaranteedRewardTestItemId(sanitized.rewardItemQuantity);
         if (sanitized.rewardItemId == null || sanitized.rewardItemId.isBlank()) {
             sanitized.rewardItemId = safeRewardItemId;
@@ -1909,6 +2489,9 @@ public final class HordeService {
         public int rewardEveryRounds;
         public String rewardItemId;
         public int rewardItemQuantity;
+        public boolean finalBossEnabled;
+        public int enemyLevelMin;
+        public int enemyLevelMax;
 
         public static HordeConfig defaults() {
             HordeConfig defaults = new HordeConfig();
@@ -1930,6 +2513,9 @@ public final class HordeService {
             defaults.rewardEveryRounds = 2;
             defaults.rewardItemId = HordeService.resolveDefaultRewardItemId();
             defaults.rewardItemQuantity = 1;
+            defaults.finalBossEnabled = false;
+            defaults.enemyLevelMin = 1;
+            defaults.enemyLevelMax = 1;
             return defaults;
         }
 
@@ -1953,6 +2539,9 @@ public final class HordeService {
             copy.rewardEveryRounds = this.rewardEveryRounds;
             copy.rewardItemId = this.rewardItemId;
             copy.rewardItemQuantity = this.rewardItemQuantity;
+            copy.finalBossEnabled = this.finalBossEnabled;
+            copy.enemyLevelMin = this.enemyLevelMin;
+            copy.enemyLevelMax = this.enemyLevelMax;
             return copy;
         }
     }

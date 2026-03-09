@@ -24,8 +24,8 @@ extends AbstractPlayerCommand {
         boolean english = HordeService.isEnglishLanguage(this.hordeService.getLanguage());
         playerRef.sendMessage(Message.raw((String)(english ? "[Horde PVE] Help" : "[Horda PVE] Ayuda")));
         playerRef.sendMessage(Message.raw((String)(english ? "/hordahelp -> show this help" : "/hordahelp -> muestra esta ayuda")));
-        playerRef.sendMessage(Message.raw((String)(english ? "/hordapve -> open configuration (alias: /hordepve)" : "/hordapve -> abre la configuracion (alias: /hordepve)")));
-        playerRef.sendMessage(Message.raw((String)"/hordapve start | stop | status | logs | setspawn"));
+        playerRef.sendMessage(Message.raw((String)(english ? "/hordapve -> open configuration (aliases: /hordepve /spawnve /spawnpve)" : "/hordapve -> abre la configuracion (alias: /hordepve /spawnve /spawnpve)")));
+        playerRef.sendMessage(Message.raw((String)"/hordapve start | stop | status | logs | setspawn | reload"));
         playerRef.sendMessage(Message.raw((String)(english ? "/hordapve enemy <category> | enemytypes" : "/hordapve enemy <categoria> | tipos")));
         playerRef.sendMessage(Message.raw((String)(english ? "/hordapve role <npcRole|auto> | roles" : "/hordapve role <rolNpc|auto> | roles")));
         playerRef.sendMessage(Message.raw((String)(english ? "/hordapve reward <rounds>" : "/hordapve reward <rondas>")));

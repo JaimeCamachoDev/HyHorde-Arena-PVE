@@ -9,7 +9,6 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgumentType;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.plugin.PluginBase;
-import com.hypixel.hytale.server.core.plugin.PluginManager;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -41,15 +40,7 @@ extends AbstractPlayerCommand {
             case "mod": 
             case "jar": 
             case "plugin": {
-                boolean ok;
-                if (this.hordeService.isActive()) {
-                    this.hordeService.stop(true);
-                }
-                if (ok = PluginManager.get().reload(this.plugin.getIdentifier())) {
-                    playerRef.sendMessage(Message.raw((String)(english ? "Plugin reloaded. .jar changes applied." : "Plugin recargado. Cambios del .jar aplicados.")));
-                } else {
-                    playerRef.sendMessage(Message.raw((String)(english ? "Could not reload plugin. Check server logs." : "No se pudo recargar el plugin. Revisa logs del servidor.")));
-                }
+                playerRef.sendMessage(Message.raw((String)this.hordeService.reloadPlugin().getMessage()));
                 return;
             }
         }

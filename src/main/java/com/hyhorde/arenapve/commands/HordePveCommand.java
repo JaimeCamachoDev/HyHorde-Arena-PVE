@@ -36,6 +36,10 @@ extends AbstractPlayerCommand {
         String[] actionAndValue = this.resolveActionAndValue(commandContext);
         String action = actionAndValue[0];
         String value = actionAndValue[1];
+        if (this.hordeService.isPluginReloadInProgress() && !"status".equals(action) && !"logs".equals(action) && !"log".equals(action)) {
+            playerRef.sendMessage(Message.raw((String)(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga del plugin en progreso. Prueba de nuevo en unos segundos.")));
+            return;
+        }
         switch (action) {
             case "menu":
             case "ui": {
@@ -62,6 +66,12 @@ extends AbstractPlayerCommand {
             case "setspawn":
             case "spawn": {
                 playerRef.sendMessage(Message.raw((String)this.hordeService.setSpawnFromPlayer(playerRef, world).getMessage()));
+                return;
+            }
+            case "reload":
+            case "reloadmod":
+            case "reloadplugin": {
+                playerRef.sendMessage(Message.raw((String)this.hordeService.reloadPlugin().getMessage()));
                 return;
             }
             case "enemy":

@@ -328,19 +328,91 @@ Group {
     Background: #0f1825;
   }
 
+  Label #FinalBossLabel {
+    Anchor: (Left: 492, Top: 620, Width: 170, Height: 28);
+    Text: "Boss final";
+    Style: (FontSize: 16, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  TextButton #FinalBossPrevButton {
+    Anchor: (Left: 668, Top: 620, Width: 46, Height: 34);
+    Text: "<";
+    Style: TextButtonStyle(
+      Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #38567b, LabelStyle: (FontSize: 18, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #4b74a5, LabelStyle: (FontSize: 18, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+    );
+  }
+
+  TextField #FinalBossEnabled {
+    Anchor: (Left: 720, Top: 620, Width: 242, Height: 34);
+    Value: "No";
+    Style: (FontSize: 14, TextColor: #e8f1ff);
+    Padding: (Left: 8);
+    Background: #0f1825;
+  }
+
+  TextButton #FinalBossNextButton {
+    Anchor: (Left: 968, Top: 620, Width: 46, Height: 34);
+    Text: ">";
+    Style: TextButtonStyle(
+      Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #38567b, LabelStyle: (FontSize: 18, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #4b74a5, LabelStyle: (FontSize: 18, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+    );
+  }
+
+  Label #EnemyLevelRangeLabel {
+    Anchor: (Left: 1024, Top: 622, Width: 166, Height: 24);
+    Text: "Nivel enemigos";
+    Style: (FontSize: 14, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  TextField #EnemyLevelMin {
+    Anchor: (Left: 1194, Top: 620, Width: 96, Height: 34);
+    Value: "1";
+    Style: (FontSize: 14, TextColor: #e8f1ff);
+    Padding: (Left: 8);
+    Background: #0f1825;
+  }
+
+  Label #EnemyLevelRangeSeparator {
+    Anchor: (Left: 1294, Top: 622, Width: 24, Height: 24);
+    Text: "-";
+    Style: (FontSize: 16, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+  }
+
+  TextField #EnemyLevelMax {
+    Anchor: (Left: 1322, Top: 620, Width: 106, Height: 34);
+    Value: "1";
+    Style: (FontSize: 14, TextColor: #e8f1ff);
+    Padding: (Left: 8);
+    Background: #0f1825;
+  }
+
   Label #StatusTitleLabel {
-    Anchor: (Left: 492, Top: 620, Width: 220, Height: 26);
+    Anchor: (Left: 492, Top: 664, Width: 220, Height: 26);
     Text: "Estado actual";
     Style: (FontSize: 16, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
+  TextButton #ReloadModButton {
+    Anchor: (Left: 1246, Top: 658, Width: 182, Height: 30);
+    Text: "Recargar mod";
+    Style: TextButtonStyle(
+      Default: (Background: #6a4f1f, LabelStyle: (FontSize: 13, TextColor: #fff6e7, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #896628, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #524018, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+    );
+  }
+
   Panel #StatusPanel {
-    Anchor: (Left: 492, Top: 648, Width: 936, Height: 130);
+    Anchor: (Left: 492, Top: 692, Width: 936, Height: 94);
     Background: #0f1825;
   }
 
   Label #StatusLabel {
-    Anchor: (Left: 506, Top: 662, Width: 908, Height: 102);
+    Anchor: (Left: 506, Top: 706, Width: 908, Height: 66);
     Text: "";
     Style: (FontSize: 13, TextColor: #d1e0f3, VerticalAlignment: Center);
   }

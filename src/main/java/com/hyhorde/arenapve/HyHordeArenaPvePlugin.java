@@ -28,6 +28,8 @@ extends JavaPlugin {
         this.getCommandRegistry().registerCommand((AbstractCommand)new HordeHelpCommand("hordahelp", "muestra ayuda de comandos en chat", this.hordeService));
         this.getCommandRegistry().registerCommand((AbstractCommand)new HordePveCommand("hordapve", "controla el sistema de hordas PVE", this.hordeService));
         this.getCommandRegistry().registerCommand((AbstractCommand)new HordePveCommand("hordepve", "alias de hordapve", this.hordeService));
+        this.getCommandRegistry().registerCommand((AbstractCommand)new HordePveCommand("spawnve", "alias de hordapve", this.hordeService));
+        this.getCommandRegistry().registerCommand((AbstractCommand)new HordePveCommand("spawnpve", "alias de hordapve", this.hordeService));
         this.getCommandRegistry().registerCommand((AbstractCommand)new HordeReloadCommand("hordareload", "recarga config/mod de horda", (PluginBase)this, this.hordeService));
     }
 
