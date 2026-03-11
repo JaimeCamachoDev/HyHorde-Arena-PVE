@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "roundStartHints": [
+    "warhorn",
+    "horn",
+    "battle_start",
+    "countdown",
+    "go"
+  ],
+  "roundVictoryHints": [
+    "victory",
+    "success",
+    "quest_complete",
+    "fanfare",
+    "triumph"
+  ],
+  "roundStartBlockedKeywords": [
+    "alerted",
+    "squirrel",
+    "antelope",
+    "bird",
+    "cow",
+    "chicken"
+  ],
+  "roundVictoryBlockedKeywords": [
+    "ambient",
+    "loop"
+  ],
+  "weakKeywords": [
+    "step",
+    "cloth",
+    "idle",
+    "heartbeat",
+    "hurt"
+  ]
+}

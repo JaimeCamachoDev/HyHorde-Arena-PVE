@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "categories": {
+    "mithril": [
+      "Ingredient_Bar_Mithril",
+      "Ore_Mithril",
+      "Armor_Mithril_Head",
+      "Armor_Mithril_Chest",
+      "Weapon_Sword_Mithril"
+    ],
+    "onyxium": [
+      "Ingredient_Bar_Onyxium",
+      "Ore_Onyxium",
+      "Armor_Onyxium_Head",
+      "Armor_Onyxium_Chest",
+      "Weapon_Sword_Onyxium"
+    ],
+    "gemas": [
+      "Ingredient_Crystal_Red",
+      "Ingredient_Crystal_Green",
+      "Ingredient_Crystal_Blue",
+      "Ingredient_Crystal_Yellow",
+      "Ingredient_Crystal_Purple"
+    ],
+    "armas_especiales": [
+      "Weapon_Daggers_Thorium",
+      "Weapon_Hammer_Thorium",
+      "Weapon_Longsword_Flame"
+    ]
+  }
+}

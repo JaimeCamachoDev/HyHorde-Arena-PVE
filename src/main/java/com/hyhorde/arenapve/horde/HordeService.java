@@ -94,11 +94,12 @@ public final class HordeService {
     private static final Map<String, String[]> DEFAULT_ENEMY_TYPE_HINTS = HordeService.buildEnemyTypeHints();
     private static final String[] DEFAULT_FINAL_BOSS_ROLE_HINTS = new String[]{"Dragon_Fire", "Dragon_Frost"};
     private static final String[] DEFAULT_BLOCKED_ENEMY_ROLE_HINTS = new String[]{"kitten", "feline", "civilian", "merchant", "vendor", "villager", "windwalker", "cub", "pet", "companion", "dummy", "training", "blanktemplate", "blank_template", "template", "friendly", "nonhostile", "feran"};
-    private static final Map<String, List<String>> REWARD_CATEGORY_ITEMS = HordeService.buildRewardCategoryItems();
+    private static final Map<String, List<String>> DEFAULT_REWARD_CATEGORY_ITEMS = HordeService.buildRewardCategoryItems();
     private static Map<String, String[]> ENEMY_TYPE_HINTS = HordeService.copyEnemyTypeHints(DEFAULT_ENEMY_TYPE_HINTS);
     private static String[] FINAL_BOSS_ROLE_HINTS = DEFAULT_FINAL_BOSS_ROLE_HINTS.clone();
     private static List<String> ENEMY_TYPE_OPTIONS = HordeService.buildEnemyTypeOptions();
-    private static final List<String> REWARD_CATEGORY_OPTIONS = HordeService.buildRewardCategoryOptions();
+    private static Map<String, List<String>> REWARD_CATEGORY_ITEMS = HordeService.copyRewardCategoryItems(DEFAULT_REWARD_CATEGORY_ITEMS);
+    private static List<String> REWARD_CATEGORY_OPTIONS = HordeService.buildRewardCategoryOptions();
     private static List<String> RANDOM_ENEMY_TYPE_OPTIONS = HordeService.buildRandomEnemyTypePool();
     private static final int MAX_REWARD_SUGGESTIONS = 72;
     private static String[] BLOCKED_ENEMY_ROLE_HINTS = DEFAULT_BLOCKED_ENEMY_ROLE_HINTS.clone();
@@ -114,10 +115,16 @@ public final class HordeService {
     private static final float TITLE_FAST_FADE_OUT_SECONDS = 0.1f;
     private static final String SOUND_SELECTION_AUTO = "auto";
     private static final String SOUND_SELECTION_NONE = "none";
-    private static final String[] ROUND_START_SOUND_EVENT_HINTS = new String[]{"warhorn", "war_horn", "horn", "fanfare", "trumpet", "battle_start", "raid_start", "combat", "danger", "warning", "encounter", "start", "begin", "countdown", "ready", "go", "signal", "notification", "event"};
-    private static final String[] ROUND_VICTORY_SOUND_EVENT_HINTS = new String[]{"victory", "win", "success", "sleep_success", "complete", "completed", "quest_complete", "reward", "fanfare", "stinger", "jingle", "clear", "triumph", "level_up"};
-    private static final String[] ROUND_START_SOUND_BLOCKED_KEYWORDS = new String[]{"alerted", "squirrel", "antelope", "bird", "sheep", "cow", "goat", "pig", "chicken", "cat", "dog", "wolf"};
-    private static final String[] ROUND_SOUND_WEAK_KEYWORDS = new String[]{"step", "foot", "cloth", "equip", "unequip", "swim", "splash", "eat", "drink", "grunt", "breath", "idle", "heartbeat", "swing", "hit", "hurt", "alerted", "squirrel", "antelope", "bird", "sheep", "cow", "goat", "pig", "chicken", "cat", "dog", "wolf"};
+    private static final String[] DEFAULT_ROUND_START_SOUND_EVENT_HINTS = new String[]{"warhorn", "war_horn", "horn", "fanfare", "trumpet", "battle_start", "raid_start", "combat", "danger", "warning", "encounter", "start", "begin", "countdown", "ready", "go", "signal", "notification", "event"};
+    private static final String[] DEFAULT_ROUND_VICTORY_SOUND_EVENT_HINTS = new String[]{"victory", "win", "success", "sleep_success", "complete", "completed", "quest_complete", "reward", "fanfare", "stinger", "jingle", "clear", "triumph", "level_up"};
+    private static final String[] DEFAULT_ROUND_START_SOUND_BLOCKED_KEYWORDS = new String[]{"alerted", "squirrel", "antelope", "bird", "sheep", "cow", "goat", "pig", "chicken", "cat", "dog", "wolf"};
+    private static final String[] DEFAULT_ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS = new String[0];
+    private static final String[] DEFAULT_ROUND_SOUND_WEAK_KEYWORDS = new String[]{"step", "foot", "cloth", "equip", "unequip", "swim", "splash", "eat", "drink", "grunt", "breath", "idle", "heartbeat", "swing", "hit", "hurt", "alerted", "squirrel", "antelope", "bird", "sheep", "cow", "goat", "pig", "chicken", "cat", "dog", "wolf"};
+    private static String[] ROUND_START_SOUND_EVENT_HINTS = DEFAULT_ROUND_START_SOUND_EVENT_HINTS.clone();
+    private static String[] ROUND_VICTORY_SOUND_EVENT_HINTS = DEFAULT_ROUND_VICTORY_SOUND_EVENT_HINTS.clone();
+    private static String[] ROUND_START_SOUND_BLOCKED_KEYWORDS = DEFAULT_ROUND_START_SOUND_BLOCKED_KEYWORDS.clone();
+    private static String[] ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS = DEFAULT_ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS.clone();
+    private static String[] ROUND_SOUND_WEAK_KEYWORDS = DEFAULT_ROUND_SOUND_WEAK_KEYWORDS.clone();
     private static final int MAX_SOUND_SUGGESTIONS = 48;
     private static final int MAX_SOUND_TOP_SCORE_SUGGESTIONS = 14;
     private static final long SESSION_TICK_INTERVAL_MILLIS = 250L;
@@ -153,6 +160,8 @@ public final class HordeService {
     private final Gson gson;
     private final Path configPath;
     private final Path enemyCategoriesPath;
+    private final Path rewardItemsPath;
+    private final Path roundSoundsPath;
     private final Map<UUID, HordeStatusPage> statusPages;
     private final Set<UUID> spectatorOverrides;
     private final Set<UUID> audienceExitOverrides;
@@ -171,6 +180,8 @@ public final class HordeService {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.configPath = plugin.getDataDirectory().resolve("horde-config.json");
         this.enemyCategoriesPath = plugin.getDataDirectory().resolve("enemy-categories.json");
+        this.rewardItemsPath = plugin.getDataDirectory().resolve("reward-items.json");
+        this.roundSoundsPath = plugin.getDataDirectory().resolve("horde-sounds.json");
         this.statusPages = new HashMap<UUID, HordeStatusPage>();
         this.spectatorOverrides = new HashSet<UUID>();
         this.audienceExitOverrides = new HashSet<UUID>();
@@ -182,6 +193,8 @@ public final class HordeService {
         this.cachedRoundVictorySoundSelection = "";
         this.config = HordeConfig.defaults();
         this.loadEnemyCategoriesFromDisk(true);
+        this.loadRewardItemsFromDisk(true);
+        this.loadRoundSoundsFromDisk(true);
         this.loadConfig();
     }
 
@@ -321,7 +334,7 @@ public final class HordeService {
     }
 
     public synchronized List<String> getRoundVictorySoundOptions() {
-        return HordeService.buildRoundSoundOptions(this.config.roundVictorySoundId, ROUND_VICTORY_SOUND_EVENT_HINTS, null);
+        return HordeService.buildRoundSoundOptions(this.config.roundVictorySoundId, ROUND_VICTORY_SOUND_EVENT_HINTS, ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS);
     }
 
     public synchronized String getRoundStartSoundSelection() {
@@ -608,11 +621,18 @@ public final class HordeService {
             return OperationResult.fail(english ? "Cannot reload config while plugin reload is in progress." : "No se puede recargar la configuracion mientras el plugin se esta recargando.");
         }
         EnemyCatalogLoadReport enemyCatalogReport = this.loadEnemyCategoriesFromDisk(true);
+        RewardCatalogLoadReport rewardCatalogReport = this.loadRewardItemsFromDisk(true);
+        RoundSoundCatalogLoadReport soundCatalogReport = this.loadRoundSoundsFromDisk(true);
         this.loadConfig();
         this.refreshStatusHud(this.session);
         boolean english = HordeService.isEnglishLanguage(this.config.language);
         String enemyCatalogInfo = enemyCatalogReport.toUserMessage(english);
-        return OperationResult.ok((english ? "Horde configuration reloaded from disk. " : "Configuracion de hordas recargada desde disco. ") + enemyCatalogInfo);
+        String rewardCatalogInfo = rewardCatalogReport.toUserMessage(english);
+        String soundCatalogInfo = soundCatalogReport.toUserMessage(english);
+        if (english) {
+            return OperationResult.ok("Horde configuration reloaded from disk. " + enemyCatalogInfo + " " + rewardCatalogInfo + " " + soundCatalogInfo);
+        }
+        return OperationResult.ok("Configuracion de hordas recargada desde disco. " + enemyCatalogInfo + " " + rewardCatalogInfo + " " + soundCatalogInfo);
     }
 
     public synchronized OperationResult openStatusHud(Ref<EntityStore> playerEntityRef, Store<EntityStore> store, PlayerRef playerRef, World world) {
@@ -779,9 +799,9 @@ public final class HordeService {
         }
         String roundVictorySoundValue = values.get("roundVictorySoundId");
         if (roundVictorySoundValue != null) {
-            updated.roundVictorySoundId = HordeService.sanitizeRoundSoundSelection(roundVictorySoundValue, ROUND_VICTORY_SOUND_EVENT_HINTS, null);
+            updated.roundVictorySoundId = HordeService.sanitizeRoundSoundSelection(roundVictorySoundValue, ROUND_VICTORY_SOUND_EVENT_HINTS, ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS);
         } else {
-            updated.roundVictorySoundId = HordeService.sanitizeRoundSoundSelection(updated.roundVictorySoundId, ROUND_VICTORY_SOUND_EVENT_HINTS, null);
+            updated.roundVictorySoundId = HordeService.sanitizeRoundSoundSelection(updated.roundVictorySoundId, ROUND_VICTORY_SOUND_EVENT_HINTS, ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS);
         }
         if (!ENEMY_TYPE_OPTIONS.contains(updated.enemyType)) {
             return OperationResult.fail(english ? "enemyType must be one of: " + String.join((CharSequence)", ", ENEMY_TYPE_OPTIONS) : "enemyType debe ser uno de: " + String.join((CharSequence)", ", ENEMY_TYPE_OPTIONS));
@@ -1361,7 +1381,7 @@ public final class HordeService {
     }
 
     private int resolveRoundVictorySoundEventIndex() {
-        return this.resolveRoundSoundEventIndex(this.config.roundVictorySoundId, ROUND_VICTORY_SOUND_EVENT_HINTS, null, false);
+        return this.resolveRoundSoundEventIndex(this.config.roundVictorySoundId, ROUND_VICTORY_SOUND_EVENT_HINTS, ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS, false);
     }
 
     private int resolveRoundSoundEventIndex(String configuredSelectionInput, String[] hintKeywords, String[] blockedKeywords, boolean startSound) {
@@ -2579,6 +2599,42 @@ public final class HordeService {
         return new ArrayList<String>(cleaned);
     }
 
+    private static List<String> sanitizeKeywordList(List<String> candidates) {
+        LinkedHashSet<String> cleaned = new LinkedHashSet<String>();
+        if (candidates == null || candidates.isEmpty()) {
+            return List.of();
+        }
+        for (String candidate : candidates) {
+            if (candidate == null) {
+                continue;
+            }
+            String value = candidate.trim().toLowerCase(Locale.ROOT);
+            if (value.isBlank()) {
+                continue;
+            }
+            cleaned.add(value);
+        }
+        return new ArrayList<String>(cleaned);
+    }
+
+    private static Map<String, List<String>> copyRewardCategoryItems(Map<String, List<String>> source) {
+        LinkedHashMap<String, List<String>> copy = new LinkedHashMap<String, List<String>>();
+        if (source == null || source.isEmpty()) {
+            return copy;
+        }
+        for (Map.Entry<String, List<String>> entry : source.entrySet()) {
+            if (entry == null || entry.getKey() == null || entry.getKey().isBlank()) {
+                continue;
+            }
+            List<String> cleanedItems = HordeService.sanitizeRoleIdList(entry.getValue());
+            if (cleanedItems.isEmpty()) {
+                continue;
+            }
+            copy.put(entry.getKey(), cleanedItems);
+        }
+        return copy;
+    }
+
     private static void applyEnemyCatalogRuntime(Map<String, String[]> categories, List<String> finalBossRoles, List<String> blockedRoleHints) {
         LinkedHashMap<String, String[]> safeCategories = new LinkedHashMap<String, String[]>(HordeService.copyEnemyTypeHints(DEFAULT_ENEMY_TYPE_HINTS));
         if (categories != null && !categories.isEmpty()) {
@@ -2611,6 +2667,37 @@ public final class HordeService {
         BLOCKED_ENEMY_ROLE_HINTS = safeBlockedHints.toArray(new String[0]);
         ENEMY_TYPE_OPTIONS = HordeService.buildEnemyTypeOptions();
         RANDOM_ENEMY_TYPE_OPTIONS = HordeService.buildRandomEnemyTypePool();
+    }
+
+    private static void applyRewardCatalogRuntime(Map<String, List<String>> categories) {
+        LinkedHashMap<String, List<String>> safeCategories = new LinkedHashMap<String, List<String>>(HordeService.copyRewardCategoryItems(DEFAULT_REWARD_CATEGORY_ITEMS));
+        if (categories != null && !categories.isEmpty()) {
+            for (Map.Entry<String, List<String>> entry : categories.entrySet()) {
+                if (entry == null || entry.getKey() == null || entry.getKey().isBlank()) {
+                    continue;
+                }
+                List<String> cleanedItems = HordeService.sanitizeRoleIdList(entry.getValue());
+                if (cleanedItems.isEmpty()) {
+                    continue;
+                }
+                safeCategories.put(entry.getKey(), cleanedItems);
+            }
+        }
+        REWARD_CATEGORY_ITEMS = safeCategories;
+        REWARD_CATEGORY_OPTIONS = HordeService.buildRewardCategoryOptions();
+    }
+
+    private static void applyRoundSoundCatalogRuntime(List<String> roundStartHints, List<String> roundVictoryHints, List<String> roundStartBlockedKeywords, List<String> roundVictoryBlockedKeywords, List<String> weakKeywords) {
+        List<String> safeStartHints = HordeService.sanitizeKeywordList(roundStartHints);
+        List<String> safeVictoryHints = HordeService.sanitizeKeywordList(roundVictoryHints);
+        List<String> safeStartBlocked = HordeService.sanitizeKeywordList(roundStartBlockedKeywords);
+        List<String> safeVictoryBlocked = HordeService.sanitizeKeywordList(roundVictoryBlockedKeywords);
+        List<String> safeWeakKeywords = HordeService.sanitizeKeywordList(weakKeywords);
+        ROUND_START_SOUND_EVENT_HINTS = safeStartHints.isEmpty() ? DEFAULT_ROUND_START_SOUND_EVENT_HINTS.clone() : safeStartHints.toArray(new String[0]);
+        ROUND_VICTORY_SOUND_EVENT_HINTS = safeVictoryHints.isEmpty() ? DEFAULT_ROUND_VICTORY_SOUND_EVENT_HINTS.clone() : safeVictoryHints.toArray(new String[0]);
+        ROUND_START_SOUND_BLOCKED_KEYWORDS = safeStartBlocked.isEmpty() ? DEFAULT_ROUND_START_SOUND_BLOCKED_KEYWORDS.clone() : safeStartBlocked.toArray(new String[0]);
+        ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS = safeVictoryBlocked.isEmpty() ? DEFAULT_ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS.clone() : safeVictoryBlocked.toArray(new String[0]);
+        ROUND_SOUND_WEAK_KEYWORDS = safeWeakKeywords.isEmpty() ? DEFAULT_ROUND_SOUND_WEAK_KEYWORDS.clone() : safeWeakKeywords.toArray(new String[0]);
     }
 
     private EnemyCatalogLoadReport loadEnemyCategoriesFromDisk(boolean createTemplateIfMissing) {
@@ -2712,6 +2799,185 @@ public final class HordeService {
         }
         HordeService.applyEnemyCatalogRuntime(mergedCategories, mergedFinalBossRoles, mergedBlockedHints);
         report.totalActiveCategories = ENEMY_TYPE_HINTS.size();
+        return report;
+    }
+
+    private RewardCatalogLoadReport loadRewardItemsFromDisk(boolean createTemplateIfMissing) {
+        RewardCatalogLoadReport report = new RewardCatalogLoadReport();
+        LinkedHashMap<String, List<String>> mergedCategories = new LinkedHashMap<String, List<String>>(HordeService.copyRewardCategoryItems(DEFAULT_REWARD_CATEGORY_ITEMS));
+        try {
+            Files.createDirectories(this.plugin.getDataDirectory(), new FileAttribute[0]);
+        }
+        catch (IOException ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo preparar carpeta de datos para reward-items.json: %s", (Object)ex.getMessage());
+            HordeService.applyRewardCatalogRuntime(mergedCategories);
+            report.fallbackToDefaults = true;
+            return report;
+        }
+        if (createTemplateIfMissing && !Files.exists(this.rewardItemsPath, new LinkOption[0])) {
+            RewardItemsConfig template = RewardItemsConfig.fromDefaults();
+            try (BufferedWriter writer = Files.newBufferedWriter(this.rewardItemsPath, StandardCharsets.UTF_8, new OpenOption[0]);){
+                this.gson.toJson((Object)template, (Appendable)writer);
+                report.templateCreated = true;
+            }
+            catch (Exception ex) {
+                this.plugin.getLogger().at(Level.WARNING).log("No se pudo crear reward-items.json de ejemplo: %s", (Object)ex.getMessage());
+            }
+        }
+        if (!Files.exists(this.rewardItemsPath, new LinkOption[0])) {
+            HordeService.applyRewardCatalogRuntime(mergedCategories);
+            report.fallbackToDefaults = true;
+            return report;
+        }
+        RewardItemsConfig external;
+        try (BufferedReader reader = Files.newBufferedReader(this.rewardItemsPath, StandardCharsets.UTF_8);){
+            external = (RewardItemsConfig)this.gson.fromJson((Reader)reader, RewardItemsConfig.class);
+        }
+        catch (Exception ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("reward-items.json invalido. Se usaran recompensas internas: %s", (Object)ex.getMessage());
+            HordeService.applyRewardCatalogRuntime(mergedCategories);
+            report.fallbackToDefaults = true;
+            report.parseError = true;
+            return report;
+        }
+        if (external == null || external.categories == null || external.categories.isEmpty()) {
+            this.plugin.getLogger().at(Level.WARNING).log("reward-items.json vacio o invalido. Se usaran recompensas internas.");
+            HordeService.applyRewardCatalogRuntime(mergedCategories);
+            report.fallbackToDefaults = true;
+            report.parseError = true;
+            return report;
+        }
+        if (external.version != null && external.version.intValue() != 1) {
+            this.plugin.getLogger().at(Level.WARNING).log("reward-items.json usa version %s (esperada: 1). Se intentara cargar igualmente.", (Object)external.version);
+        }
+        for (Map.Entry<String, List<String>> entry : external.categories.entrySet()) {
+            if (entry == null) {
+                continue;
+            }
+            String rawCategory = entry.getKey() == null ? "" : entry.getKey().trim();
+            String normalizedCategory = HordeService.normalizeRewardCategoryKey(rawCategory);
+            if (normalizedCategory.isBlank()) {
+                ++report.ignoredCategories;
+                this.plugin.getLogger().at(Level.WARNING).log("reward-items.json: categoria '%s' ignorada (nombre invalido).", (Object)rawCategory);
+                continue;
+            }
+            List<String> cleanedItems = HordeService.sanitizeRoleIdList(entry.getValue());
+            if (cleanedItems.isEmpty()) {
+                ++report.ignoredCategories;
+                this.plugin.getLogger().at(Level.WARNING).log("reward-items.json: categoria '%s' ignorada (items vacios/invalidos).", (Object)rawCategory);
+                continue;
+            }
+            mergedCategories.put(normalizedCategory, cleanedItems);
+            ++report.appliedCategories;
+        }
+        HordeService.applyRewardCatalogRuntime(mergedCategories);
+        report.totalActiveCategories = REWARD_CATEGORY_ITEMS.size();
+        return report;
+    }
+
+    private RoundSoundCatalogLoadReport loadRoundSoundsFromDisk(boolean createTemplateIfMissing) {
+        RoundSoundCatalogLoadReport report = new RoundSoundCatalogLoadReport();
+        ArrayList<String> startHints = new ArrayList<String>(List.of(DEFAULT_ROUND_START_SOUND_EVENT_HINTS));
+        ArrayList<String> victoryHints = new ArrayList<String>(List.of(DEFAULT_ROUND_VICTORY_SOUND_EVENT_HINTS));
+        ArrayList<String> startBlocked = new ArrayList<String>(List.of(DEFAULT_ROUND_START_SOUND_BLOCKED_KEYWORDS));
+        ArrayList<String> victoryBlocked = new ArrayList<String>(List.of(DEFAULT_ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS));
+        ArrayList<String> weakKeywords = new ArrayList<String>(List.of(DEFAULT_ROUND_SOUND_WEAK_KEYWORDS));
+        try {
+            Files.createDirectories(this.plugin.getDataDirectory(), new FileAttribute[0]);
+        }
+        catch (IOException ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo preparar carpeta de datos para horde-sounds.json: %s", (Object)ex.getMessage());
+            HordeService.applyRoundSoundCatalogRuntime(startHints, victoryHints, startBlocked, victoryBlocked, weakKeywords);
+            report.fallbackToDefaults = true;
+            return report;
+        }
+        if (createTemplateIfMissing && !Files.exists(this.roundSoundsPath, new LinkOption[0])) {
+            RoundSoundsConfig template = RoundSoundsConfig.fromDefaults();
+            try (BufferedWriter writer = Files.newBufferedWriter(this.roundSoundsPath, StandardCharsets.UTF_8, new OpenOption[0]);){
+                this.gson.toJson((Object)template, (Appendable)writer);
+                report.templateCreated = true;
+            }
+            catch (Exception ex) {
+                this.plugin.getLogger().at(Level.WARNING).log("No se pudo crear horde-sounds.json de ejemplo: %s", (Object)ex.getMessage());
+            }
+        }
+        if (!Files.exists(this.roundSoundsPath, new LinkOption[0])) {
+            HordeService.applyRoundSoundCatalogRuntime(startHints, victoryHints, startBlocked, victoryBlocked, weakKeywords);
+            report.fallbackToDefaults = true;
+            return report;
+        }
+        RoundSoundsConfig external;
+        try (BufferedReader reader = Files.newBufferedReader(this.roundSoundsPath, StandardCharsets.UTF_8);){
+            external = (RoundSoundsConfig)this.gson.fromJson((Reader)reader, RoundSoundsConfig.class);
+        }
+        catch (Exception ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("horde-sounds.json invalido. Se usaran sonidos internos: %s", (Object)ex.getMessage());
+            HordeService.applyRoundSoundCatalogRuntime(startHints, victoryHints, startBlocked, victoryBlocked, weakKeywords);
+            report.fallbackToDefaults = true;
+            report.parseError = true;
+            return report;
+        }
+        if (external == null) {
+            this.plugin.getLogger().at(Level.WARNING).log("horde-sounds.json vacio o invalido. Se usaran sonidos internos.");
+            HordeService.applyRoundSoundCatalogRuntime(startHints, victoryHints, startBlocked, victoryBlocked, weakKeywords);
+            report.fallbackToDefaults = true;
+            report.parseError = true;
+            return report;
+        }
+        if (external.version != null && external.version.intValue() != 1) {
+            this.plugin.getLogger().at(Level.WARNING).log("horde-sounds.json usa version %s (esperada: 1). Se intentara cargar igualmente.", (Object)external.version);
+        }
+        if (external.roundStartHints != null) {
+            List<String> cleaned = HordeService.sanitizeKeywordList(external.roundStartHints);
+            if (!cleaned.isEmpty()) {
+                startHints.clear();
+                startHints.addAll(cleaned);
+                report.customStartHints = cleaned.size();
+            } else {
+                this.plugin.getLogger().at(Level.WARNING).log("horde-sounds.json: roundStartHints vacio/invalido. Se mantienen hints internos.");
+            }
+        }
+        if (external.roundVictoryHints != null) {
+            List<String> cleaned = HordeService.sanitizeKeywordList(external.roundVictoryHints);
+            if (!cleaned.isEmpty()) {
+                victoryHints.clear();
+                victoryHints.addAll(cleaned);
+                report.customVictoryHints = cleaned.size();
+            } else {
+                this.plugin.getLogger().at(Level.WARNING).log("horde-sounds.json: roundVictoryHints vacio/invalido. Se mantienen hints internos.");
+            }
+        }
+        if (external.roundStartBlockedKeywords != null) {
+            List<String> cleaned = HordeService.sanitizeKeywordList(external.roundStartBlockedKeywords);
+            if (!cleaned.isEmpty()) {
+                startBlocked.clear();
+                startBlocked.addAll(cleaned);
+                report.customStartBlocked = cleaned.size();
+            } else {
+                this.plugin.getLogger().at(Level.WARNING).log("horde-sounds.json: roundStartBlockedKeywords vacio/invalido. Se mantienen bloqueos internos.");
+            }
+        }
+        if (external.roundVictoryBlockedKeywords != null) {
+            List<String> cleaned = HordeService.sanitizeKeywordList(external.roundVictoryBlockedKeywords);
+            if (!cleaned.isEmpty()) {
+                victoryBlocked.clear();
+                victoryBlocked.addAll(cleaned);
+                report.customVictoryBlocked = cleaned.size();
+            } else {
+                this.plugin.getLogger().at(Level.WARNING).log("horde-sounds.json: roundVictoryBlockedKeywords vacio/invalido. Se mantienen bloqueos internos.");
+            }
+        }
+        if (external.weakKeywords != null) {
+            List<String> cleaned = HordeService.sanitizeKeywordList(external.weakKeywords);
+            if (!cleaned.isEmpty()) {
+                weakKeywords.clear();
+                weakKeywords.addAll(cleaned);
+                report.customWeakKeywords = cleaned.size();
+            } else {
+                this.plugin.getLogger().at(Level.WARNING).log("horde-sounds.json: weakKeywords vacio/invalido. Se mantienen keywords internas.");
+            }
+        }
+        HordeService.applyRoundSoundCatalogRuntime(startHints, victoryHints, startBlocked, victoryBlocked, weakKeywords);
         return report;
     }
 
@@ -2821,8 +3087,19 @@ public final class HordeService {
     }
 
     private static String normalizeRewardCategory(String input) {
-        if (input == null || input.isBlank()) {
+        String normalized = HordeService.normalizeRewardCategoryKey(input);
+        if (normalized.isBlank()) {
             return DEFAULT_REWARD_CATEGORY;
+        }
+        if (REWARD_CATEGORY_ITEMS.containsKey(normalized)) {
+            return normalized;
+        }
+        return DEFAULT_REWARD_CATEGORY;
+    }
+
+    private static String normalizeRewardCategoryKey(String input) {
+        if (input == null || input.isBlank()) {
+            return "";
         }
         String normalized = input.trim().toLowerCase(Locale.ROOT);
         normalized = normalized.replace('\u00e1', 'a').replace('\u00e9', 'e').replace('\u00ed', 'i').replace('\u00f3', 'o').replace('\u00fa', 'u');
@@ -2856,10 +3133,7 @@ public final class HordeService {
             case "special_items":
                 return "items_especiales";
         }
-        if (REWARD_CATEGORY_ITEMS.containsKey(normalized)) {
-            return normalized;
-        }
-        return DEFAULT_REWARD_CATEGORY;
+        return normalized;
     }
 
     private static List<String> getRewardCategoryItems(String rewardCategoryInput) {
@@ -3972,7 +4246,7 @@ public final class HordeService {
             }
         }
         sanitized.roundStartSoundId = HordeService.sanitizeRoundSoundSelection(sanitized.roundStartSoundId, ROUND_START_SOUND_EVENT_HINTS, ROUND_START_SOUND_BLOCKED_KEYWORDS);
-        sanitized.roundVictorySoundId = HordeService.sanitizeRoundSoundSelection(sanitized.roundVictorySoundId, ROUND_VICTORY_SOUND_EVENT_HINTS, null);
+        sanitized.roundVictorySoundId = HordeService.sanitizeRoundSoundSelection(sanitized.roundVictorySoundId, ROUND_VICTORY_SOUND_EVENT_HINTS, ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS);
         sanitized.minSpawnRadius = HordeService.clamp(sanitized.minSpawnRadius, MIN_RADIUS, MAX_RADIUS);
         sanitized.maxSpawnRadius = HordeService.clamp(sanitized.maxSpawnRadius, MIN_RADIUS, MAX_RADIUS);
         if (sanitized.maxSpawnRadius < sanitized.minSpawnRadius) {
@@ -4071,6 +4345,86 @@ public final class HordeService {
                 return String.format(Locale.ROOT, "Enemy categories loaded: %d active | updated: %d | ignored: %d | finalBossRoles: %d | blockedHints: +%d.%s", this.totalActiveCategories, this.appliedCategories, this.ignoredCategories, this.appliedFinalBossRoles, this.appliedBlockedHints, templateSuffix);
             }
             return String.format(Locale.ROOT, "Categorias cargadas: %d activas | actualizadas: %d | ignoradas: %d | finalBossRoles: %d | blockedHints: +%d.%s", this.totalActiveCategories, this.appliedCategories, this.ignoredCategories, this.appliedFinalBossRoles, this.appliedBlockedHints, templateSuffix);
+        }
+    }
+
+    private static final class RewardItemsConfig {
+        private Integer version;
+        private Map<String, List<String>> categories;
+
+        private static RewardItemsConfig fromDefaults() {
+            RewardItemsConfig defaults = new RewardItemsConfig();
+            defaults.version = 1;
+            defaults.categories = new LinkedHashMap<String, List<String>>(HordeService.copyRewardCategoryItems(DEFAULT_REWARD_CATEGORY_ITEMS));
+            return defaults;
+        }
+    }
+
+    private static final class RewardCatalogLoadReport {
+        private boolean fallbackToDefaults;
+        private boolean parseError;
+        private boolean templateCreated;
+        private int appliedCategories;
+        private int ignoredCategories;
+        private int totalActiveCategories;
+
+        private String toUserMessage(boolean english) {
+            if (this.fallbackToDefaults) {
+                if (english) {
+                    return "Rewards fallback to internal defaults (check reward-items.json).";
+                }
+                return "Recompensas en fallback interno (revisa reward-items.json).";
+            }
+            String templateSuffix = this.templateCreated ? (english ? " Template created." : " Plantilla creada.") : "";
+            if (english) {
+                return String.format(Locale.ROOT, "Rewards loaded: %d categories | updated: %d | ignored: %d.%s", this.totalActiveCategories, this.appliedCategories, this.ignoredCategories, templateSuffix);
+            }
+            return String.format(Locale.ROOT, "Recompensas cargadas: %d categorias | actualizadas: %d | ignoradas: %d.%s", this.totalActiveCategories, this.appliedCategories, this.ignoredCategories, templateSuffix);
+        }
+    }
+
+    private static final class RoundSoundsConfig {
+        private Integer version;
+        private List<String> roundStartHints;
+        private List<String> roundVictoryHints;
+        private List<String> roundStartBlockedKeywords;
+        private List<String> roundVictoryBlockedKeywords;
+        private List<String> weakKeywords;
+
+        private static RoundSoundsConfig fromDefaults() {
+            RoundSoundsConfig defaults = new RoundSoundsConfig();
+            defaults.version = 1;
+            defaults.roundStartHints = new ArrayList<String>(List.of(DEFAULT_ROUND_START_SOUND_EVENT_HINTS));
+            defaults.roundVictoryHints = new ArrayList<String>(List.of(DEFAULT_ROUND_VICTORY_SOUND_EVENT_HINTS));
+            defaults.roundStartBlockedKeywords = new ArrayList<String>(List.of(DEFAULT_ROUND_START_SOUND_BLOCKED_KEYWORDS));
+            defaults.roundVictoryBlockedKeywords = new ArrayList<String>(List.of(DEFAULT_ROUND_VICTORY_SOUND_BLOCKED_KEYWORDS));
+            defaults.weakKeywords = new ArrayList<String>(List.of(DEFAULT_ROUND_SOUND_WEAK_KEYWORDS));
+            return defaults;
+        }
+    }
+
+    private static final class RoundSoundCatalogLoadReport {
+        private boolean fallbackToDefaults;
+        private boolean parseError;
+        private boolean templateCreated;
+        private int customStartHints;
+        private int customVictoryHints;
+        private int customStartBlocked;
+        private int customVictoryBlocked;
+        private int customWeakKeywords;
+
+        private String toUserMessage(boolean english) {
+            if (this.fallbackToDefaults) {
+                if (english) {
+                    return "Sounds fallback to internal defaults (check horde-sounds.json).";
+                }
+                return "Sonidos en fallback interno (revisa horde-sounds.json).";
+            }
+            String templateSuffix = this.templateCreated ? (english ? " Template created." : " Plantilla creada.") : "";
+            if (english) {
+                return String.format(Locale.ROOT, "Sounds loaded | start hints: %d | victory hints: %d | start blocked: %d | victory blocked: %d | weak keywords: %d.%s", this.customStartHints, this.customVictoryHints, this.customStartBlocked, this.customVictoryBlocked, this.customWeakKeywords, templateSuffix);
+            }
+            return String.format(Locale.ROOT, "Sonidos cargados | hints inicio: %d | hints victoria: %d | bloqueos inicio: %d | bloqueos victoria: %d | weak keywords: %d.%s", this.customStartHints, this.customVictoryHints, this.customStartBlocked, this.customVictoryBlocked, this.customWeakKeywords, templateSuffix);
         }
     }
 
