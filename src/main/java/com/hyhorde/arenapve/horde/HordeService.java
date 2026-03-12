@@ -660,6 +660,26 @@ public final class HordeService {
         }
     }
 
+    public synchronized boolean isStatusHudOpen(UUID playerId) {
+        return playerId != null && this.statusPages.containsKey(playerId);
+    }
+
+    public synchronized void closeStatusHud(UUID playerId) {
+        if (playerId == null) {
+            return;
+        }
+        HordeStatusPage page = this.statusPages.remove(playerId);
+        if (page == null) {
+            return;
+        }
+        try {
+            page.closeFromService();
+        }
+        catch (Exception ignored) {
+            // best-effort close, player/world may be in teardown
+        }
+    }
+
     public synchronized OperationResult setEnemyType(String enemyTypeInput) {
         boolean english = HordeService.isEnglishLanguage(this.config.language);
         String enemyType = HordeService.normalizeEnemyType(enemyTypeInput);
@@ -1033,7 +1053,22 @@ public final class HordeService {
             this.closeAllStatusPages();
             return;
         }
-        this.endSession(this.session, english ? "Horde ended due to plugin shutdown." : "Horda finalizada por apagado del plugin.", false);
+        try {
+            this.endSession(this.session, english ? "Horde ended due to plugin shutdown." : "Horda finalizada por apagado del plugin.", false);
+        }
+        catch (Exception ex) {
+            // Common shutdown race:
+            // during singleplayer/server teardown the world thread can stop accepting tasks.
+            // If we attempt UI/chat/title work in that moment, the engine can throw
+            // IllegalThreadStateException ("World thread is not accepting tasks").
+            // Keep shutdown resilient and clear session state even if announcements fail.
+            HordeSession staleSession = this.session;
+            if (staleSession != null && staleSession.ticker != null) {
+                staleSession.ticker.cancel(false);
+            }
+            this.session = null;
+            this.plugin.getLogger().at(Level.WARNING).log("Skipping horde shutdown announcements because world is already closing: %s", (Object)ex.getMessage());
+        }
         this.closeAllStatusPages();
     }
 
@@ -1883,9 +1918,19 @@ public final class HordeService {
         this.session = null;
         String cleanInfo = cleanupAliveEnemies ? (english ? " | cleaned: " + cleanedEnemies : " | limpiados: " + cleanedEnemies) : "";
         String aliveLabel = english ? "alive remaining: " : "vivos restantes: ";
-        this.sendAudienceMessage(trackedSession, Message.raw((String)(reason + " (" + aliveLabel + aliveAtEnd + cleanInfo + ").")));
-        this.broadcastHordeEndAnnouncement(trackedSession, reason, aliveAtEnd);
+        // Important:
+        // if world teardown already started, sending chat/title packets can fail with
+        // IllegalThreadStateException in engine internals ("World thread is not accepting tasks").
+        // This has historically looked like a "HUD crash at horde end", but root cause is
+        // end-session messaging during world shutdown.
+        if (trackedSession.world != null && trackedSession.world.isAlive()) {
+            this.sendAudienceMessage(trackedSession, Message.raw((String)(reason + " (" + aliveLabel + aliveAtEnd + cleanInfo + ").")));
+            this.broadcastHordeEndAnnouncement(trackedSession, reason, aliveAtEnd);
+        }
         this.refreshStatusHud(null);
+        // Auto HUD behavior: close status windows when horde ends.
+        // This avoids leaving stale overlays open after the session is over.
+        this.closeAllStatusPages();
     }
 
     private int cleanupTrackedEnemies(HordeSession trackedSession) {

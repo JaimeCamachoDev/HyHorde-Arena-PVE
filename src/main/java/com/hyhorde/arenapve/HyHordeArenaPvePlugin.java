@@ -9,6 +9,7 @@ import com.hyhorde.arenapve.commands.HordeHelpCommand;
 import com.hyhorde.arenapve.commands.HordePveCommand;
 import com.hyhorde.arenapve.commands.HordeReloadCommand;
 import com.hyhorde.arenapve.horde.HordeDamageTrackerSystem;
+import com.hyhorde.arenapve.horde.HordeHudSystem;
 import com.hyhorde.arenapve.horde.HordeService;
 import javax.annotation.Nonnull;
 
@@ -24,6 +25,11 @@ extends JavaPlugin {
         super.setup();
         this.hordeService = new HordeService((PluginBase)this);
         this.getEntityStoreRegistry().registerSystem(new HordeDamageTrackerSystem(this.hordeService));
+        // HUD lifecycle is managed on world tick through HordeHudSystem.
+        // Compatibility note:
+        // if another mod already owns CustomUIHud (e.g. EconomySystem), HordeHudSystem
+        // will skip takeover for that player to avoid "Failed to apply CustomUI HUD commands".
+        this.getEntityStoreRegistry().registerSystem(new HordeHudSystem(this.hordeService));
         this.getCommandRegistry().registerCommand((AbstractCommand)new HordeCommand("horda", "crea una horda de enemigos alrededor de ti", this.hordeService));
         this.getCommandRegistry().registerCommand((AbstractCommand)new HordeHelpCommand("hordahelp", "muestra ayuda de comandos en chat", this.hordeService));
         this.getCommandRegistry().registerCommand((AbstractCommand)new HordePveCommand("hordeconfig", "controla el sistema de hordas PVE", this.hordeService));
