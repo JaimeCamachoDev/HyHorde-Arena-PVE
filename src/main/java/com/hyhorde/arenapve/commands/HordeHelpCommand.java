@@ -24,13 +24,13 @@ extends AbstractPlayerCommand {
         boolean english = HordeService.isEnglishLanguage(this.hordeService.getLanguage());
         playerRef.sendMessage(Message.raw((String)(english ? "[Horde PVE] Help" : "[Horda PVE] Ayuda")));
         playerRef.sendMessage(Message.raw((String)(english ? "/hordahelp -> show this help" : "/hordahelp -> muestra esta ayuda")));
-        playerRef.sendMessage(Message.raw((String)(english ? "/hordapve -> open configuration (aliases: /hordepve /spawnve /spawnpve)" : "/hordapve -> abre la configuracion (alias: /hordepve /spawnve /spawnpve)")));
-        playerRef.sendMessage(Message.raw((String)"/hordapve start | stop | status | logs | setspawn | reload"));
-        playerRef.sendMessage(Message.raw((String)(english ? "/hordapve enemy <category> | enemytypes" : "/hordapve enemy <categoria> | tipos")));
-        playerRef.sendMessage(Message.raw((String)(english ? "/hordapve role <npcRole|auto> | roles" : "/hordapve role <rolNpc|auto> | roles")));
-        playerRef.sendMessage(Message.raw((String)(english ? "/hordapve reward <rounds>" : "/hordapve reward <rondas>")));
-        playerRef.sendMessage(Message.raw((String)(english ? "/hordapve spectator <on|off> | player" : "/hordapve spectator <on|off> | jugador")));
-        playerRef.sendMessage(Message.raw((String)(english ? "/hordapve arearadius <blocks>" : "/hordapve arearadius <bloques>")));
+        playerRef.sendMessage(Message.raw((String)(english ? "/hordeconfig -> open configuration (aliases: /hconfig /hordecfg /hordepve /spawnve /spawnpve)" : "/hordeconfig -> abre la configuracion (alias: /hconfig /hordecfg /hordepve /spawnve /spawnpve)")));
+        playerRef.sendMessage(Message.raw((String)"/hordeconfig start | stop | status | logs | setspawn | reload"));
+        playerRef.sendMessage(Message.raw((String)(english ? "/hordeconfig enemy <category> | enemytypes" : "/hordeconfig enemy <categoria> | tipos")));
+        playerRef.sendMessage(Message.raw((String)(english ? "/hordeconfig role <npcRole|auto> | roles" : "/hordeconfig role <rolNpc|auto> | roles")));
+        playerRef.sendMessage(Message.raw((String)(english ? "/hordeconfig reward <rounds>" : "/hordeconfig reward <rondas>")));
+        playerRef.sendMessage(Message.raw((String)(english ? "/hordeconfig spectator <on|off> | player" : "/hordeconfig spectator <on|off> | jugador")));
+        playerRef.sendMessage(Message.raw((String)(english ? "/hordeconfig arearadius <blocks>" : "/hordeconfig arearadius <bloques>")));
         playerRef.sendMessage(Message.raw((String)(english ? "/hordareload [config] (mod/jar requires restart)" : "/hordareload [config] (mod/jar requiere reinicio)")));
     }
 }

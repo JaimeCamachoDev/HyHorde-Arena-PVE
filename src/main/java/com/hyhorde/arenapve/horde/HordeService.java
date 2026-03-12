@@ -210,9 +210,9 @@ public final class HordeService {
         String language = HordeService.normalizeLanguage(this.config.language);
         if (this.session == null) {
             if (HordeService.isEnglishLanguage(language)) {
-                return "No active horde. Use /hordapve to open the interface.";
+                return "No active horde. Use /hordeconfig to open the interface.";
             }
-            return "Sin horda activa. Usa /hordapve para abrir la interfaz.";
+            return "Sin horda activa. Usa /hordeconfig para abrir la interfaz.";
         }
         this.syncSessionPlayers(this.session);
         int alive = HordeService.countAlive(this.session.activeEnemies);
@@ -668,7 +668,7 @@ public final class HordeService {
         }
         List<String> roles = this.getAvailableRoles();
         if (!roles.isEmpty() && !HordeService.isRandomEnemyType(enemyType) && !HordeService.isRandomAllEnemyType(enemyType) && HordeService.resolveRoleForEnemyType(roles, enemyType) == null) {
-            return OperationResult.fail(english ? "Category '" + enemyType + "' has no compatible NPCs in this modpack. Use /hordapve enemytypes." : "La categoria '" + enemyType + "' no tiene NPCs compatibles en este modpack. Usa /hordapve tipos para revisar.");
+            return OperationResult.fail(english ? "Category '" + enemyType + "' has no compatible NPCs in this modpack. Use /hordeconfig enemytypes." : "La categoria '" + enemyType + "' no tiene NPCs compatibles en este modpack. Usa /hordeconfig tipos para revisar.");
         }
         this.config.enemyType = enemyType;
         this.saveConfig();
@@ -697,7 +697,7 @@ public final class HordeService {
             }
         }
         if (resolvedRole == null) {
-            return OperationResult.fail(english ? "NPC role not found: '" + raw + "'. Use /hordapve roles." : "Rol NPC no encontrado: '" + raw + "'. Usa /hordapve roles.");
+            return OperationResult.fail(english ? "NPC role not found: '" + raw + "'. Use /hordeconfig roles." : "Rol NPC no encontrado: '" + raw + "'. Usa /hordeconfig roles.");
         }
         if (HordeService.isBlockedEnemyRole(resolvedRole)) {
             return OperationResult.fail(english ? "Role '" + resolvedRole + "' is blocked for hordes (pet/non-hostile)." : "El rol '" + resolvedRole + "' esta bloqueado para hordas (mascota/no hostil).");
@@ -937,7 +937,7 @@ public final class HordeService {
         } else {
             selectedRole = HordeService.resolveRoleForEnemyType(roles, selectedEnemyType);
             if (selectedRole == null) {
-                return OperationResult.fail(english ? "Category '" + selectedEnemyType + "' has no compatible NPCs in this modpack. Use /hordapve enemytypes." : "La categoria '" + selectedEnemyType + "' no tiene NPCs compatibles en este modpack. Usa /hordapve tipos.");
+                return OperationResult.fail(english ? "Category '" + selectedEnemyType + "' has no compatible NPCs in this modpack. Use /hordeconfig enemytypes." : "La categoria '" + selectedEnemyType + "' no tiene NPCs compatibles en este modpack. Usa /hordeconfig tipos.");
             }
         }
         if (selectedRole == null) {

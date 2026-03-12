@@ -12,20 +12,20 @@ Version actual: `1.1.1`.
 ## Comandos
 
 - `/hordahelp` -> ayuda rapida en chat.
-- `/hordapve` -> abre la UI de configuracion (tambien `/hordepve`, `/spawnve`, `/spawnpve`).
-- `/hordapve start` -> inicia la horda.
-- `/hordapve stop` -> detiene la horda y limpia enemigos de la sesion.
-- `/hordapve status` -> muestra estado actual.
-- `/hordapve logs` -> muestra ruta de logs.
-- `/hordapve setspawn` -> guarda el centro de la horda en tu posicion.
-- `/hordapve enemy <tipo>` -> cambia categoria de enemigos.
-- `/hordapve tipos` -> diagnostico de categorias y roles detectados.
-- `/hordapve role <rolNpc|auto>` -> fuerza rol NPC o vuelve a auto.
-- `/hordapve roles` -> lista roles NPC disponibles.
-- `/hordapve reward <rondas>` -> cada cuantas rondas se entrega recompensa.
-- `/hordapve spectator <on|off>` -> marca preferencia espectador/jugador para el bloqueo al inicio.
-- `/hordapve player` -> vuelve a modo jugador.
-- `/hordapve arearadius <bloques>` -> radio de captura de participantes de arena.
+- `/hordeconfig` -> abre la UI de configuracion (alias: `/hconfig`, `/hordecfg`, `/hordepve`, `/spawnve`, `/spawnpve`).
+- `/hordeconfig start` -> inicia la horda.
+- `/hordeconfig stop` -> detiene la horda y limpia enemigos de la sesion.
+- `/hordeconfig status` -> muestra estado actual.
+- `/hordeconfig logs` -> muestra ruta de logs.
+- `/hordeconfig setspawn` -> guarda el centro de la horda en tu posicion.
+- `/hordeconfig enemy <tipo>` -> cambia categoria de enemigos.
+- `/hordeconfig tipos` -> diagnostico de categorias y roles detectados.
+- `/hordeconfig role <rolNpc|auto>` -> fuerza rol NPC o vuelve a auto.
+- `/hordeconfig roles` -> lista roles NPC disponibles.
+- `/hordeconfig reward <rondas>` -> cada cuantas rondas se entrega recompensa.
+- `/hordeconfig spectator <on|off>` -> marca preferencia espectador/jugador para el bloqueo al inicio.
+- `/hordeconfig player` -> vuelve a modo jugador.
+- `/hordeconfig arearadius <bloques>` -> radio de captura de participantes de arena.
 - `/hordareload config` -> recarga configuraciones JSON del mod sin reiniciar.
 
 ## Tipos de enemigo
@@ -39,17 +39,17 @@ Version actual: `1.1.1`.
 - `wild`
 - `elementals`
 
-Nota: la disponibilidad real depende de los roles NPC de tu modpack. Usa `/hordapve tipos`.
+Nota: la disponibilidad real depende de los roles NPC de tu modpack. Usa `/hordeconfig tipos`.
 
 ## Flujo rapido
 
-1. Ejecuta `/hordapve`.
-2. Pulsa `Usar mi posicion actual` o ejecuta `/hordapve setspawn`.
+1. Ejecuta `/hordeconfig`.
+2. Pulsa `Usar mi posicion actual` o ejecuta `/hordeconfig setspawn`.
 3. Ajusta parametros por pestanas (`General`, `Horda`, `Jugadores`, `Sonidos`, `Recompensas`).
 4. En `Jugadores`, define `arearadius` y el modo de cada jugador (jugador/espectador/salir).
 5. Guarda con `Guardar config`.
-6. Inicia con `/hordapve start`.
-7. Deten con `/hordapve stop`.
+6. Inicia con `/hordeconfig start`.
+7. Deten con `/hordeconfig stop`.
 
 ## Configuracion del mod (JSON)
 

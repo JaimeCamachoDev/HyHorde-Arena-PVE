@@ -150,7 +150,7 @@ extends AbstractPlayerCommand {
         if (enemyType.isBlank()) {
             List<String> options = this.hordeService.getEnemyTypeOptionsForCurrentRoles();
             String usage = options.isEmpty() ? "undead|goblins|scarak|void|wild|elementals" : String.join("|", options);
-            playerRef.sendMessage(Message.raw((String)((english ? "Usage: /hordapve enemy <" : "Uso: /hordapve enemy <") + usage + ">")));
+            playerRef.sendMessage(Message.raw((String)((english ? "Usage: /hordeconfig enemy <" : "Uso: /hordeconfig enemy <") + usage + ">")));
             return;
         }
         playerRef.sendMessage(Message.raw((String)this.hordeService.setEnemyType(enemyType).getMessage()));
@@ -172,7 +172,7 @@ extends AbstractPlayerCommand {
             String currentRole = this.hordeService.getConfiguredNpcRole();
             String roleState = currentRole == null || currentRole.isBlank() ? (english ? "no override (using enemyType category)" : "sin override (por categoria enemyType)") : currentRole;
             playerRef.sendMessage(Message.raw((String)((english ? "Current NPC role: " : "Rol NPC actual: ") + roleState)));
-            playerRef.sendMessage(Message.raw((String)(english ? "Usage: /hordapve role <npcRole|auto>" : "Uso: /hordapve role <rolNpc|auto>")));
+            playerRef.sendMessage(Message.raw((String)(english ? "Usage: /hordeconfig role <npcRole|auto>" : "Uso: /hordeconfig role <rolNpc|auto>")));
             return;
         }
         playerRef.sendMessage(Message.raw((String)this.hordeService.setNpcRole(requestedRole).getMessage()));
@@ -194,7 +194,7 @@ extends AbstractPlayerCommand {
         int everyRounds;
         String raw = value == null ? "" : value.trim();
         if (raw.isBlank()) {
-            playerRef.sendMessage(Message.raw((String)(english ? "Usage: /hordapve reward <rounds>" : "Uso: /hordapve reward <rondas>")));
+            playerRef.sendMessage(Message.raw((String)(english ? "Usage: /hordeconfig reward <rounds>" : "Uso: /hordeconfig reward <rondas>")));
             return;
         }
         try {
@@ -214,7 +214,7 @@ extends AbstractPlayerCommand {
             boolean spectator = this.hordeService.isSpectatorPreferenceEnabled(playerRef);
             String current = spectator ? (english ? "SPECTATOR" : "ESPECTADOR") : (english ? "PLAYER" : "JUGADOR");
             playerRef.sendMessage(Message.raw((String)((english ? "Current pre-start role: " : "Rol previo al inicio: ") + current)));
-            playerRef.sendMessage(Message.raw((String)(english ? "Usage: /hordapve spectator <on|off>" : "Uso: /hordapve spectator <on|off>")));
+            playerRef.sendMessage(Message.raw((String)(english ? "Usage: /hordeconfig spectator <on|off>" : "Uso: /hordeconfig spectator <on|off>")));
             return;
         }
         if ("on".equals(raw) || "true".equals(raw) || "1".equals(raw) || "yes".equals(raw) || "si".equals(raw) || "espectador".equals(raw) || "spectator".equals(raw)) {
@@ -225,14 +225,14 @@ extends AbstractPlayerCommand {
             playerRef.sendMessage(Message.raw((String)this.hordeService.setSpectatorPreference(playerRef, false).getMessage()));
             return;
         }
-        playerRef.sendMessage(Message.raw((String)(english ? "Usage: /hordapve spectator <on|off>" : "Uso: /hordapve spectator <on|off>")));
+        playerRef.sendMessage(Message.raw((String)(english ? "Usage: /hordeconfig spectator <on|off>" : "Uso: /hordeconfig spectator <on|off>")));
     }
 
     private void handleArenaRadius(String value, PlayerRef playerRef) {
         boolean english = this.isEnglish();
         String raw = value == null ? "" : value.trim();
         if (raw.isBlank()) {
-            playerRef.sendMessage(Message.raw((String)String.format(Locale.ROOT, english ? "Current arena radius: %.2f blocks. Usage: /hordapve arearadius <value>" : "Radio de arena actual: %.2f bloques. Uso: /hordapve arearadius <valor>", this.hordeService.getArenaJoinRadius())));
+            playerRef.sendMessage(Message.raw((String)String.format(Locale.ROOT, english ? "Current arena radius: %.2f blocks. Usage: /hordeconfig arearadius <value>" : "Radio de arena actual: %.2f bloques. Uso: /hordeconfig arearadius <valor>", this.hordeService.getArenaJoinRadius())));
             return;
         }
         double radius;
