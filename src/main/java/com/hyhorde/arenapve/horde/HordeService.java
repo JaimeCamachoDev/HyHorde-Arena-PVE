@@ -4075,10 +4075,21 @@ public final class HordeService {
         if (input == null || input.isBlank()) {
             return currentValue;
         }
+        String normalizedInteger = HordeService.normalizeNumberInput(input, false);
         try {
-            return Integer.parseInt(HordeService.normalizeNumberInput(input, false));
+            return Integer.parseInt(normalizedInteger);
         }
         catch (NumberFormatException ex) {
+            try {
+                double decimalValue = Double.parseDouble(HordeService.normalizeNumberInput(input, true));
+                long rounded = Math.round(decimalValue);
+                if (Math.abs(decimalValue - (double)rounded) <= 1.0E-9 && rounded >= Integer.MIN_VALUE && rounded <= Integer.MAX_VALUE) {
+                    return (int)rounded;
+                }
+            }
+            catch (NumberFormatException ignored) {
+                // keep original validation error below
+            }
             throw new IllegalArgumentException(english ? name + " must be an integer number. Received value: " + input : name + " debe ser un numero entero. Valor recibido: " + input);
         }
     }

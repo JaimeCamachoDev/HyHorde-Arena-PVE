@@ -9,6 +9,8 @@ import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.CustomUIPage;
+import com.hypixel.hytale.server.core.ui.DropdownEntryInfo;
+import com.hypixel.hytale.server.core.ui.LocalizableString;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
@@ -16,6 +18,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hyhorde.arenapve.horde.HordeService;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -31,7 +34,7 @@ extends CustomUIPage {
     private static final String TAB_SOUNDS = "sounds";
     private static final String TAB_REWARDS = "rewards";
     private static final String TAB_HELP = "help";
-    private static final int MAX_AUDIENCE_ROWS = 10;
+    private static final int MAX_AUDIENCE_ROWS = Integer.MAX_VALUE;
     private final HordeService hordeService;
     private String activeTab;
 
@@ -58,6 +61,10 @@ extends CustomUIPage {
         List<String> rewardItemSuggestions = this.hordeService.getRewardItemSuggestions(rewardCategory);
         String rewardHint = HordeConfigPage.buildRewardItemsHint(rewardCategoryOptions, rewardCategory, rewardItemSuggestions, config.rewardItemId, english);
         String enemyTypesHint = this.buildEnemyTypesHint(enemyTypeOptions, config.enemyType, english);
+        List<DropdownEntryInfo> rewardCategoryEntries = HordeConfigPage.buildDropdownEntries(rewardCategoryOptions, rewardCategory);
+        List<DropdownEntryInfo> rewardItemEntries = HordeConfigPage.buildDropdownEntries(rewardItemSuggestions, config.rewardItemId);
+        List<DropdownEntryInfo> roundStartSoundEntries = HordeConfigPage.buildDropdownEntries(roundStartSoundOptions, this.hordeService.getRoundStartSoundSelection());
+        List<DropdownEntryInfo> roundVictorySoundEntries = HordeConfigPage.buildDropdownEntries(roundVictorySoundOptions, this.hordeService.getRoundVictorySoundSelection());
         String tab = HordeConfigPage.normalizeTab(this.activeTab);
         this.activeTab = tab;
         EntityStore entityStore = (EntityStore)store.getExternalData();
@@ -67,22 +74,17 @@ extends CustomUIPage {
                 .set("#SpawnX.Value", HordeConfigPage.formatDouble(config.spawnX))
                 .set("#SpawnY.Value", HordeConfigPage.formatDouble(config.spawnY))
                 .set("#SpawnZ.Value", HordeConfigPage.formatDouble(config.spawnZ))
-                .set("#MinRadius.Value", HordeConfigPage.formatDouble(config.minSpawnRadius))
-                .set("#MaxRadius.Value", HordeConfigPage.formatDouble(config.maxSpawnRadius))
-                .set("#ArenaJoinRadius.Value", HordeConfigPage.formatDouble(config.arenaJoinRadius))
-                .set("#Rounds.Value", Integer.toString(config.rounds))
-                .set("#BaseEnemies.Value", Integer.toString(config.baseEnemiesPerRound))
-                .set("#EnemiesPerRound.Value", Integer.toString(config.enemiesPerRoundIncrement))
-                .set("#WaveDelay.Value", Integer.toString(config.waveDelaySeconds))
                 .set("#EnemyType.Value", config.enemyType == null ? "undead" : config.enemyType)
-                .set("#Language.Value", HordeService.getLanguageDisplay(config.language))
-                .set("#RewardEveryRounds.Value", Integer.toString(config.rewardEveryRounds))
+                .set("#Language.Value", HordeService.normalizeLanguage(config.language))
                 .set("#RewardCategory.Value", rewardCategory)
+                .set("#RewardCategory.Entries", rewardCategoryEntries)
                 .set("#RewardItemId.Value", config.rewardItemId == null ? "" : config.rewardItemId)
-                .set("#RewardItemQuantity.Value", Integer.toString(config.rewardItemQuantity))
-                .set("#FinalBossEnabled.Value", HordeConfigPage.finalBossDisplay(config.finalBossEnabled, english))
+                .set("#RewardItemId.Entries", rewardItemEntries)
+                .set("#FinalBossEnabled.Value", config.finalBossEnabled)
                 .set("#RoundStartSoundId.Value", this.hordeService.getRoundStartSoundSelection())
+                .set("#RoundStartSoundId.Entries", roundStartSoundEntries)
                 .set("#RoundVictorySoundId.Value", this.hordeService.getRoundVictorySoundSelection())
+                .set("#RoundVictorySoundId.Entries", roundVictorySoundEntries)
                 .set("#EnemyLevelMin.Value", Integer.toString(config.enemyLevelMin))
                 .set("#EnemyLevelMax.Value", Integer.toString(config.enemyLevelMax))
                 .set("#AudienceInfoLabel.Text", HordeConfigPage.buildAudienceInfo(config.arenaJoinRadius, audienceRows.size(), english))
@@ -353,7 +355,7 @@ extends CustomUIPage {
     }
 
     private EventData buildConfigSnapshotEvent(String action) {
-        return EventData.of((String)"action", (String)action).append("@SpawnX", "#SpawnX.Value").append("@SpawnY", "#SpawnY.Value").append("@SpawnZ", "#SpawnZ.Value").append("@MinRadius", "#MinRadius.Value").append("@MaxRadius", "#MaxRadius.Value").append("@ArenaJoinRadius", "#ArenaJoinRadius.Value").append("@Rounds", "#Rounds.Value").append("@BaseEnemies", "#BaseEnemies.Value").append("@EnemiesPerRound", "#EnemiesPerRound.Value").append("@WaveDelay", "#WaveDelay.Value").append("@EnemyType", "#EnemyType.Value").append("@Language", "#Language.Value").append("@RewardEveryRounds", "#RewardEveryRounds.Value").append("@RewardCategory", "#RewardCategory.Value").append("@RewardItemId", "#RewardItemId.Value").append("@RewardItemQuantity", "#RewardItemQuantity.Value").append("@FinalBossEnabled", "#FinalBossEnabled.Value").append("@RoundStartSoundId", "#RoundStartSoundId.Value").append("@RoundVictorySoundId", "#RoundVictorySoundId.Value");
+        return EventData.of((String)"action", (String)action).append("@SpawnX", "#SpawnX.Value").append("@SpawnY", "#SpawnY.Value").append("@SpawnZ", "#SpawnZ.Value").append("@MinRadius", "#MinRadius.Value").append("@MaxRadius", "#MaxRadius.Value").append("@ArenaJoinRadius", "#ArenaJoinRadius.Value").append("@Rounds", "#Rounds.Value").append("@BaseEnemies", "#BaseEnemies.Value").append("@EnemiesPerRound", "#EnemiesPerRound.Value").append("@WaveDelay", "#WaveDelay.Value").append("@EnemyType", "#EnemyType.Value").append("@Language", "#Language.Value").append("@RewardCategory", "#RewardCategory.Value").append("@RewardItemId", "#RewardItemId.Value").append("@RewardItemQuantity", "#RewardItemQuantity.Value").append("@FinalBossEnabled", "#FinalBossEnabled.Value").append("@RoundStartSoundId", "#RoundStartSoundId.Value").append("@RoundVictorySoundId", "#RoundVictorySoundId.Value");
     }
 
     private void populateAudienceRows(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<HordeService.AudiencePlayerSnapshot> rows, boolean english) {
@@ -616,9 +618,42 @@ extends CustomUIPage {
         List<String> startPreview = roundStartOptions == null || roundStartOptions.isEmpty() ? List.of("auto", "none") : roundStartOptions.subList(0, Math.min(4, roundStartOptions.size()));
         List<String> victoryPreview = roundVictoryOptions == null || roundVictoryOptions.isEmpty() ? List.of("auto", "none") : roundVictoryOptions.subList(0, Math.min(4, roundVictoryOptions.size()));
         if (english) {
-            return "Use < > to change round sounds | Start: " + startCurrent + " | Victory: " + victoryCurrent + " | Start options: " + String.join(", ", startPreview) + " | Victory options: " + String.join(", ", victoryPreview);
+            return "Use dropdowns to change round sounds | Start: " + startCurrent + " | Victory: " + victoryCurrent + " | Start options: " + String.join(", ", startPreview) + " | Victory options: " + String.join(", ", victoryPreview);
         }
-        return "Usa < > para cambiar sonidos de ronda | Inicio: " + startCurrent + " | Victoria: " + victoryCurrent + " | Opciones inicio: " + String.join(", ", startPreview) + " | Opciones victoria: " + String.join(", ", victoryPreview);
+        return "Usa desplegables para cambiar sonidos de ronda | Inicio: " + startCurrent + " | Victoria: " + victoryCurrent + " | Opciones inicio: " + String.join(", ", startPreview) + " | Opciones victoria: " + String.join(", ", victoryPreview);
+    }
+
+    private static List<DropdownEntryInfo> buildDropdownEntries(List<String> options, String selectedValue) {
+        ArrayList<String> values = new ArrayList<String>();
+        if (options != null) {
+            for (String option : options) {
+                if (option == null) continue;
+                String trimmed = option.trim();
+                if (trimmed.isBlank()) continue;
+                if (HordeConfigPage.containsIgnoreCase(values, trimmed)) continue;
+                values.add(trimmed);
+            }
+        }
+        String selected = selectedValue == null ? "" : selectedValue.trim();
+        if (!selected.isBlank() && !HordeConfigPage.containsIgnoreCase(values, selected)) {
+            values.add(0, selected);
+        }
+        ArrayList<DropdownEntryInfo> entries = new ArrayList<DropdownEntryInfo>(values.size());
+        for (String value : values) {
+            entries.add(new DropdownEntryInfo(LocalizableString.fromString(value), value));
+        }
+        return entries;
+    }
+
+    private static boolean containsIgnoreCase(List<String> values, String value) {
+        if (values == null || values.isEmpty() || value == null) {
+            return false;
+        }
+        for (String candidate : values) {
+            if (candidate == null || !candidate.equalsIgnoreCase(value)) continue;
+            return true;
+        }
+        return false;
     }
 
     private static String buildRewardItemsHint(List<String> rewardCategoryOptions, String selectedCategory, List<String> rewardItems, String selectedItemId, boolean english) {
@@ -633,9 +668,9 @@ extends CustomUIPage {
 
         if (rewardItems == null || rewardItems.isEmpty()) {
             if (english) {
-                return "Use < > on category | Current: " + currentCategoryLabel + " | Categories: " + String.join(", ", categoryPreview) + categorySuffix + " | No reward items available.";
+                return "Use dropdowns on rewards | Current category: " + currentCategoryLabel + " | Categories: " + String.join(", ", categoryPreview) + categorySuffix + " | No reward items available.";
             }
-            return "Usa < > en categoria | Actual: " + currentCategoryLabel + " | Categorias: " + String.join(", ", categoryPreview) + categorySuffix + " | No hay items recompensa disponibles.";
+            return "Usa desplegables en recompensas | Categoria actual: " + currentCategoryLabel + " | Categorias: " + String.join(", ", categoryPreview) + categorySuffix + " | No hay items recompensa disponibles.";
         }
 
         int itemPreviewCount = Math.min(4, rewardItems.size());
@@ -643,9 +678,9 @@ extends CustomUIPage {
         String itemSuffix = rewardItems.size() > itemPreviewCount ? (english ? " ... (+" + (rewardItems.size() - itemPreviewCount) + " more)" : " ... (+" + (rewardItems.size() - itemPreviewCount) + " mas)") : "";
         String currentItem = HordeConfigPage.firstNonEmpty(selectedItemId, rewardItems.get(0));
         if (english) {
-            return "Use < > on category/item | Category: " + currentCategoryLabel + " | Item: " + currentItem + " | Categories: " + String.join(", ", categoryPreview) + categorySuffix + " | Items: " + String.join(", ", itemPreview) + itemSuffix + " | Modes: random, random_all";
+            return "Use reward dropdowns | Category: " + currentCategoryLabel + " | Item: " + currentItem + " | Categories: " + String.join(", ", categoryPreview) + categorySuffix + " | Items: " + String.join(", ", itemPreview) + itemSuffix + " | Modes: random, random_all";
         }
-        return "Usa < > en categoria/item | Categoria: " + currentCategoryLabel + " | Item: " + currentItem + " | Categorias: " + String.join(", ", categoryPreview) + categorySuffix + " | Items: " + String.join(", ", itemPreview) + itemSuffix + " | Modos: random, random_all";
+        return "Usa desplegables en recompensas | Categoria: " + currentCategoryLabel + " | Item: " + currentItem + " | Categorias: " + String.join(", ", categoryPreview) + categorySuffix + " | Items: " + String.join(", ", itemPreview) + itemSuffix + " | Modos: random, random_all";
     }
 
     private static String rewardCategoryLabel(String rewardCategory) {
@@ -809,13 +844,13 @@ extends CustomUIPage {
         boolean rewardsTab = TAB_REWARDS.equals(tab);
         boolean helpTab = TAB_HELP.equals(tab);
 
-        this.setVisible(commandBuilder, generalTab, "#SpawnStateLabel", "#SpawnLabel", "#SpawnX", "#SpawnY", "#SpawnZ", "#SetSpawnButton", "#RadiusLabel", "#MinRadius", "#MaxRadius", "#LanguageLabel", "#LanguagePrevButton", "#Language", "#LanguageNextButton");
-        this.setVisible(commandBuilder, hordeTab, "#RoundLabel", "#Rounds", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound", "#WaveDelayLabel", "#WaveDelay", "#RoleLabel", "#EnemyTypePrevButton", "#EnemyType", "#EnemyTypeNextButton", "#RolesButton", "#RoleHelpLabel", "#FinalBossLabel", "#FinalBossPrevButton", "#FinalBossEnabled", "#FinalBossNextButton", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel");
+        this.setVisible(commandBuilder, generalTab, "#SpawnStateLabel", "#SpawnLabel", "#SpawnX", "#SpawnY", "#SpawnZ", "#SetSpawnButton", "#RadiusLabel", "#MinRadius", "#MaxRadius", "#LanguageLabel", "#Language", "#ArenaJoinRadiusLabel", "#ArenaJoinRadius");
+        this.setVisible(commandBuilder, hordeTab, "#RoundLabel", "#Rounds", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound", "#WaveDelayLabel", "#WaveDelay", "#RoleLabel", "#EnemyTypePrevButton", "#EnemyType", "#EnemyTypeNextButton", "#RolesButton", "#RoleHelpLabel", "#FinalBossLabel", "#FinalBossEnabled", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel");
         this.setVisible(commandBuilder, playersTab, "#ArenaJoinRadiusLabel", "#ArenaJoinRadius", "#AudienceInfoLabel", "#PlayersListTitle", "#PlayersCountLabel", "#PlayersCountValue", "#PlayersListHint", "#PlayersRefreshButton", "#PlayersHeaderName", "#PlayersHeaderMode", "#AudiencePlayersRows", "#AudiencePlayersEmptyLabel", "#AudienceHelpLabel");
-        this.setVisible(commandBuilder, soundsTab, "#RoundStartSoundLabel", "#RoundStartSoundPrevButton", "#RoundStartSoundId", "#RoundStartSoundNextButton", "#RoundVictorySoundLabel", "#RoundVictorySoundPrevButton", "#RoundVictorySoundId", "#RoundVictorySoundNextButton", "#RoundSoundHelpLabel");
-        this.setVisible(commandBuilder, rewardsTab, "#RewardEveryRoundsLabel", "#RewardEveryRounds", "#RewardCategoryLabel", "#RewardCategoryPrevButton", "#RewardCategory", "#RewardCategoryNextButton", "#RewardTypesButton", "#RewardCommandsLabel", "#RewardItemPrevButton", "#RewardItemId", "#RewardItemNextButton", "#RewardItemQuantityLabel", "#RewardItemQuantity", "#RewardCommandsHelpLabel");
+        this.setVisible(commandBuilder, soundsTab, "#RoundStartSoundLabel", "#RoundStartSoundId", "#RoundVictorySoundLabel", "#RoundVictorySoundId", "#RoundSoundHelpLabel");
+        this.setVisible(commandBuilder, rewardsTab, "#RewardCategoryLabel", "#RewardCategory", "#RewardTypesButton", "#RewardCommandsLabel", "#RewardItemId", "#RewardItemQuantityLabel", "#RewardItemQuantity", "#RewardCommandsHelpLabel");
         this.setVisible(commandBuilder, helpTab, "#HelpIntroLabel", "#HelpCommandsLabel", "#HelpCommandsLine1", "#HelpCommandsLine2", "#HelpCommandsLine3", "#HelpConfigLabel", "#HelpConfigLine1", "#HelpConfigLine2", "#HelpConfigLine3", "#HelpExternalLabel", "#HelpExternalLine1", "#HelpExternalLine2", "#HelpExternalLine3", "#HelpReloadLabel", "#HelpReloadLine1", "#HelpReloadLine2");
-        this.setVisible(commandBuilder, false, "#PlayerMultiplierLabel", "#PlayerMultiplier", "#EnemyLevelMin", "#EnemyLevelRangeSeparator", "#EnemyLevelMax");
+        this.setVisible(commandBuilder, false, "#PlayerMultiplierLabel", "#PlayerMultiplier", "#EnemyLevelMin", "#EnemyLevelRangeSeparator", "#EnemyLevelMax", "#LanguagePrevButton", "#LanguageNextButton", "#FinalBossPrevButton", "#FinalBossNextButton", "#RoundStartSoundPrevButton", "#RoundStartSoundNextButton", "#RoundVictorySoundPrevButton", "#RoundVictorySoundNextButton", "#RewardCategoryPrevButton", "#RewardCategoryNextButton", "#RewardItemPrevButton", "#RewardItemNextButton", "#RewardEveryRoundsLabel", "#RewardEveryRounds");
     }
 
     private void setVisible(UICommandBuilder commandBuilder, boolean visible, String ... elementIds) {
