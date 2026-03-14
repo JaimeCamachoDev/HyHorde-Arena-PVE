@@ -114,7 +114,6 @@ extends CustomUIPage {
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabRewardsButton", EventData.of((String)"action", (String)"tab_rewards"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabHelpButton", EventData.of((String)"action", (String)"tab_help"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#SetSpawnButton", EventData.of((String)"action", (String)"set_spawn_here"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#RolesButton", EventData.of((String)"action", (String)"enemy_types"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#LanguagePrevButton", this.buildConfigSnapshotEvent("language_prev"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#LanguageNextButton", this.buildConfigSnapshotEvent("language_next"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#RewardCategoryPrevButton", this.buildConfigSnapshotEvent("reward_category_prev"))
@@ -127,7 +126,6 @@ extends CustomUIPage {
                 .addEventBinding(CustomUIEventBindingType.Activating, "#RoundStartSoundNextButton", this.buildConfigSnapshotEvent("round_start_sound_next"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#RoundVictorySoundPrevButton", this.buildConfigSnapshotEvent("round_victory_sound_prev"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#RoundVictorySoundNextButton", this.buildConfigSnapshotEvent("round_victory_sound_next"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#RewardTypesButton", EventData.of((String)"action", (String)"reward_types"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#PlayersRefreshButton", EventData.of((String)"action", (String)"refresh_players"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#ReloadModButton", EventData.of((String)"action", (String)"reload_config"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#SaveButton", this.buildConfigSnapshotEvent("save"))
@@ -800,14 +798,12 @@ extends CustomUIPage {
                 .set("#EnemiesPerRoundLabel.Text", english ? "Inc. per round" : "Inc. por ronda")
                 .set("#WaveDelayLabel.Text", english ? "Delay (s)" : "Espera (s)")
                 .set("#RoleLabel.Text", english ? "Horde category" : "Categoria de horda")
-                .set("#RolesButton.Text", english ? "View categories" : "Ver categorias")
                 .set("#LanguageLabel.Text", english ? "Interface language" : "Idioma interfaz")
                 .set("#EnemyLevelRangeLabel.Text", english ? "Enemy level range" : "Rango nivel enemigos")
                 .set("#EnemyLevelWipLabel.Text", english ? "WIP: this system is temporarily disabled." : "WIP: este sistema esta desactivado temporalmente.")
                 .set("#RewardEveryRoundsLabel.Text", english ? "Reward every round(s)" : "Recompensa por ronda(s)")
                 .set("#RewardCategoryLabel.Text", english ? "Reward category" : "Categoria recompensa")
                 .set("#RewardCommandsLabel.Text", english ? "Reward item" : "Item recompensa")
-                .set("#RewardTypesButton.Text", english ? "View loot" : "Ver loot")
                 .set("#RewardItemQuantityLabel.Text", english ? "Qty." : "Cant.")
                 .set("#FinalBossLabel.Text", english ? "Final boss" : "Boss final")
                 .set("#RoundStartSoundLabel.Text", english ? "Round start sound" : "Sonido inicio ronda")
@@ -846,10 +842,10 @@ extends CustomUIPage {
         boolean helpTab = TAB_HELP.equals(tab);
 
         this.setVisible(commandBuilder, generalTab, "#SpawnStateLabel", "#SpawnLabel", "#SpawnX", "#SpawnY", "#SpawnZ", "#SetSpawnButton", "#RadiusLabel", "#MinRadius", "#MaxRadius", "#LanguageLabel", "#Language", "#ArenaJoinRadiusLabel", "#ArenaJoinRadius");
-        this.setVisible(commandBuilder, hordeTab, "#RoundLabel", "#Rounds", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound", "#WaveDelayLabel", "#WaveDelay", "#RoleLabel", "#EnemyType", "#RolesButton", "#RoleHelpLabel", "#FinalBossLabel", "#FinalBossEnabled", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel");
+        this.setVisible(commandBuilder, hordeTab, "#RoundLabel", "#Rounds", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound", "#WaveDelayLabel", "#WaveDelay", "#RoleLabel", "#EnemyType", "#RoleHelpLabel", "#FinalBossLabel", "#FinalBossEnabled", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel");
         this.setVisible(commandBuilder, playersTab, "#ArenaJoinRadiusLabel", "#ArenaJoinRadius", "#AudienceInfoLabel", "#PlayersListTitle", "#PlayersCountLabel", "#PlayersCountValue", "#PlayersListHint", "#PlayersRefreshButton", "#PlayersHeaderName", "#PlayersHeaderMode", "#AudiencePlayersRows", "#AudiencePlayersEmptyLabel", "#AudienceHelpLabel");
         this.setVisible(commandBuilder, soundsTab, "#RoundStartSoundLabel", "#RoundStartSoundId", "#RoundVictorySoundLabel", "#RoundVictorySoundId", "#RoundSoundHelpLabel");
-        this.setVisible(commandBuilder, rewardsTab, "#RewardCategoryLabel", "#RewardCategory", "#RewardTypesButton", "#RewardCommandsLabel", "#RewardItemId", "#RewardItemQuantityLabel", "#RewardItemQuantity", "#RewardCommandsHelpLabel");
+        this.setVisible(commandBuilder, rewardsTab, "#RewardCategoryLabel", "#RewardCategory", "#RewardCommandsLabel", "#RewardItemId", "#RewardItemQuantityLabel", "#RewardItemQuantity", "#RewardCommandsHelpLabel");
         this.setVisible(commandBuilder, helpTab, "#HelpIntroLabel", "#HelpCommandsLabel", "#HelpCommandsLine1", "#HelpCommandsLine2", "#HelpCommandsLine3", "#HelpConfigLabel", "#HelpConfigLine1", "#HelpConfigLine2", "#HelpConfigLine3", "#HelpExternalLabel", "#HelpExternalLine1", "#HelpExternalLine2", "#HelpExternalLine3", "#HelpReloadLabel", "#HelpReloadLine1", "#HelpReloadLine2");
         this.setVisible(commandBuilder, false, "#PlayerMultiplierLabel", "#PlayerMultiplier", "#EnemyLevelMin", "#EnemyLevelRangeSeparator", "#EnemyLevelMax", "#LanguagePrevButton", "#LanguageNextButton", "#FinalBossPrevButton", "#FinalBossNextButton", "#RoundStartSoundPrevButton", "#RoundStartSoundNextButton", "#RoundVictorySoundPrevButton", "#RoundVictorySoundNextButton", "#RewardCategoryPrevButton", "#RewardCategoryNextButton", "#RewardItemPrevButton", "#RewardItemNextButton", "#RewardEveryRoundsLabel", "#RewardEveryRounds");
     }

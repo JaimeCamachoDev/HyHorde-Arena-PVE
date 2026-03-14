@@ -117,7 +117,7 @@ Group {
   }
 
   $C.@SliderNumberField #MinRadius {
-    @Anchor = (Left: 642, Top: 318, Width: 188);
+    @Anchor = (Left: 686, Top: 318, Width: 168);
     Value: 5.0;
     Min: 1.0;
     Max: 128.0;
@@ -126,7 +126,7 @@ Group {
   }
 
   $C.@SliderNumberField #MaxRadius {
-    @Anchor = (Left: 836, Top: 318, Width: 190);
+    @Anchor = (Left: 858, Top: 318, Width: 168);
     Value: 12.0;
     Min: 1.0;
     Max: 128.0;
@@ -141,7 +141,7 @@ Group {
   }
 
   $C.@SliderNumberField #ArenaJoinRadius {
-    @Anchor = (Left: 642, Top: 272, Width: 188);
+    @Anchor = (Left: 686, Top: 272, Width: 340);
     Value: 32.0;
     Min: 4.0;
     Max: 512.0;
@@ -236,14 +236,8 @@ Group {
   }
 
   $C.@DropdownBox #EnemyType {
-    @Anchor = (Left: 642, Top: 382, Width: 382);
+    @Anchor = (Left: 642, Top: 382, Width: 822);
     Value: "undead";
-  }
-
-  TextButton #RolesButton {
-    Anchor: (Left: 1030, Top: 382, Width: 196, Height: 34);
-    Text: "Ver categorias";
-    Style: $C.@SecondaryTextButtonStyle;
   }
 
   Label #RoleHelpLabel {
@@ -521,7 +515,7 @@ Group {
   }
 
   $C.@DropdownBox #RewardCategory {
-    @Anchor = (Left: 662, Top: 276, Width: 364);
+    @Anchor = (Left: 662, Top: 276, Width: 802);
     Value: "mithril";
   }
 
@@ -533,12 +527,6 @@ Group {
       Hovered: (Background: #38567b, LabelStyle: (FontSize: 18, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
       Pressed: (Background: #4b74a5, LabelStyle: (FontSize: 18, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
     );
-  }
-
-  TextButton #RewardTypesButton {
-    Anchor: (Left: 1030, Top: 276, Width: 196, Height: 34);
-    Text: "Ver loot";
-    Style: $C.@SecondaryTextButtonStyle;
   }
 
   Label #RewardCommandsLabel {
@@ -579,10 +567,10 @@ Group {
   }
 
   $C.@SliderNumberField #RewardItemQuantity {
-    @Anchor = (Left: 662, Top: 390, Width: 420);
+    @Anchor = (Left: 662, Top: 390, Width: 802);
     Value: 1;
     Min: 1;
-    Max: 9999;
+    Max: 100;
     Step: 1;
     NumberFieldStyle: $C.@DefaultInputFieldStyle;
   }
