@@ -35,6 +35,26 @@ extends CustomUIPage {
     private static final String TAB_REWARDS = "rewards";
     private static final String TAB_HELP = "help";
     private static final int MAX_AUDIENCE_ROWS = Integer.MAX_VALUE;
+    private static final UiFieldBinding[] SNAPSHOT_FIELDS = new UiFieldBinding[]{
+            new UiFieldBinding("spawnX", "SpawnX", "#SpawnX.Value"),
+            new UiFieldBinding("spawnY", "SpawnY", "#SpawnY.Value"),
+            new UiFieldBinding("spawnZ", "SpawnZ", "#SpawnZ.Value"),
+            new UiFieldBinding("minRadius", "MinRadius", "#MinRadius.Value"),
+            new UiFieldBinding("maxRadius", "MaxRadius", "#MaxRadius.Value"),
+            new UiFieldBinding("arenaJoinRadius", "ArenaJoinRadius", "#ArenaJoinRadius.Value"),
+            new UiFieldBinding("rounds", "Rounds", "#Rounds.Value"),
+            new UiFieldBinding("baseEnemies", "BaseEnemies", "#BaseEnemies.Value"),
+            new UiFieldBinding("enemiesPerRound", "EnemiesPerRound", "#EnemiesPerRound.Value"),
+            new UiFieldBinding("waveDelay", "WaveDelay", "#WaveDelay.Value"),
+            new UiFieldBinding("enemyType", "EnemyType", "#EnemyType.Value", "role", "@Role", "Role"),
+            new UiFieldBinding("language", "Language", "#Language.Value"),
+            new UiFieldBinding("rewardCategory", "RewardCategory", "#RewardCategory.Value"),
+            new UiFieldBinding("rewardItemId", "RewardItemId", "#RewardItemId.Value"),
+            new UiFieldBinding("rewardItemQuantity", "RewardItemQuantity", "#RewardItemQuantity.Value"),
+            new UiFieldBinding("finalBossEnabled", "FinalBossEnabled", "#FinalBossEnabled.Value"),
+            new UiFieldBinding("roundStartSoundId", "RoundStartSoundId", "#RoundStartSoundId.Value"),
+            new UiFieldBinding("roundVictorySoundId", "RoundVictorySoundId", "#RoundVictorySoundId.Value")
+    };
     private final HordeService hordeService;
     private String activeTab;
 
@@ -114,18 +134,6 @@ extends CustomUIPage {
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabRewardsButton", EventData.of((String)"action", (String)"tab_rewards"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabHelpButton", EventData.of((String)"action", (String)"tab_help"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#SetSpawnButton", EventData.of((String)"action", (String)"set_spawn_here"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#LanguagePrevButton", this.buildConfigSnapshotEvent("language_prev"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#LanguageNextButton", this.buildConfigSnapshotEvent("language_next"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#RewardCategoryPrevButton", this.buildConfigSnapshotEvent("reward_category_prev"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#RewardCategoryNextButton", this.buildConfigSnapshotEvent("reward_category_next"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#RewardItemPrevButton", this.buildConfigSnapshotEvent("reward_prev"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#RewardItemNextButton", this.buildConfigSnapshotEvent("reward_next"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#FinalBossPrevButton", this.buildConfigSnapshotEvent("final_boss_prev"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#FinalBossNextButton", this.buildConfigSnapshotEvent("final_boss_next"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#RoundStartSoundPrevButton", this.buildConfigSnapshotEvent("round_start_sound_prev"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#RoundStartSoundNextButton", this.buildConfigSnapshotEvent("round_start_sound_next"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#RoundVictorySoundPrevButton", this.buildConfigSnapshotEvent("round_victory_sound_prev"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#RoundVictorySoundNextButton", this.buildConfigSnapshotEvent("round_victory_sound_next"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#PlayersRefreshButton", EventData.of((String)"action", (String)"refresh_players"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#ReloadModButton", EventData.of((String)"action", (String)"reload_config"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#SaveButton", this.buildConfigSnapshotEvent("save"))
@@ -187,71 +195,6 @@ extends CustomUIPage {
                     result = this.hordeService.setSpawnFromPlayer(this.playerRef, world);
                     break;
                 }
-                case "enemy_types":
-                case "roles": {
-                    this.sendEnemyTypesPreview();
-                    break;
-                }
-                case "enemy_prev": {
-                    result = this.cycleEnemyType(HordeConfigPage.extractConfigValues(payload), world, -1);
-                    break;
-                }
-                case "enemy_next": {
-                    result = this.cycleEnemyType(HordeConfigPage.extractConfigValues(payload), world, 1);
-                    break;
-                }
-                case "reward_prev": {
-                    result = this.cycleRewardItem(HordeConfigPage.extractConfigValues(payload), world, -1);
-                    break;
-                }
-                case "reward_next": {
-                    result = this.cycleRewardItem(HordeConfigPage.extractConfigValues(payload), world, 1);
-                    break;
-                }
-                case "reward_category_prev": {
-                    result = this.cycleRewardCategory(HordeConfigPage.extractConfigValues(payload), world, -1);
-                    break;
-                }
-                case "reward_category_next": {
-                    result = this.cycleRewardCategory(HordeConfigPage.extractConfigValues(payload), world, 1);
-                    break;
-                }
-                case "final_boss_prev": {
-                    result = this.cycleFinalBoss(HordeConfigPage.extractConfigValues(payload), world);
-                    break;
-                }
-                case "final_boss_next": {
-                    result = this.cycleFinalBoss(HordeConfigPage.extractConfigValues(payload), world);
-                    break;
-                }
-                case "language_prev": {
-                    result = this.cycleLanguage(HordeConfigPage.extractConfigValues(payload), world, -1);
-                    break;
-                }
-                case "language_next": {
-                    result = this.cycleLanguage(HordeConfigPage.extractConfigValues(payload), world, 1);
-                    break;
-                }
-                case "round_start_sound_prev": {
-                    result = this.cycleRoundStartSound(HordeConfigPage.extractConfigValues(payload), world, -1);
-                    break;
-                }
-                case "round_start_sound_next": {
-                    result = this.cycleRoundStartSound(HordeConfigPage.extractConfigValues(payload), world, 1);
-                    break;
-                }
-                case "round_victory_sound_prev": {
-                    result = this.cycleRoundVictorySound(HordeConfigPage.extractConfigValues(payload), world, -1);
-                    break;
-                }
-                case "round_victory_sound_next": {
-                    result = this.cycleRoundVictorySound(HordeConfigPage.extractConfigValues(payload), world, 1);
-                    break;
-                }
-                case "reward_types": {
-                    this.sendRewardTypesPreview();
-                    break;
-                }
                 case "refresh_players": {
                     break;
                 }
@@ -301,20 +244,6 @@ extends CustomUIPage {
         }
         switch (action) {
             case "set_spawn_here":
-            case "enemy_prev":
-            case "enemy_next":
-            case "reward_prev":
-            case "reward_next":
-            case "reward_category_prev":
-            case "reward_category_next":
-            case "final_boss_prev":
-            case "final_boss_next":
-            case "language_prev":
-            case "language_next":
-            case "round_start_sound_prev":
-            case "round_start_sound_next":
-            case "round_victory_sound_prev":
-            case "round_victory_sound_next":
             case "save":
             case "skip_round":
             case "start": {
@@ -354,7 +283,11 @@ extends CustomUIPage {
     }
 
     private EventData buildConfigSnapshotEvent(String action) {
-        return EventData.of((String)"action", (String)action).append("@SpawnX", "#SpawnX.Value").append("@SpawnY", "#SpawnY.Value").append("@SpawnZ", "#SpawnZ.Value").append("@MinRadius", "#MinRadius.Value").append("@MaxRadius", "#MaxRadius.Value").append("@ArenaJoinRadius", "#ArenaJoinRadius.Value").append("@Rounds", "#Rounds.Value").append("@BaseEnemies", "#BaseEnemies.Value").append("@EnemiesPerRound", "#EnemiesPerRound.Value").append("@WaveDelay", "#WaveDelay.Value").append("@EnemyType", "#EnemyType.Value").append("@Language", "#Language.Value").append("@RewardCategory", "#RewardCategory.Value").append("@RewardItemId", "#RewardItemId.Value").append("@RewardItemQuantity", "#RewardItemQuantity.Value").append("@FinalBossEnabled", "#FinalBossEnabled.Value").append("@RoundStartSoundId", "#RoundStartSoundId.Value").append("@RoundVictorySoundId", "#RoundVictorySoundId.Value");
+        EventData eventData = EventData.of((String)"action", (String)action);
+        for (UiFieldBinding field : SNAPSHOT_FIELDS) {
+            eventData = eventData.append("@" + field.payloadAlias, field.uiValueSelector);
+        }
+        return eventData;
     }
 
     private void populateAudienceRows(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<HordeService.AudiencePlayerSnapshot> rows, boolean english) {
@@ -389,195 +322,25 @@ extends CustomUIPage {
         return "audience_set:" + mode + ":" + playerId;
     }
 
-    private void sendEnemyTypesPreview() {
-        List<String> diagnostics = this.hordeService.getEnemyTypeDiagnostics();
-        boolean english = this.isEnglish();
-        this.playerRef.sendMessage(Message.raw((String)((english ? "Detected categories" : "Categorias detectadas") + " (" + diagnostics.size() + "):")));
-        for (String line : diagnostics) {
-            this.playerRef.sendMessage(Message.raw((String)(" - " + line)));
-        }
-    }
-
-    private void sendRewardTypesPreview() {
-        HordeService.HordeConfig config = this.hordeService.getConfigSnapshot();
-        String rewardCategory = HordeConfigPage.firstNonEmpty(config.rewardCategory, this.hordeService.getRewardCategory());
-        List<String> suggestions = this.hordeService.getRewardItemSuggestions(rewardCategory);
-        boolean english = this.isEnglish();
-        if (suggestions.isEmpty()) {
-            this.playerRef.sendMessage(Message.raw((String)(english ? "No valid reward items detected in this modpack." : "No hay items recompensa validos detectados en este modpack.")));
-            return;
-        }
-        int total = suggestions.size();
-        int previewCount = Math.min(24, total);
-        List<String> preview = suggestions.subList(0, previewCount);
-        String safeTestItem = suggestions.get(0);
-        for (String candidate : suggestions) {
-            if ("random".equalsIgnoreCase(candidate) || "random_all".equalsIgnoreCase(candidate)) continue;
-            safeTestItem = candidate;
-            break;
-        }
-        this.playerRef.sendMessage(Message.raw((String)((english ? "Detected reward items for category '" : "Items recompensa detectados para categoria '") + rewardCategory + "': " + total + ".")));
-        this.playerRef.sendMessage(Message.raw((String)((english ? "Recommended safe test item: " : "Item de test recomendado (seguro): ") + safeTestItem)));
-        this.playerRef.sendMessage(Message.raw((String)("Preview (" + previewCount + "): " + String.join(", ", preview))));
-        if (total > previewCount) {
-            this.playerRef.sendMessage(Message.raw((String)(english ? "There are +" + (total - previewCount) + " IDs. Use the reward dropdown to browse more options." : "Hay +" + (total - previewCount) + " IDs. Usa el desplegable de recompensas para ver mas opciones.")));
-        }
-        this.playerRef.sendMessage(Message.raw((String)(english ? "Tip: use 'random' (current category) or 'random_all' (all categories)." : "Tip extra: usa 'random' (categoria actual) o 'random_all' (todas las categorias).")));
-        this.playerRef.sendMessage(Message.raw((String)(english ? "You can also paste a full ItemDumper line and the ID will be auto-extracted." : "Tambien puedes pegar una linea completa de ItemDumper y se intentara extraer el ID automaticamente.")));
-    }
-
-    private HordeService.OperationResult cycleEnemyType(Map<String, String> values, World world, int offset) {
-        List<String> enemyTypes = this.hordeService.getEnemyTypeOptionsForCurrentRoles();
-        boolean english = this.isEnglish();
-        if (enemyTypes.isEmpty()) {
-            return HordeService.OperationResult.fail(english ? "No horde categories available." : "No hay categorias de horda disponibles.");
-        }
-        String currentType = HordeConfigPage.normalizeEnemyTypeInput(HordeConfigPage.firstNonEmpty(values.get("enemyType"), this.hordeService.getConfigSnapshot().enemyType));
-        int currentIndex = enemyTypes.indexOf(currentType);
-        if (currentIndex < 0) {
-            currentIndex = offset > 0 ? -1 : 0;
-        }
-        int nextIndex = Math.floorMod(currentIndex + offset, enemyTypes.size());
-        return this.hordeService.setEnemyType(enemyTypes.get(nextIndex));
-    }
-
-    private HordeService.OperationResult cycleRewardItem(Map<String, String> values, World world, int offset) {
-        String rewardCategory = HordeConfigPage.normalizeRewardCategoryInput(HordeConfigPage.firstNonEmpty(values.get("rewardCategory"), this.hordeService.getConfigSnapshot().rewardCategory, this.hordeService.getRewardCategory()));
-        List<String> suggestions = this.hordeService.getRewardItemSuggestions(rewardCategory);
-        boolean english = this.isEnglish();
-        if (suggestions.isEmpty()) {
-            return HordeService.OperationResult.fail(english ? "No suggested reward items available." : "No hay items recompensa sugeridos.");
-        }
-        String currentItem = HordeConfigPage.firstNonEmpty(values.get("rewardItemId")).trim();
-        int currentIndex = suggestions.indexOf(currentItem);
-        if (currentIndex < 0) {
-            currentIndex = offset > 0 ? -1 : 0;
-        }
-        int nextIndex = Math.floorMod(currentIndex + offset, suggestions.size());
-        values.put("rewardItemId", suggestions.get(nextIndex));
-        values.put("rewardCategory", rewardCategory);
-        return this.hordeService.applyUiConfig(values, world);
-    }
-
-    private HordeService.OperationResult cycleRewardCategory(Map<String, String> values, World world, int offset) {
-        List<String> categories = this.hordeService.getRewardCategoryOptions();
-        boolean english = this.isEnglish();
-        if (categories.isEmpty()) {
-            return HordeService.OperationResult.fail(english ? "No reward categories available." : "No hay categorias de recompensa disponibles.");
-        }
-        String currentCategory = HordeConfigPage.normalizeRewardCategoryInput(HordeConfigPage.firstNonEmpty(values.get("rewardCategory"), this.hordeService.getConfigSnapshot().rewardCategory, this.hordeService.getRewardCategory()));
-        int currentIndex = categories.indexOf(currentCategory);
-        if (currentIndex < 0) {
-            currentIndex = offset > 0 ? -1 : 0;
-        }
-        int nextIndex = Math.floorMod(currentIndex + offset, categories.size());
-        String nextCategory = categories.get(nextIndex);
-        List<String> nextItems = this.hordeService.getRewardItemSuggestions(nextCategory);
-        if (!nextItems.isEmpty()) {
-            String nextItem = nextItems.get(0);
-            for (String candidate : nextItems) {
-                if ("random".equalsIgnoreCase(candidate) || "random_all".equalsIgnoreCase(candidate)) continue;
-                nextItem = candidate;
-                break;
-            }
-            values.put("rewardItemId", nextItem);
-        }
-        values.put("rewardCategory", nextCategory);
-        return this.hordeService.applyUiConfig(values, world);
-    }
-
-    private HordeService.OperationResult cycleLanguage(Map<String, String> values, World world, int offset) {
-        List<String> options = this.hordeService.getLanguageOptions();
-        boolean english = this.isEnglish();
-        if (options.isEmpty()) {
-            return HordeService.OperationResult.fail(english ? "No language options available." : "No hay idiomas disponibles.");
-        }
-        String current = HordeService.normalizeLanguage(HordeConfigPage.extractLanguage(HordeConfigPage.firstNonEmpty(values.get("language"), this.hordeService.getLanguage())));
-        int currentIndex = options.indexOf(current);
-        if (currentIndex < 0) {
-            currentIndex = offset > 0 ? -1 : 0;
-        }
-        int nextIndex = Math.floorMod(currentIndex + offset, options.size());
-        return this.hordeService.setLanguage(options.get(nextIndex));
-    }
-
-    private HordeService.OperationResult cycleRoundStartSound(Map<String, String> values, World world, int offset) {
-        List<String> options = this.hordeService.getRoundStartSoundOptions();
-        boolean english = this.isEnglish();
-        if (options.isEmpty()) {
-            return HordeService.OperationResult.fail(english ? "No round start sounds available." : "No hay sonidos de inicio de ronda disponibles.");
-        }
-        String current = HordeConfigPage.firstNonEmpty(values.get("roundStartSoundId"), this.hordeService.getRoundStartSoundSelection()).trim();
-        int currentIndex = -1;
-        for (int i = 0; i < options.size(); ++i) {
-            if (!options.get(i).equalsIgnoreCase(current)) continue;
-            currentIndex = i;
-            break;
-        }
-        if (currentIndex < 0) {
-            currentIndex = offset > 0 ? -1 : 0;
-        }
-        int nextIndex = Math.floorMod(currentIndex + offset, options.size());
-        values.put("roundStartSoundId", options.get(nextIndex));
-        return this.hordeService.applyUiConfig(values, world);
-    }
-
-    private HordeService.OperationResult cycleRoundVictorySound(Map<String, String> values, World world, int offset) {
-        List<String> options = this.hordeService.getRoundVictorySoundOptions();
-        boolean english = this.isEnglish();
-        if (options.isEmpty()) {
-            return HordeService.OperationResult.fail(english ? "No round victory sounds available." : "No hay sonidos de victoria de ronda disponibles.");
-        }
-        String current = HordeConfigPage.firstNonEmpty(values.get("roundVictorySoundId"), this.hordeService.getRoundVictorySoundSelection()).trim();
-        int currentIndex = -1;
-        for (int i = 0; i < options.size(); ++i) {
-            if (!options.get(i).equalsIgnoreCase(current)) continue;
-            currentIndex = i;
-            break;
-        }
-        if (currentIndex < 0) {
-            currentIndex = offset > 0 ? -1 : 0;
-        }
-        int nextIndex = Math.floorMod(currentIndex + offset, options.size());
-        values.put("roundVictorySoundId", options.get(nextIndex));
-        return this.hordeService.applyUiConfig(values, world);
-    }
-
-    private HordeService.OperationResult cycleFinalBoss(Map<String, String> values, World world) {
-        boolean english = this.isEnglish();
-        boolean current = HordeConfigPage.parseFinalBoss(values.get("finalBossEnabled"), this.hordeService.getConfigSnapshot().finalBossEnabled);
-        values.put("finalBossEnabled", Boolean.toString(!current));
-        HordeService.OperationResult result = this.hordeService.applyUiConfig(values, world);
-        if (!result.isSuccess()) {
-            return result;
-        }
-        return HordeService.OperationResult.ok(english ? "Final boss: " + (!current ? "enabled" : "disabled") + "." : "Boss final: " + (!current ? "activado" : "desactivado") + ".");
-    }
-
     private static Map<String, String> extractConfigValues(JsonObject payload) {
         HashMap<String, String> values = new HashMap<String, String>();
-        values.put("spawnX", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "spawnX"), HordeConfigPage.read(payload, "@SpawnX"), HordeConfigPage.read(payload, "SpawnX")));
-        values.put("spawnY", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "spawnY"), HordeConfigPage.read(payload, "@SpawnY"), HordeConfigPage.read(payload, "SpawnY")));
-        values.put("spawnZ", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "spawnZ"), HordeConfigPage.read(payload, "@SpawnZ"), HordeConfigPage.read(payload, "SpawnZ")));
-        values.put("minRadius", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "minRadius"), HordeConfigPage.read(payload, "@MinRadius"), HordeConfigPage.read(payload, "MinRadius")));
-        values.put("maxRadius", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "maxRadius"), HordeConfigPage.read(payload, "@MaxRadius"), HordeConfigPage.read(payload, "MaxRadius")));
-        values.put("arenaJoinRadius", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "arenaJoinRadius"), HordeConfigPage.read(payload, "@ArenaJoinRadius"), HordeConfigPage.read(payload, "ArenaJoinRadius")));
-        values.put("rounds", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "rounds"), HordeConfigPage.read(payload, "@Rounds"), HordeConfigPage.read(payload, "Rounds")));
-        values.put("baseEnemies", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "baseEnemies"), HordeConfigPage.read(payload, "@BaseEnemies"), HordeConfigPage.read(payload, "BaseEnemies")));
-        values.put("enemiesPerRound", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "enemiesPerRound"), HordeConfigPage.read(payload, "@EnemiesPerRound"), HordeConfigPage.read(payload, "EnemiesPerRound")));
-        values.put("waveDelay", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "waveDelay"), HordeConfigPage.read(payload, "@WaveDelay"), HordeConfigPage.read(payload, "WaveDelay")));
-        values.put("enemyType", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "enemyType"), HordeConfigPage.read(payload, "@EnemyType"), HordeConfigPage.read(payload, "EnemyType"), HordeConfigPage.read(payload, "role"), HordeConfigPage.read(payload, "@Role"), HordeConfigPage.read(payload, "Role")));
-        values.put("language", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "language"), HordeConfigPage.read(payload, "@Language"), HordeConfigPage.read(payload, "Language")));
+        for (UiFieldBinding field : SNAPSHOT_FIELDS) {
+            values.put(field.configKey, HordeConfigPage.extractFieldValue(payload, field));
+        }
         values.put("rewardEveryRounds", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "rewardEveryRounds"), HordeConfigPage.read(payload, "@RewardEveryRounds"), HordeConfigPage.read(payload, "RewardEveryRounds")));
-        values.put("rewardCategory", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "rewardCategory"), HordeConfigPage.read(payload, "@RewardCategory"), HordeConfigPage.read(payload, "RewardCategory")));
-        values.put("rewardItemId", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "rewardItemId"), HordeConfigPage.read(payload, "@RewardItemId"), HordeConfigPage.read(payload, "RewardItemId")));
-        values.put("rewardItemQuantity", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "rewardItemQuantity"), HordeConfigPage.read(payload, "@RewardItemQuantity"), HordeConfigPage.read(payload, "RewardItemQuantity")));
-        values.put("finalBossEnabled", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "finalBossEnabled"), HordeConfigPage.read(payload, "@FinalBossEnabled"), HordeConfigPage.read(payload, "FinalBossEnabled")));
-        values.put("roundStartSoundId", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "roundStartSoundId"), HordeConfigPage.read(payload, "@RoundStartSoundId"), HordeConfigPage.read(payload, "RoundStartSoundId")));
-        values.put("roundVictorySoundId", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "roundVictorySoundId"), HordeConfigPage.read(payload, "@RoundVictorySoundId"), HordeConfigPage.read(payload, "RoundVictorySoundId")));
         values.put("enemyLevelMin", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "enemyLevelMin"), HordeConfigPage.read(payload, "@EnemyLevelMin"), HordeConfigPage.read(payload, "EnemyLevelMin")));
         values.put("enemyLevelMax", HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, "enemyLevelMax"), HordeConfigPage.read(payload, "@EnemyLevelMax"), HordeConfigPage.read(payload, "EnemyLevelMax")));
         return values;
+    }
+
+    private static String extractFieldValue(JsonObject payload, UiFieldBinding field) {
+        String value = HordeConfigPage.firstNonEmpty(HordeConfigPage.read(payload, field.configKey), HordeConfigPage.read(payload, "@" + field.payloadAlias), HordeConfigPage.read(payload, field.payloadAlias));
+        if (field.extraPayloadKeys != null) {
+            for (String key : field.extraPayloadKeys) {
+                value = HordeConfigPage.firstNonEmpty(value, HordeConfigPage.read(payload, key));
+            }
+        }
+        return value;
     }
 
     private static String buildSpawnLabel(HordeService.HordeConfig config, boolean english) {
@@ -731,36 +494,6 @@ extends CustomUIPage {
             }
         }
         return enemyType;
-    }
-
-    private static String enemyTypePreviewIds(String enemyType) {
-        switch (HordeConfigPage.normalizeEnemyTypeInput(enemyType)) {
-            case "random": {
-                return "Random by category each spawn";
-            }
-            case "random-all": {
-                return "Random from all hostile roles";
-            }
-            case "undead": {
-                return "Aberrant_Zombie, Burnt_Zombie, Burnt_Skeleton_Archer...";
-            }
-            case "goblins": {
-                return "Goblin_Scavenger, Goblin_Lobber, Goblin_Duke...";
-            }
-            case "scarak": {
-                return "Dungeon_Scarak_Fighter, Dungeon_Scarak_Seeker, Dungeon_Scarak_Broodmother_Young";
-            }
-            case "void": {
-                return "Crawler_Void, Eye_Void, Larva_Void, Spawn_Void, Spectre_Void";
-            }
-            case "wild": {
-                return "Crocodile, Black_Wolf, Cave_Raptor, Cave_Rex...";
-            }
-            case "elementals": {
-                return "Golem_Crystal_Earth, Golem_Firesteel, Spirit_Ember...";
-            }
-        }
-        return "-";
     }
 
     private boolean isEnglish() {
@@ -919,43 +652,6 @@ extends CustomUIPage {
         return playersInArea > 0 ? "Usa cada fila para poner modo Jugador, Espectador o Salir." : "Mueve jugadores dentro del radio de arena para gestionarlos aqui.";
     }
 
-    private static String finalBossDisplay(boolean enabled, boolean english) {
-        if (english) {
-            return enabled ? "On" : "Off";
-        }
-        return enabled ? "Si" : "No";
-    }
-
-    private static boolean parseFinalBoss(String value, boolean fallback) {
-        if (value == null || value.isBlank()) {
-            return fallback;
-        }
-        String normalized = value.trim().toLowerCase(Locale.ROOT);
-        normalized = normalized.replace('\u00e1', 'a').replace('\u00e9', 'e').replace('\u00ed', 'i').replace('\u00f3', 'o').replace('\u00fa', 'u');
-        switch (normalized) {
-            case "1":
-            case "true":
-            case "yes":
-            case "y":
-            case "on":
-            case "si":
-            case "enabled":
-            case "enable": {
-                return true;
-            }
-            case "0":
-            case "false":
-            case "no":
-            case "n":
-            case "off":
-            case "disabled":
-            case "disable": {
-                return false;
-            }
-        }
-        return fallback;
-    }
-
     private static String formatDouble(double value) {
         return String.format(Locale.ROOT, "%.2f", value);
     }
@@ -1100,18 +796,18 @@ extends CustomUIPage {
         return safe.substring(0, Math.max(0, maxLength - 1)) + ".";
     }
 
-    private static String extractLanguage(String value) {
-        if (value == null || value.isBlank()) {
-            return "es";
+    private static final class UiFieldBinding {
+        private final String configKey;
+        private final String payloadAlias;
+        private final String uiValueSelector;
+        private final String[] extraPayloadKeys;
+
+        private UiFieldBinding(String configKey, String payloadAlias, String uiValueSelector, String ... extraPayloadKeys) {
+            this.configKey = configKey;
+            this.payloadAlias = payloadAlias;
+            this.uiValueSelector = uiValueSelector;
+            this.extraPayloadKeys = extraPayloadKeys;
         }
-        String normalized = value.trim().toLowerCase(Locale.ROOT);
-        if (normalized.contains("english") || normalized.contains("(en)")) {
-            return "en";
-        }
-        if (normalized.contains("espanol") || normalized.contains("espa\u00f1ol") || normalized.contains("(es)")) {
-            return "es";
-        }
-        return normalized;
     }
 }
 

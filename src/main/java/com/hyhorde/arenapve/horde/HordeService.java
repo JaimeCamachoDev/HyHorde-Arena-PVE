@@ -128,28 +128,28 @@ public final class HordeService {
     private static final int MAX_SOUND_SUGGESTIONS = 48;
     private static final int MAX_SOUND_TOP_SCORE_SUGGESTIONS = 14;
     private static final long SESSION_TICK_INTERVAL_MILLIS = 250L;
-    private static final int MIN_ROUNDS = 1;
-    private static final int MAX_ROUNDS = 200;
-    private static final int MIN_ENEMIES_PER_ROUND = 1;
-    private static final int MAX_ENEMIES_PER_ROUND = 400;
-    private static final int MIN_ENEMY_INCREMENT = 0;
-    private static final int MAX_ENEMY_INCREMENT = 400;
-    private static final int MIN_PLAYER_MULTIPLIER = 1;
-    private static final int MAX_PLAYER_MULTIPLIER = 20;
-    private static final int MIN_WAVE_DELAY_SECONDS = 0;
-    private static final int MAX_WAVE_DELAY_SECONDS = 300;
-    private static final int MIN_REWARD_ITEM_QUANTITY = 1;
-    private static final int MAX_REWARD_ITEM_QUANTITY = 9999;
-    private static final int MIN_ENEMY_LEVEL = 1;
-    private static final int MAX_ENEMY_LEVEL = 200;
+    private static final int MIN_ROUNDS = HordeConfigRules.MIN_ROUNDS;
+    private static final int MAX_ROUNDS = HordeConfigRules.MAX_ROUNDS;
+    private static final int MIN_ENEMIES_PER_ROUND = HordeConfigRules.MIN_ENEMIES_PER_ROUND;
+    private static final int MAX_ENEMIES_PER_ROUND = HordeConfigRules.MAX_ENEMIES_PER_ROUND;
+    private static final int MIN_ENEMY_INCREMENT = HordeConfigRules.MIN_ENEMY_INCREMENT;
+    private static final int MAX_ENEMY_INCREMENT = HordeConfigRules.MAX_ENEMY_INCREMENT;
+    private static final int MIN_PLAYER_MULTIPLIER = HordeConfigRules.MIN_PLAYER_MULTIPLIER;
+    private static final int MAX_PLAYER_MULTIPLIER = HordeConfigRules.MAX_PLAYER_MULTIPLIER;
+    private static final int MIN_WAVE_DELAY_SECONDS = HordeConfigRules.MIN_WAVE_DELAY_SECONDS;
+    private static final int MAX_WAVE_DELAY_SECONDS = HordeConfigRules.MAX_WAVE_DELAY_SECONDS;
+    private static final int MIN_REWARD_ITEM_QUANTITY = HordeConfigRules.MIN_REWARD_ITEM_QUANTITY;
+    private static final int MAX_REWARD_ITEM_QUANTITY = HordeConfigRules.MAX_REWARD_ITEM_QUANTITY;
+    private static final int MIN_ENEMY_LEVEL = HordeConfigRules.MIN_ENEMY_LEVEL;
+    private static final int MAX_ENEMY_LEVEL = HordeConfigRules.MAX_ENEMY_LEVEL;
     private static final int FINAL_BOSS_LEVEL_BONUS = 2;
     private static final float ENEMY_LEVEL_HEALTH_STEP = 0.1f;
     private static final float ENEMY_LEVEL_HEALTH_MAX_MULTIPLIER = 6.0f;
     private static final float FINAL_BOSS_HEALTH_MULTIPLIER = 1.35f;
-    private static final double MIN_RADIUS = 1.0;
-    private static final double MAX_RADIUS = 128.0;
-    private static final double MIN_ARENA_JOIN_RADIUS = 4.0;
-    private static final double MAX_ARENA_JOIN_RADIUS = 512.0;
+    private static final double MIN_RADIUS = HordeConfigRules.MIN_RADIUS;
+    private static final double MAX_RADIUS = HordeConfigRules.MAX_RADIUS;
+    private static final double MIN_ARENA_JOIN_RADIUS = HordeConfigRules.MIN_ARENA_JOIN_RADIUS;
+    private static final double MAX_ARENA_JOIN_RADIUS = HordeConfigRules.MAX_ARENA_JOIN_RADIUS;
     private static final String LANGUAGE_SPANISH = "es";
     private static final String LANGUAGE_ENGLISH = "en";
     private static final String AUDIENCE_MODE_PLAYER = "player";
@@ -772,25 +772,7 @@ public final class HordeService {
             return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
         }
         try {
-            updated.spawnX = HordeService.parseDouble(values.get("spawnX"), updated.spawnX, "spawnX", english);
-            updated.spawnY = HordeService.parseDouble(values.get("spawnY"), updated.spawnY, "spawnY", english);
-            updated.spawnZ = HordeService.parseDouble(values.get("spawnZ"), updated.spawnZ, "spawnZ", english);
-            updated.minSpawnRadius = HordeService.parseDouble(values.get("minRadius"), updated.minSpawnRadius, "minRadius", english);
-            updated.maxSpawnRadius = HordeService.parseDouble(values.get("maxRadius"), updated.maxSpawnRadius, "maxRadius", english);
-            updated.arenaJoinRadius = HordeService.parseDouble(values.get("arenaJoinRadius"), updated.arenaJoinRadius, "arenaJoinRadius", english);
-            updated.rounds = HordeService.parseInt(values.get("rounds"), updated.rounds, "rounds", english);
-            updated.baseEnemiesPerRound = HordeService.parseInt(values.get("baseEnemies"), updated.baseEnemiesPerRound, "baseEnemies", english);
-            updated.enemiesPerRoundIncrement = HordeService.parseInt(values.get("enemiesPerRound"), updated.enemiesPerRoundIncrement, "enemiesPerRound", english);
-            updated.waveDelaySeconds = HordeService.parseInt(values.get("waveDelay"), updated.waveDelaySeconds, "waveDelay", english);
-            updated.rewardEveryRounds = HordeService.parseInt(values.get("rewardEveryRounds"), updated.rewardEveryRounds, "rewardEveryRounds", english);
-            updated.enemyLevelMin = HordeService.parseInt(values.get("enemyLevelMin"), updated.enemyLevelMin, "enemyLevelMin", english);
-            updated.enemyLevelMax = HordeService.parseInt(values.get("enemyLevelMax"), updated.enemyLevelMax, "enemyLevelMax", english);
-        }
-        catch (IllegalArgumentException ex) {
-            return OperationResult.fail(ex.getMessage());
-        }
-        try {
-            updated.finalBossEnabled = HordeService.parseBoolean(values.get("finalBossEnabled"), updated.finalBossEnabled, "finalBossEnabled", english);
+            HordeService.parseCoreUiValues(values, updated, english);
         }
         catch (IllegalArgumentException ex) {
             return OperationResult.fail(ex.getMessage());
@@ -4071,6 +4053,23 @@ public final class HordeService {
         return alive;
     }
 
+    private static void parseCoreUiValues(Map<String, String> values, HordeConfig updated, boolean english) {
+        updated.spawnX = HordeService.parseDouble(values.get("spawnX"), updated.spawnX, "spawnX", english);
+        updated.spawnY = HordeService.parseDouble(values.get("spawnY"), updated.spawnY, "spawnY", english);
+        updated.spawnZ = HordeService.parseDouble(values.get("spawnZ"), updated.spawnZ, "spawnZ", english);
+        updated.minSpawnRadius = HordeService.parseDouble(values.get("minRadius"), updated.minSpawnRadius, "minRadius", english);
+        updated.maxSpawnRadius = HordeService.parseDouble(values.get("maxRadius"), updated.maxSpawnRadius, "maxRadius", english);
+        updated.arenaJoinRadius = HordeService.parseDouble(values.get("arenaJoinRadius"), updated.arenaJoinRadius, "arenaJoinRadius", english);
+        updated.rounds = HordeService.parseInt(values.get("rounds"), updated.rounds, "rounds", english);
+        updated.baseEnemiesPerRound = HordeService.parseInt(values.get("baseEnemies"), updated.baseEnemiesPerRound, "baseEnemies", english);
+        updated.enemiesPerRoundIncrement = HordeService.parseInt(values.get("enemiesPerRound"), updated.enemiesPerRoundIncrement, "enemiesPerRound", english);
+        updated.waveDelaySeconds = HordeService.parseInt(values.get("waveDelay"), updated.waveDelaySeconds, "waveDelay", english);
+        updated.rewardEveryRounds = HordeService.parseInt(values.get("rewardEveryRounds"), updated.rewardEveryRounds, "rewardEveryRounds", english);
+        updated.enemyLevelMin = HordeService.parseInt(values.get("enemyLevelMin"), updated.enemyLevelMin, "enemyLevelMin", english);
+        updated.enemyLevelMax = HordeService.parseInt(values.get("enemyLevelMax"), updated.enemyLevelMax, "enemyLevelMax", english);
+        updated.finalBossEnabled = HordeService.parseBoolean(values.get("finalBossEnabled"), updated.finalBossEnabled, "finalBossEnabled", english);
+    }
+
     private static int parseInt(String input, int currentValue, String name, boolean english) {
         if (input == null || input.isBlank()) {
             return currentValue;
@@ -4524,29 +4523,29 @@ public final class HordeService {
             HordeConfig defaults = new HordeConfig();
             defaults.spawnConfigured = false;
             defaults.worldName = "default";
-            defaults.spawnX = 0.0;
-            defaults.spawnY = 64.0;
-            defaults.spawnZ = 0.0;
-            defaults.minSpawnRadius = 5.0;
-            defaults.maxSpawnRadius = 12.0;
-            defaults.arenaJoinRadius = 32.0;
-            defaults.rounds = 5;
-            defaults.baseEnemiesPerRound = 10;
-            defaults.enemiesPerRoundIncrement = 3;
-            defaults.waveDelaySeconds = 8;
-            defaults.playerMultiplier = 1;
+            defaults.spawnX = HordeConfigRules.DEFAULT_SPAWN_X;
+            defaults.spawnY = HordeConfigRules.DEFAULT_SPAWN_Y;
+            defaults.spawnZ = HordeConfigRules.DEFAULT_SPAWN_Z;
+            defaults.minSpawnRadius = HordeConfigRules.DEFAULT_MIN_RADIUS;
+            defaults.maxSpawnRadius = HordeConfigRules.DEFAULT_MAX_RADIUS;
+            defaults.arenaJoinRadius = HordeConfigRules.DEFAULT_ARENA_JOIN_RADIUS;
+            defaults.rounds = HordeConfigRules.DEFAULT_ROUNDS;
+            defaults.baseEnemiesPerRound = HordeConfigRules.DEFAULT_BASE_ENEMIES;
+            defaults.enemiesPerRoundIncrement = HordeConfigRules.DEFAULT_ENEMIES_INCREMENT;
+            defaults.waveDelaySeconds = HordeConfigRules.DEFAULT_WAVE_DELAY_SECONDS;
+            defaults.playerMultiplier = HordeConfigRules.DEFAULT_PLAYER_MULTIPLIER;
             defaults.enemyType = DEFAULT_ENEMY_TYPE;
             defaults.npcRole = "";
             defaults.language = LANGUAGE_SPANISH;
-            defaults.rewardEveryRounds = 2;
+            defaults.rewardEveryRounds = HordeConfigRules.DEFAULT_REWARD_EVERY_ROUNDS;
             defaults.rewardCategory = DEFAULT_REWARD_CATEGORY;
             defaults.rewardItemId = HordeService.resolveDefaultRewardItemIdForCategory(defaults.rewardCategory, 1);
-            defaults.rewardItemQuantity = 1;
+            defaults.rewardItemQuantity = HordeConfigRules.DEFAULT_REWARD_ITEM_QUANTITY;
             defaults.roundStartSoundId = SOUND_SELECTION_AUTO;
             defaults.roundVictorySoundId = SOUND_SELECTION_AUTO;
             defaults.finalBossEnabled = false;
-            defaults.enemyLevelMin = 1;
-            defaults.enemyLevelMax = 1;
+            defaults.enemyLevelMin = HordeConfigRules.DEFAULT_ENEMY_LEVEL_MIN;
+            defaults.enemyLevelMax = HordeConfigRules.DEFAULT_ENEMY_LEVEL_MAX;
             return defaults;
         }
 
