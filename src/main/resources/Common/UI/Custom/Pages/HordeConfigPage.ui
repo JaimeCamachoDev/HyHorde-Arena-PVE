@@ -337,13 +337,13 @@ Group {
   }
 
   Label #ArenaJoinRadiusLabel {
-    Anchor: (Left: 1048, Top: 302, Width: 416, Height: 22);
+    Anchor: (Left: 1048, Top: 270, Width: 416, Height: 22);
     Text: "Radio de jugadores de arena";
     Style: (FontSize: 13, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   $C.@SliderNumberField #ArenaJoinRadius {
-    @Anchor = (Left: 1048, Top: 326, Width: 416);
+    @Anchor = (Left: 1048, Top: 294, Width: 416);
     Value: 32.0;
     Min: 4.0;
     Max: 512.0;
@@ -670,31 +670,31 @@ Group {
   }
 
   Label #AudienceInfoLabel {
-    Anchor: (Left: 1048, Top: 364, Width: 416, Height: 20);
+    Anchor: (Left: 1048, Top: 332, Width: 416, Height: 20);
     Text: "";
     Style: (FontSize: 12, TextColor: #b5c7df, VerticalAlignment: Center);
   }
 
   Label #PlayersListTitle {
-    Anchor: (Left: 456, Top: 264, Width: 560, Height: 30);
+    Anchor: (Left: 456, Top: 232, Width: 560, Height: 30);
     Text: "Jugadores en area";
     Style: (FontSize: 18, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
   Label #PlayersCountLabel {
-    Anchor: (Left: 1048, Top: 268, Width: 94, Height: 22);
+    Anchor: (Left: 1048, Top: 236, Width: 94, Height: 22);
     Text: "Detectados";
     Style: (FontSize: 13, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   Label #PlayersCountValue {
-    Anchor: (Left: 1146, Top: 268, Width: 64, Height: 22);
+    Anchor: (Left: 1146, Top: 236, Width: 64, Height: 22);
     Text: "0";
     Style: (FontSize: 13, TextColor: #f1f7ff, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #PlayersRefreshButton {
-    Anchor: (Left: 1218, Top: 262, Width: 246, Height: 32);
+    Anchor: (Left: 1218, Top: 230, Width: 246, Height: 32);
     Text: "Actualizar lista";
     Style: $C.@SmallSecondaryTextButtonStyle;
     Padding: (Horizontal: 8);
@@ -748,13 +748,13 @@ Group {
   }
 
   Label #RewardCategoryLabel {
-    Anchor: (Left: 456, Top: 268, Width: 200, Height: 28);
+    Anchor: (Left: 456, Top: 232, Width: 200, Height: 28);
     Text: "Categoria recompensa";
-    Style: (FontSize: 16, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
+    Style: (FontSize: 14, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #RewardCategoryPrevButton {
-    Anchor: (Left: 662, Top: 268, Width: 46, Height: 34);
+    Anchor: (Left: 662, Top: 230, Width: 46, Height: 34);
     Text: "<";
     Style: TextButtonStyle(
       Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -764,12 +764,12 @@ Group {
   }
 
   $C.@DropdownBox #RewardCategory {
-    @Anchor = (Left: 662, Top: 268, Width: 802);
+    @Anchor = (Left: 662, Top: 230, Width: 802);
     Value: "mithril";
   }
 
   TextButton #RewardCategoryNextButton {
-    Anchor: (Left: 978, Top: 268, Width: 46, Height: 34);
+    Anchor: (Left: 978, Top: 230, Width: 46, Height: 34);
     Text: ">";
     Style: TextButtonStyle(
       Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -779,13 +779,13 @@ Group {
   }
 
   Label #RewardCommandsLabel {
-    Anchor: (Left: 456, Top: 352, Width: 200, Height: 28);
+    Anchor: (Left: 456, Top: 332, Width: 200, Height: 28);
     Text: "Item recompensa";
-    Style: (FontSize: 16, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
+    Style: (FontSize: 14, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #RewardItemPrevButton {
-    Anchor: (Left: 662, Top: 352, Width: 46, Height: 34);
+    Anchor: (Left: 662, Top: 330, Width: 46, Height: 34);
     Text: "<";
     Style: TextButtonStyle(
       Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -795,12 +795,12 @@ Group {
   }
 
   $C.@DropdownBox #RewardItemId {
-    @Anchor = (Left: 662, Top: 352, Width: 802);
+    @Anchor = (Left: 662, Top: 330, Width: 802);
     Value: "";
   }
 
   TextButton #RewardItemNextButton {
-    Anchor: (Left: 1232, Top: 352, Width: 46, Height: 34);
+    Anchor: (Left: 1232, Top: 330, Width: 46, Height: 34);
     Text: ">";
     Style: TextButtonStyle(
       Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -810,13 +810,13 @@ Group {
   }
 
   Label #RewardItemQuantityLabel {
-    Anchor: (Left: 456, Top: 436, Width: 200, Height: 22);
+    Anchor: (Left: 456, Top: 432, Width: 200, Height: 22);
     Text: "Cantidad";
-    Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center);
+    Style: (FontSize: 13, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   $C.@SliderNumberField #RewardItemQuantity {
-    @Anchor = (Left: 662, Top: 460, Width: 802);
+    @Anchor = (Left: 662, Top: 456, Width: 802);
     Value: 1;
     Min: 1;
     Max: 100;
@@ -825,7 +825,7 @@ Group {
   }
 
   Label #RewardCommandsHelpLabel {
-    Anchor: (Left: 662, Top: 508, Width: 802, Height: 24);
+    Anchor: (Left: 662, Top: 504, Width: 802, Height: 24);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center);
