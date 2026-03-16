@@ -18,119 +18,154 @@ Group {
   }
 
   Panel #CategoryBar {
-    Anchor: (Left: 856, Top: 18, Width: 628, Height: 58);
-    Background: #10151f(0.92);
+    Anchor: (Left: 856, Top: 14, Width: 628, Height: 64);
+    Background: #0b1018(0.76);
   }
 
   Panel #CategoryBarInset {
-    Anchor: (Left: 860, Top: 22, Width: 620, Height: 50);
-    Background: #172335(0.96);
+    Anchor: (Left: 860, Top: 18, Width: 620, Height: 56);
+    Background: #142033(0.94);
+  }
+
+  Panel #CategoryBarBottomEdge {
+    Anchor: (Left: 860, Top: 74, Width: 620, Height: 2);
+    Background: #355172(0.85);
+  }
+
+  Panel #TabGeneralPlate {
+    Anchor: (Left: 861, Top: 20, Width: 102, Height: 50);
+    Background: #243448(0.95);
+  }
+
+  Panel #TabHordePlate {
+    Anchor: (Left: 965, Top: 20, Width: 102, Height: 50);
+    Background: #243448(0.95);
+  }
+
+  Panel #TabPlayersPlate {
+    Anchor: (Left: 1069, Top: 20, Width: 102, Height: 50);
+    Background: #243448(0.95);
+  }
+
+  Panel #TabSoundsPlate {
+    Anchor: (Left: 1173, Top: 20, Width: 102, Height: 50);
+    Background: #243448(0.95);
+  }
+
+  Panel #TabRewardsPlate {
+    Anchor: (Left: 1277, Top: 20, Width: 102, Height: 50);
+    Background: #243448(0.95);
+  }
+
+  Panel #TabHelpPlate {
+    Anchor: (Left: 1381, Top: 20, Width: 102, Height: 50);
+    Background: #243448(0.95);
   }
 
   Panel #TabGeneralActiveBack {
-    Anchor: (Left: 860, Top: 22, Width: 104, Height: 44);
-    Background: #28384f;
+    Anchor: (Left: 862, Top: 22, Width: 100, Height: 46);
+    Background: #2a3c53;
     Visible: false;
   }
 
   Panel #TabGeneralActiveTop {
-    Anchor: (Left: 860, Top: 66, Width: 104, Height: 2);
+    Anchor: (Left: 862, Top: 66, Width: 100, Height: 2);
     Background: #ddb35f;
     Visible: false;
   }
 
   Panel #TabGeneralActiveNotch {
-    Anchor: (Left: 907, Top: 68, Width: 10, Height: 2);
+    Anchor: (Left: 907, Top: 68, Width: 10, Height: 3);
     Background: #ddb35f;
     Visible: false;
   }
 
   Panel #TabHordeActiveBack {
-    Anchor: (Left: 964, Top: 22, Width: 104, Height: 44);
-    Background: #28384f;
+    Anchor: (Left: 966, Top: 22, Width: 100, Height: 46);
+    Background: #2a3c53;
     Visible: false;
   }
 
   Panel #TabHordeActiveTop {
-    Anchor: (Left: 964, Top: 66, Width: 104, Height: 2);
+    Anchor: (Left: 966, Top: 66, Width: 100, Height: 2);
     Background: #ddb35f;
     Visible: false;
   }
 
   Panel #TabHordeActiveNotch {
-    Anchor: (Left: 1011, Top: 68, Width: 10, Height: 2);
+    Anchor: (Left: 1011, Top: 68, Width: 10, Height: 3);
     Background: #ddb35f;
     Visible: false;
   }
 
   Panel #TabPlayersActiveBack {
-    Anchor: (Left: 1068, Top: 22, Width: 104, Height: 44);
-    Background: #28384f;
+    Anchor: (Left: 1070, Top: 22, Width: 100, Height: 46);
+    Background: #2a3c53;
     Visible: false;
   }
 
   Panel #TabPlayersActiveTop {
-    Anchor: (Left: 1068, Top: 66, Width: 104, Height: 2);
+    Anchor: (Left: 1070, Top: 66, Width: 100, Height: 2);
     Background: #ddb35f;
     Visible: false;
   }
 
   Panel #TabPlayersActiveNotch {
-    Anchor: (Left: 1115, Top: 68, Width: 10, Height: 2);
+    Anchor: (Left: 1115, Top: 68, Width: 10, Height: 3);
     Background: #ddb35f;
     Visible: false;
   }
 
   Panel #TabSoundsActiveBack {
-    Anchor: (Left: 1172, Top: 22, Width: 104, Height: 44);
-    Background: #28384f;
+    Anchor: (Left: 1174, Top: 22, Width: 100, Height: 46);
+    Background: #2a3c53;
     Visible: false;
   }
 
   Panel #TabSoundsActiveTop {
-    Anchor: (Left: 1172, Top: 66, Width: 104, Height: 2);
+    Anchor: (Left: 1174, Top: 66, Width: 100, Height: 2);
     Background: #ddb35f;
     Visible: false;
   }
 
   Panel #TabSoundsActiveNotch {
-    Anchor: (Left: 1219, Top: 68, Width: 10, Height: 2);
+    Anchor: (Left: 1219, Top: 68, Width: 10, Height: 3);
     Background: #ddb35f;
     Visible: false;
   }
 
   Panel #TabRewardsActiveBack {
-    Anchor: (Left: 1276, Top: 22, Width: 104, Height: 44);
-    Background: #28384f;
+    Anchor: (Left: 1278, Top: 22, Width: 100, Height: 46);
+    Background: #2a3c53;
     Visible: false;
   }
 
   Panel #TabRewardsActiveTop {
-    Anchor: (Left: 1276, Top: 66, Width: 104, Height: 2);
+    Anchor: (Left: 1278, Top: 66, Width: 100, Height: 2);
     Background: #ddb35f;
     Visible: false;
   }
 
   Panel #TabRewardsActiveNotch {
-    Anchor: (Left: 1323, Top: 68, Width: 10, Height: 2);
+    Anchor: (Left: 1323, Top: 68, Width: 10, Height: 3);
     Background: #ddb35f;
     Visible: false;
   }
 
   Panel #TabHelpActiveBack {
-    Anchor: (Left: 1380, Top: 22, Width: 104, Height: 44);
-    Background: #28384f;
+    Anchor: (Left: 1382, Top: 22, Width: 100, Height: 46);
+    Background: #2a3c53;
     Visible: false;
   }
 
   Panel #TabHelpActiveTop {
-    Anchor: (Left: 1380, Top: 66, Width: 104, Height: 2);
+    Anchor: (Left: 1382, Top: 66, Width: 100, Height: 2);
     Background: #ddb35f;
     Visible: false;
   }
 
   Panel #TabHelpActiveNotch {
-    Anchor: (Left: 1427, Top: 68, Width: 10, Height: 2);
+    Anchor: (Left: 1427, Top: 68, Width: 10, Height: 3);
     Background: #ddb35f;
     Visible: false;
   }
@@ -154,67 +189,67 @@ Group {
   }
 
   TextButton #TabGeneralButton {
-    Anchor: (Left: 862, Top: 28, Width: 100, Height: 36);
+    Anchor: (Left: 863, Top: 24, Width: 98, Height: 40);
     Text: "General";
     Style: TextButtonStyle(
-      Default: (Background: #1a2638, LabelStyle: (FontSize: 13, TextColor: #aebed2, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #23344a, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #2f435e, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+      Default: (Background: #121b29, LabelStyle: (FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #1b2a3f, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #243a55, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
     );
     Padding: (Horizontal: 8);
   }
 
   TextButton #TabHordeButton {
-    Anchor: (Left: 966, Top: 28, Width: 100, Height: 36);
+    Anchor: (Left: 967, Top: 24, Width: 98, Height: 40);
     Text: "Horda";
     Style: TextButtonStyle(
-      Default: (Background: #1a2638, LabelStyle: (FontSize: 13, TextColor: #aebed2, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #23344a, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #2f435e, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+      Default: (Background: #121b29, LabelStyle: (FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #1b2a3f, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #243a55, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
     );
     Padding: (Horizontal: 8);
   }
 
   TextButton #TabPlayersButton {
-    Anchor: (Left: 1070, Top: 28, Width: 100, Height: 36);
+    Anchor: (Left: 1071, Top: 24, Width: 98, Height: 40);
     Text: "Jugadores";
     Style: TextButtonStyle(
-      Default: (Background: #1a2638, LabelStyle: (FontSize: 13, TextColor: #aebed2, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #23344a, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #2f435e, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+      Default: (Background: #121b29, LabelStyle: (FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #1b2a3f, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #243a55, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
     );
     Padding: (Horizontal: 8);
   }
 
   TextButton #TabSoundsButton {
-    Anchor: (Left: 1174, Top: 28, Width: 100, Height: 36);
+    Anchor: (Left: 1175, Top: 24, Width: 98, Height: 40);
     Text: "Sonidos";
     Style: TextButtonStyle(
-      Default: (Background: #1a2638, LabelStyle: (FontSize: 13, TextColor: #aebed2, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #23344a, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #2f435e, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+      Default: (Background: #121b29, LabelStyle: (FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #1b2a3f, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #243a55, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
     );
     Padding: (Horizontal: 8);
   }
 
   TextButton #TabRewardsButton {
-    Anchor: (Left: 1278, Top: 28, Width: 100, Height: 36);
+    Anchor: (Left: 1279, Top: 24, Width: 98, Height: 40);
     Text: "Recompensas";
     Style: TextButtonStyle(
-      Default: (Background: #1a2638, LabelStyle: (FontSize: 13, TextColor: #aebed2, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #23344a, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #2f435e, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+      Default: (Background: #121b29, LabelStyle: (FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #1b2a3f, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #243a55, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
     );
     Padding: (Horizontal: 8);
   }
 
   TextButton #TabHelpButton {
-    Anchor: (Left: 1382, Top: 28, Width: 100, Height: 36);
+    Anchor: (Left: 1383, Top: 24, Width: 98, Height: 40);
     Text: "Ayuda";
     Style: TextButtonStyle(
-      Default: (Background: #1a2638, LabelStyle: (FontSize: 13, TextColor: #aebed2, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #23344a, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #2f435e, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+      Default: (Background: #121b29, LabelStyle: (FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Hovered: (Background: #1b2a3f, LabelStyle: (FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+      Pressed: (Background: #243a55, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
     );
     Padding: (Horizontal: 8);
   }
@@ -713,13 +748,13 @@ Group {
   }
 
   Label #RewardCategoryLabel {
-    Anchor: (Left: 456, Top: 276, Width: 200, Height: 28);
+    Anchor: (Left: 456, Top: 268, Width: 200, Height: 28);
     Text: "Categoria recompensa";
     Style: (FontSize: 16, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #RewardCategoryPrevButton {
-    Anchor: (Left: 662, Top: 276, Width: 46, Height: 34);
+    Anchor: (Left: 662, Top: 268, Width: 46, Height: 34);
     Text: "<";
     Style: TextButtonStyle(
       Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -729,12 +764,12 @@ Group {
   }
 
   $C.@DropdownBox #RewardCategory {
-    @Anchor = (Left: 662, Top: 276, Width: 802);
+    @Anchor = (Left: 662, Top: 268, Width: 802);
     Value: "mithril";
   }
 
   TextButton #RewardCategoryNextButton {
-    Anchor: (Left: 978, Top: 276, Width: 46, Height: 34);
+    Anchor: (Left: 978, Top: 268, Width: 46, Height: 34);
     Text: ">";
     Style: TextButtonStyle(
       Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -744,13 +779,13 @@ Group {
   }
 
   Label #RewardCommandsLabel {
-    Anchor: (Left: 456, Top: 320, Width: 200, Height: 28);
+    Anchor: (Left: 456, Top: 352, Width: 200, Height: 28);
     Text: "Item recompensa";
     Style: (FontSize: 16, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #RewardItemPrevButton {
-    Anchor: (Left: 662, Top: 320, Width: 46, Height: 34);
+    Anchor: (Left: 662, Top: 352, Width: 46, Height: 34);
     Text: "<";
     Style: TextButtonStyle(
       Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -760,12 +795,12 @@ Group {
   }
 
   $C.@DropdownBox #RewardItemId {
-    @Anchor = (Left: 662, Top: 320, Width: 802);
+    @Anchor = (Left: 662, Top: 352, Width: 802);
     Value: "";
   }
 
   TextButton #RewardItemNextButton {
-    Anchor: (Left: 1232, Top: 320, Width: 46, Height: 34);
+    Anchor: (Left: 1232, Top: 352, Width: 46, Height: 34);
     Text: ">";
     Style: TextButtonStyle(
       Default: (Background: #2a3d58, LabelStyle: (FontSize: 18, TextColor: #e8f1ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -775,13 +810,13 @@ Group {
   }
 
   Label #RewardItemQuantityLabel {
-    Anchor: (Left: 662, Top: 366, Width: 200, Height: 22);
+    Anchor: (Left: 456, Top: 436, Width: 200, Height: 22);
     Text: "Cantidad";
     Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center);
   }
 
   $C.@SliderNumberField #RewardItemQuantity {
-    @Anchor = (Left: 662, Top: 390, Width: 802);
+    @Anchor = (Left: 662, Top: 460, Width: 802);
     Value: 1;
     Min: 1;
     Max: 100;
@@ -790,7 +825,7 @@ Group {
   }
 
   Label #RewardCommandsHelpLabel {
-    Anchor: (Left: 662, Top: 438, Width: 802, Height: 24);
+    Anchor: (Left: 662, Top: 508, Width: 802, Height: 24);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center);
