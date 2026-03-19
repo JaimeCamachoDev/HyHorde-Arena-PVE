@@ -414,7 +414,7 @@ extends CustomUIPage {
                 }
             }
             if (tabSwitched) {
-                this.updateCurrentTabVisibilityOnly();
+                this.safeRebuild();
                 return;
             }
             if (refreshDraftFromConfig) {
