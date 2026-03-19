@@ -430,6 +430,54 @@ public final class HordeService {
         return this.bossArenaCatalogService.getBossTierOptions();
     }
 
+    public synchronized List<String> getBossNpcIdOptions() {
+        LinkedHashSet<String> values = new LinkedHashSet<String>();
+        for (String role : this.getAvailableRoles()) {
+            if (role == null) {
+                continue;
+            }
+            String trimmed = role.trim();
+            if (trimmed.isBlank()) {
+                continue;
+            }
+            values.add(trimmed);
+        }
+        for (String[] hints : ENEMY_TYPE_HINTS.values()) {
+            if (hints == null) {
+                continue;
+            }
+            for (String hint : hints) {
+                if (hint == null) {
+                    continue;
+                }
+                String trimmed = hint.trim();
+                if (trimmed.isBlank()) {
+                    continue;
+                }
+                values.add(trimmed);
+            }
+        }
+        List<BossArenaCatalogService.BossDefinitionSnapshot> bosses = this.bossArenaCatalogService.getBossDefinitionsSnapshot();
+        if (bosses != null) {
+            for (BossArenaCatalogService.BossDefinitionSnapshot row : bosses) {
+                if (row == null || row.npcId == null) {
+                    continue;
+                }
+                String trimmed = row.npcId.trim();
+                if (trimmed.isBlank()) {
+                    continue;
+                }
+                values.add(trimmed);
+            }
+        }
+        if (values.isEmpty()) {
+            values.add("enemy");
+        }
+        ArrayList<String> ordered = new ArrayList<String>(values);
+        ordered.sort(String.CASE_INSENSITIVE_ORDER);
+        return ordered;
+    }
+
     public synchronized List<BossArenaCatalogService.BossDefinitionSnapshot> getBossDefinitionsSnapshot() {
         return this.bossArenaCatalogService.getBossDefinitionsSnapshot();
     }
