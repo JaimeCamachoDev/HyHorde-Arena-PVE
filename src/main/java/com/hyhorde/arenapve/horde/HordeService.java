@@ -174,6 +174,7 @@ public final class HordeService {
     private final Path rewardItemsPath;
     private final Path roundSoundsPath;
     private final BossArenaCatalogService bossArenaCatalogService;
+    private final HordeDefinitionCatalogService hordeDefinitionCatalogService;
     private final Map<UUID, HordeStatusPage> statusPages;
     private final Set<UUID> spectatorOverrides;
     private final Set<UUID> audienceExitOverrides;
@@ -197,6 +198,7 @@ public final class HordeService {
         this.rewardItemsPath = plugin.getDataDirectory().resolve("reward-items.json");
         this.roundSoundsPath = plugin.getDataDirectory().resolve("horde-sounds.json");
         this.bossArenaCatalogService = new BossArenaCatalogService(plugin, this.gson, plugin.getDataDirectory());
+        this.hordeDefinitionCatalogService = new HordeDefinitionCatalogService(plugin, this.gson, plugin.getDataDirectory());
         this.statusPages = new HashMap<UUID, HordeStatusPage>();
         this.spectatorOverrides = new HashSet<UUID>();
         this.audienceExitOverrides = new HashSet<UUID>();
@@ -484,6 +486,152 @@ public final class HordeService {
 
     public synchronized List<BossArenaCatalogService.ArenaDefinitionSnapshot> getArenaDefinitionsSnapshot() {
         return this.bossArenaCatalogService.getArenaDefinitionsSnapshot();
+    }
+
+    public synchronized List<HordeDefinitionCatalogService.HordeDefinitionSnapshot> getHordeDefinitionsSnapshot() {
+        return this.hordeDefinitionCatalogService.getDefinitionsSnapshot();
+    }
+
+    public synchronized List<EnemyCategorySnapshot> getEnemyCategoryDefinitionsSnapshot() {
+        ArrayList<EnemyCategorySnapshot> rows = new ArrayList<EnemyCategorySnapshot>();
+        for (Map.Entry<String, String[]> entry : ENEMY_TYPE_HINTS.entrySet()) {
+            if (entry == null || entry.getKey() == null || entry.getKey().isBlank()) {
+                continue;
+            }
+            String categoryId = HordeService.normalizeEnemyType(entry.getKey());
+            if (categoryId.isBlank() || HordeService.isRandomEnemyType(categoryId) || HordeService.isRandomAllEnemyType(categoryId)) {
+                continue;
+            }
+            ArrayList<String> rawRoles = new ArrayList<String>();
+            String[] configuredRoles = entry.getValue();
+            if (configuredRoles != null) {
+                for (String role : configuredRoles) {
+                    if (role == null || role.isBlank()) {
+                        continue;
+                    }
+                    rawRoles.add(role);
+                }
+            }
+            List<String> cleanedRoles = HordeService.sanitizeRoleIdList(rawRoles);
+            if (cleanedRoles.isEmpty()) {
+                continue;
+            }
+            rows.add(new EnemyCategorySnapshot(categoryId, cleanedRoles));
+        }
+        return rows;
+    }
+
+    public synchronized OperationResult createEnemyCategoryDraft(String requestedCategoryId) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        EnemyCategoriesConfig editableConfig = this.readEnemyCategoriesConfigForEditor(true);
+        if (editableConfig.categories == null) {
+            editableConfig.categories = new LinkedHashMap<String, List<String>>();
+        }
+        String baseCategoryId = HordeService.normalizeEnemyType(requestedCategoryId == null ? "" : requestedCategoryId.trim());
+        if (baseCategoryId.isBlank() || HordeService.isRandomEnemyType(baseCategoryId) || HordeService.isRandomAllEnemyType(baseCategoryId)) {
+            baseCategoryId = "enemy_category";
+        }
+        String uniqueCategoryId = baseCategoryId;
+        int suffix = 1;
+        while (editableConfig.categories.containsKey(uniqueCategoryId)) {
+            ++suffix;
+            uniqueCategoryId = baseCategoryId + "_" + suffix;
+        }
+        String fallbackRole = "enemy";
+        List<String> availableRoles = this.getAvailableRoles();
+        if (availableRoles != null && !availableRoles.isEmpty()) {
+            String firstRole = availableRoles.get(0);
+            if (firstRole != null && !firstRole.isBlank()) {
+                fallbackRole = firstRole.trim();
+            }
+        }
+        editableConfig.categories.put(uniqueCategoryId, List.of(fallbackRole));
+        this.saveEnemyCategoriesEditorConfig(editableConfig);
+        this.loadEnemyCategoriesFromDisk(false);
+        return OperationResult.ok(english ? "Enemy category created: " + uniqueCategoryId + "." : "Categoria de enemigos creada: " + uniqueCategoryId + ".");
+    }
+
+    public synchronized OperationResult saveEnemyCategoryFromUi(Map<String, String> values) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        String selectedRaw = HordeService.trimToEmpty(values == null ? "" : values.get("enemyCategorySelected"));
+        String requestedRaw = HordeService.firstNonBlankValue(values == null ? "" : values.get("enemyCategoryEditId"), selectedRaw);
+        String requestedCategoryId = HordeService.normalizeEnemyType(requestedRaw);
+        if (requestedCategoryId.isBlank() || HordeService.isRandomEnemyType(requestedCategoryId) || HordeService.isRandomAllEnemyType(requestedCategoryId)) {
+            return OperationResult.fail(english ? "Enemy category ID is invalid or reserved." : "El ID de categoria de enemigos es invalido o reservado.");
+        }
+        String selectedCategoryId = HordeService.normalizeEnemyType(selectedRaw);
+        String rolesRaw = HordeService.trimToEmpty(values == null ? "" : values.get("enemyCategoryEditRoles"));
+        List<String> cleanedRoles = HordeService.parseEnemyCategoryRoles(rolesRaw);
+        if (cleanedRoles.isEmpty()) {
+            return OperationResult.fail(english ? "Enemy IDs list cannot be empty." : "La lista de Enemy IDs no puede estar vacia.");
+        }
+        EnemyCategoriesConfig editableConfig = this.readEnemyCategoriesConfigForEditor(true);
+        if (editableConfig.categories == null) {
+            editableConfig.categories = new LinkedHashMap<String, List<String>>();
+        }
+        boolean creating = selectedCategoryId.isBlank() || !editableConfig.categories.containsKey(selectedCategoryId);
+        if (!selectedCategoryId.equals(requestedCategoryId) && editableConfig.categories.containsKey(requestedCategoryId)) {
+            return OperationResult.fail(english ? "An enemy category with that ID already exists." : "Ya existe una categoria de enemigos con ese ID.");
+        }
+        if (!selectedCategoryId.isBlank() && !selectedCategoryId.equals(requestedCategoryId)) {
+            editableConfig.categories.remove(selectedCategoryId);
+        }
+        editableConfig.categories.put(requestedCategoryId, cleanedRoles);
+        this.saveEnemyCategoriesEditorConfig(editableConfig);
+        this.loadEnemyCategoriesFromDisk(false);
+        return OperationResult.ok(english ? (creating ? "Enemy category saved: " : "Enemy category updated: ") + requestedCategoryId + "." : (creating ? "Categoria de enemigos guardada: " : "Categoria de enemigos actualizada: ") + requestedCategoryId + ".");
+    }
+
+    public synchronized OperationResult deleteEnemyCategoryDefinition(String categoryId) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        String normalizedCategoryId = HordeService.normalizeEnemyType(HordeService.trimToEmpty(categoryId));
+        if (normalizedCategoryId.isBlank() || HordeService.isRandomEnemyType(normalizedCategoryId) || HordeService.isRandomAllEnemyType(normalizedCategoryId)) {
+            return OperationResult.fail(english ? "Enemy category ID is invalid or reserved." : "El ID de categoria de enemigos es invalido o reservado.");
+        }
+        EnemyCategoriesConfig editableConfig = this.readEnemyCategoriesConfigForEditor(true);
+        if (editableConfig.categories == null || editableConfig.categories.isEmpty()) {
+            return OperationResult.ok(english ? "Enemy category already removed: " + normalizedCategoryId + "." : "Categoria de enemigos ya eliminada: " + normalizedCategoryId + ".");
+        }
+        List<String> removed = editableConfig.categories.remove(normalizedCategoryId);
+        if (removed == null) {
+            return OperationResult.ok(english ? "Enemy category already removed: " + normalizedCategoryId + "." : "Categoria de enemigos ya eliminada: " + normalizedCategoryId + ".");
+        }
+        this.saveEnemyCategoriesEditorConfig(editableConfig);
+        this.loadEnemyCategoriesFromDisk(false);
+        return OperationResult.ok(english ? "Enemy category deleted: " + normalizedCategoryId + "." : "Categoria de enemigos eliminada: " + normalizedCategoryId + ".");
+    }
+
+    public synchronized OperationResult createHordeDefinitionDraft(String requestedHordeId) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        return this.hordeDefinitionCatalogService.createDraft(requestedHordeId, this.config.copy(), english);
+    }
+
+    public synchronized OperationResult saveHordeDefinitionFromUi(Map<String, String> values) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        return this.hordeDefinitionCatalogService.upsertFromValues(values, this.config.copy(), english);
+    }
+
+    public synchronized OperationResult deleteHordeDefinition(String hordeId) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        return this.hordeDefinitionCatalogService.delete(hordeId, english);
     }
 
     public synchronized OperationResult createBossDraft(String requestedBossId) {
@@ -828,6 +976,7 @@ public final class HordeService {
         EnemyCatalogLoadReport enemyCatalogReport = this.loadEnemyCategoriesFromDisk(true);
         RewardCatalogLoadReport rewardCatalogReport = this.loadRewardItemsFromDisk(true);
         RoundSoundCatalogLoadReport soundCatalogReport = this.loadRoundSoundsFromDisk(true);
+        this.hordeDefinitionCatalogService.reloadFromDisk();
         this.loadConfig();
         this.resetAutoStartSchedule(false);
         this.refreshStatusHud(this.session);
@@ -1005,6 +1154,15 @@ public final class HordeService {
                     updated.worldName = selectedArenaForHorde.worldName;
                 }
             }
+        }
+        String selectedBossIdValue = values.get("selectedBossId");
+        if (selectedBossIdValue != null) {
+            updated.selectedBossId = HordeService.cleanBossSelectionValue(selectedBossIdValue);
+        } else {
+            updated.selectedBossId = HordeService.cleanBossSelectionValue(updated.selectedBossId);
+        }
+        if (!updated.selectedBossId.isBlank() && HordeService.findBossById(this.bossArenaCatalogService.getBossDefinitionsSnapshot(), updated.selectedBossId) == null) {
+            updated.selectedBossId = "";
         }
         String enemyTypeValue = values.get("enemyType");
         if (enemyTypeValue != null && !enemyTypeValue.isBlank()) {
@@ -2879,6 +3037,43 @@ public final class HordeService {
         return new ArrayList<String>(cleaned);
     }
 
+    private static List<String> parseEnemyCategoryRoles(String rawInput) {
+        if (rawInput == null || rawInput.isBlank()) {
+            return List.of();
+        }
+        String normalized = rawInput.replace('\r', '\n').replace(',', '\n').replace(';', '\n');
+        String[] parts = normalized.split("\\n");
+        ArrayList<String> roles = new ArrayList<String>();
+        for (String part : parts) {
+            if (part == null) {
+                continue;
+            }
+            String value = part.trim();
+            if (value.isBlank()) {
+                continue;
+            }
+            roles.add(value);
+        }
+        return HordeService.sanitizeRoleIdList(roles);
+    }
+
+    private static String trimToEmpty(String value) {
+        return value == null ? "" : value.trim();
+    }
+
+    private static String firstNonBlankValue(String ... values) {
+        if (values == null) {
+            return "";
+        }
+        for (String value : values) {
+            String clean = HordeService.trimToEmpty(value);
+            if (!clean.isBlank()) {
+                return clean;
+            }
+        }
+        return "";
+    }
+
     private static List<String> sanitizeBlockedHintList(List<String> candidates) {
         LinkedHashSet<String> cleaned = new LinkedHashSet<String>();
         if (candidates == null || candidates.isEmpty()) {
@@ -2934,10 +3129,14 @@ public final class HordeService {
     }
 
     private static void applyEnemyCatalogRuntime(Map<String, String[]> categories, List<String> finalBossRoles, List<String> blockedRoleHints) {
-        LinkedHashMap<String, String[]> safeCategories = new LinkedHashMap<String, String[]>(HordeService.copyEnemyTypeHints(DEFAULT_ENEMY_TYPE_HINTS));
+        LinkedHashMap<String, String[]> safeCategories = new LinkedHashMap<String, String[]>();
         if (categories != null && !categories.isEmpty()) {
             for (Map.Entry<String, String[]> entry : categories.entrySet()) {
                 if (entry == null || entry.getKey() == null || entry.getKey().isBlank()) {
+                    continue;
+                }
+                String normalizedCategory = HordeService.normalizeEnemyType(entry.getKey());
+                if (normalizedCategory.isBlank() || HordeService.isRandomEnemyType(normalizedCategory) || HordeService.isRandomAllEnemyType(normalizedCategory)) {
                     continue;
                 }
                 String[] roles = entry.getValue();
@@ -2946,8 +3145,11 @@ public final class HordeService {
                 }
                 String[] cloned = new String[roles.length];
                 System.arraycopy(roles, 0, cloned, 0, roles.length);
-                safeCategories.put(entry.getKey(), cloned);
+                safeCategories.put(normalizedCategory, cloned);
             }
+        }
+        if (safeCategories.isEmpty()) {
+            safeCategories.putAll(HordeService.copyEnemyTypeHints(DEFAULT_ENEMY_TYPE_HINTS));
         }
         ENEMY_TYPE_HINTS = safeCategories;
         List<String> safeFinalBossRoles = HordeService.sanitizeRoleIdList(finalBossRoles);
@@ -2998,9 +3200,120 @@ public final class HordeService {
         ROUND_SOUND_WEAK_KEYWORDS = safeWeakKeywords.isEmpty() ? DEFAULT_ROUND_SOUND_WEAK_KEYWORDS.clone() : safeWeakKeywords.toArray(new String[0]);
     }
 
+    private EnemyCategoriesConfig readEnemyCategoriesConfigForEditor(boolean createTemplateIfMissing) {
+        try {
+            Files.createDirectories(this.plugin.getDataDirectory(), new FileAttribute[0]);
+        }
+        catch (IOException ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo preparar carpeta de datos para enemy-categories editor: %s", (Object)ex.getMessage());
+            return EnemyCategoriesConfig.fromDefaults();
+        }
+        if (createTemplateIfMissing && !Files.exists(this.enemyCategoriesPath, new LinkOption[0])) {
+            EnemyCategoriesConfig template = EnemyCategoriesConfig.fromDefaults();
+            try (BufferedWriter writer = Files.newBufferedWriter(this.enemyCategoriesPath, StandardCharsets.UTF_8, new OpenOption[0]);){
+                this.gson.toJson((Object)template, (Appendable)writer);
+            }
+            catch (Exception ex) {
+                this.plugin.getLogger().at(Level.WARNING).log("No se pudo crear enemy-categories.json para editor: %s", (Object)ex.getMessage());
+            }
+            return template;
+        }
+        if (!Files.exists(this.enemyCategoriesPath, new LinkOption[0])) {
+            return EnemyCategoriesConfig.fromDefaults();
+        }
+        EnemyCategoriesConfig loaded;
+        try (BufferedReader reader = Files.newBufferedReader(this.enemyCategoriesPath, StandardCharsets.UTF_8);){
+            loaded = (EnemyCategoriesConfig)this.gson.fromJson((Reader)reader, EnemyCategoriesConfig.class);
+        }
+        catch (Exception ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo leer enemy-categories.json para editor, se usaran defaults: %s", (Object)ex.getMessage());
+            return EnemyCategoriesConfig.fromDefaults();
+        }
+        if (loaded == null) {
+            return EnemyCategoriesConfig.fromDefaults();
+        }
+        EnemyCategoriesConfig sanitized = new EnemyCategoriesConfig();
+        sanitized.version = 1;
+        List<String> finalBossRoles = HordeService.sanitizeRoleIdList(loaded.finalBossRoles);
+        if (finalBossRoles.isEmpty()) {
+            finalBossRoles = HordeService.sanitizeRoleIdList(List.of(DEFAULT_FINAL_BOSS_ROLE_HINTS));
+        }
+        sanitized.finalBossRoles = new ArrayList<String>(finalBossRoles);
+        List<String> blockedHints = HordeService.sanitizeBlockedHintList(loaded.blockedRoleHints);
+        if (blockedHints.isEmpty()) {
+            blockedHints = HordeService.sanitizeBlockedHintList(List.of(DEFAULT_BLOCKED_ENEMY_ROLE_HINTS));
+        }
+        sanitized.blockedRoleHints = new ArrayList<String>(blockedHints);
+        sanitized.categories = new LinkedHashMap<String, List<String>>();
+        if (loaded.categories != null && !loaded.categories.isEmpty()) {
+            for (Map.Entry<String, List<String>> entry : loaded.categories.entrySet()) {
+                if (entry == null || entry.getKey() == null || entry.getKey().isBlank()) {
+                    continue;
+                }
+                String normalizedCategory = HordeService.normalizeEnemyType(entry.getKey());
+                if (normalizedCategory.isBlank() || HordeService.isRandomEnemyType(normalizedCategory) || HordeService.isRandomAllEnemyType(normalizedCategory)) {
+                    continue;
+                }
+                List<String> cleanedRoles = HordeService.sanitizeRoleIdList(entry.getValue());
+                if (cleanedRoles.isEmpty()) {
+                    continue;
+                }
+                sanitized.categories.put(normalizedCategory, cleanedRoles);
+            }
+        }
+        if (sanitized.categories.isEmpty()) {
+            sanitized.categories.putAll(EnemyCategoriesConfig.fromDefaults().categories);
+        }
+        return sanitized;
+    }
+
+    private void saveEnemyCategoriesEditorConfig(EnemyCategoriesConfig config) {
+        EnemyCategoriesConfig payload = new EnemyCategoriesConfig();
+        payload.version = 1;
+        List<String> finalBossRoles = config == null ? List.of() : HordeService.sanitizeRoleIdList(config.finalBossRoles);
+        if (finalBossRoles.isEmpty()) {
+            finalBossRoles = HordeService.sanitizeRoleIdList(List.of(DEFAULT_FINAL_BOSS_ROLE_HINTS));
+        }
+        payload.finalBossRoles = new ArrayList<String>(finalBossRoles);
+        List<String> blockedHints = config == null ? List.of() : HordeService.sanitizeBlockedHintList(config.blockedRoleHints);
+        if (blockedHints.isEmpty()) {
+            blockedHints = HordeService.sanitizeBlockedHintList(List.of(DEFAULT_BLOCKED_ENEMY_ROLE_HINTS));
+        }
+        payload.blockedRoleHints = new ArrayList<String>(blockedHints);
+        payload.categories = new LinkedHashMap<String, List<String>>();
+        if (config != null && config.categories != null) {
+            for (Map.Entry<String, List<String>> entry : config.categories.entrySet()) {
+                if (entry == null || entry.getKey() == null || entry.getKey().isBlank()) {
+                    continue;
+                }
+                String normalizedCategory = HordeService.normalizeEnemyType(entry.getKey());
+                if (normalizedCategory.isBlank() || HordeService.isRandomEnemyType(normalizedCategory) || HordeService.isRandomAllEnemyType(normalizedCategory)) {
+                    continue;
+                }
+                List<String> cleanedRoles = HordeService.sanitizeRoleIdList(entry.getValue());
+                if (cleanedRoles.isEmpty()) {
+                    continue;
+                }
+                payload.categories.put(normalizedCategory, cleanedRoles);
+            }
+        }
+        if (payload.categories.isEmpty()) {
+            payload.categories.putAll(EnemyCategoriesConfig.fromDefaults().categories);
+        }
+        try {
+            Files.createDirectories(this.plugin.getDataDirectory(), new FileAttribute[0]);
+            try (BufferedWriter writer = Files.newBufferedWriter(this.enemyCategoriesPath, StandardCharsets.UTF_8, new OpenOption[0]);){
+                this.gson.toJson((Object)payload, (Appendable)writer);
+            }
+        }
+        catch (Exception ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo guardar enemy-categories.json desde editor: %s", (Object)ex.getMessage());
+        }
+    }
+
     private EnemyCatalogLoadReport loadEnemyCategoriesFromDisk(boolean createTemplateIfMissing) {
         EnemyCatalogLoadReport report = new EnemyCatalogLoadReport();
-        LinkedHashMap<String, String[]> mergedCategories = new LinkedHashMap<String, String[]>(HordeService.copyEnemyTypeHints(DEFAULT_ENEMY_TYPE_HINTS));
+        LinkedHashMap<String, String[]> mergedCategories = new LinkedHashMap<String, String[]>();
         ArrayList<String> mergedFinalBossRoles = new ArrayList<String>();
         for (String role : DEFAULT_FINAL_BOSS_ROLE_HINTS) {
             mergedFinalBossRoles.add(role);
@@ -3075,6 +3388,10 @@ public final class HordeService {
                 mergedCategories.put(normalizedCategory, cleanedRoles.toArray(new String[0]));
                 ++report.appliedCategories;
             }
+        }
+        if (mergedCategories.isEmpty()) {
+            mergedCategories.putAll(HordeService.copyEnemyTypeHints(DEFAULT_ENEMY_TYPE_HINTS));
+            report.fallbackToDefaults = true;
         }
         if (external.finalBossRoles != null) {
             List<String> cleanedFinalBossRoles = HordeService.sanitizeRoleIdList(external.finalBossRoles);
@@ -4489,6 +4806,10 @@ public final class HordeService {
         return arenaId == null ? "" : arenaId.trim();
     }
 
+    private static String cleanBossSelectionValue(String bossId) {
+        return bossId == null ? "" : bossId.trim();
+    }
+
     private static BossArenaCatalogService.ArenaDefinitionSnapshot findArenaById(List<BossArenaCatalogService.ArenaDefinitionSnapshot> rows, String arenaId) {
         if (rows == null || rows.isEmpty()) {
             return null;
@@ -4502,6 +4823,25 @@ public final class HordeService {
                 continue;
             }
             if (row.arenaId.equalsIgnoreCase(requested)) {
+                return row;
+            }
+        }
+        return null;
+    }
+
+    private static BossArenaCatalogService.BossDefinitionSnapshot findBossById(List<BossArenaCatalogService.BossDefinitionSnapshot> rows, String bossId) {
+        if (rows == null || rows.isEmpty()) {
+            return null;
+        }
+        String requested = HordeService.cleanBossSelectionValue(bossId);
+        if (requested.isBlank()) {
+            return null;
+        }
+        for (BossArenaCatalogService.BossDefinitionSnapshot row : rows) {
+            if (row == null || row.bossId == null) {
+                continue;
+            }
+            if (row.bossId.equalsIgnoreCase(requested)) {
                 return row;
             }
         }
@@ -4644,6 +4984,7 @@ public final class HordeService {
             sanitized.npcRole = "";
         }
         sanitized.selectedArenaId = HordeService.cleanArenaSelectionValue(sanitized.selectedArenaId);
+        sanitized.selectedBossId = HordeService.cleanBossSelectionValue(sanitized.selectedBossId);
         sanitized.language = HordeService.normalizeLanguage(sanitized.language);
         sanitized.worldName = sanitized.worldName == null || sanitized.worldName.isBlank() ? "default" : sanitized.worldName;
         return sanitized;
@@ -4824,6 +5165,7 @@ public final class HordeService {
         public String enemyType;
         public String npcRole;
         public String selectedArenaId;
+        public String selectedBossId;
         public String language;
         public int rewardEveryRounds;
         public String rewardCategory;
@@ -4856,6 +5198,7 @@ public final class HordeService {
             defaults.enemyType = DEFAULT_ENEMY_TYPE;
             defaults.npcRole = "";
             defaults.selectedArenaId = "";
+            defaults.selectedBossId = "";
             defaults.language = LANGUAGE_SPANISH;
             defaults.rewardEveryRounds = HordeConfigRules.DEFAULT_REWARD_EVERY_ROUNDS;
             defaults.rewardCategory = DEFAULT_REWARD_CATEGORY;
@@ -4890,6 +5233,7 @@ public final class HordeService {
             copy.enemyType = this.enemyType;
             copy.npcRole = this.npcRole;
             copy.selectedArenaId = this.selectedArenaId;
+            copy.selectedBossId = this.selectedBossId;
             copy.language = this.language;
             copy.rewardEveryRounds = this.rewardEveryRounds;
             copy.rewardCategory = this.rewardCategory;
@@ -5054,6 +5398,23 @@ public final class HordeService {
 
         public static StatusSnapshot active(int currentRound, int totalRounds, int aliveEnemies, int totalSpawned, int totalKilled, int totalDeaths, String role, long elapsedSeconds, long nextRoundInSeconds, String worldName, String language, List<PlayerSnapshot> players) {
             return new StatusSnapshot(true, currentRound, totalRounds, aliveEnemies, totalSpawned, totalKilled, totalDeaths, role, elapsedSeconds, nextRoundInSeconds, worldName, language, players);
+        }
+    }
+
+    public static final class EnemyCategorySnapshot {
+        public final String categoryId;
+        public final List<String> roles;
+        public final String rolesCsv;
+        public final String rolesPreview;
+        public final int roleCount;
+
+        private EnemyCategorySnapshot(String categoryId, List<String> roles) {
+            this.categoryId = categoryId == null ? "" : categoryId;
+            List<String> safeRoles = roles == null ? List.of() : List.copyOf(roles);
+            this.roles = safeRoles;
+            this.roleCount = safeRoles.size();
+            this.rolesCsv = String.join(", ", safeRoles);
+            this.rolesPreview = this.roleCount <= 3 ? this.rolesCsv : String.join(", ", safeRoles.subList(0, 3)) + " ...";
         }
     }
 
