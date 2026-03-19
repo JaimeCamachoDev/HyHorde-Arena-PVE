@@ -741,13 +741,13 @@ Group {
   }
 
   Label #ArenaJoinRadiusLabel {
-    Anchor: (Left: 1048, Top: 592, Width: 416, Height: 22);
+    Anchor: (Left: 980, Top: 544, Width: 160, Height: 22);
     Text: "Radio de jugadores de arena";
     Style: (FontSize: 13, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   $C.@SliderNumberField #ArenaJoinRadius {
-    @Anchor = (Left: 1048, Top: 616, Width: 416);
+    @Anchor = (Left: 1148, Top: 540, Width: 316);
     Value: 32.0;
     Min: 4.0;
     Max: 512.0;
@@ -1182,8 +1182,8 @@ Group {
   Label #RewardCatEditIdLabel { Anchor: (Left: 980, Top: 312, Width: 160, Height: 22); Text: "Categoria ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
   $C.@TextField #RewardCatEditId { @Anchor = (Left: 1148, Top: 308, Width: 316); Value: ""; }
   Label #RewardCatItemPickerLabel { Anchor: (Left: 980, Top: 358, Width: 160, Height: 22); Text: "Reward item ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@DropdownBox #RewardCatItemPicker { @Anchor = (Left: 1148, Top: 354, Width: 232, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 232); }
-  TextButton #RewardCatItemAddButton { Anchor: (Left: 1388, Top: 354, Width: 76, Height: 34); Text: "Anadir"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  $C.@DropdownBox #RewardCatItemPicker { @Anchor = (Left: 1148, Top: 354, Width: 220, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 220); }
+  TextButton #RewardCatItemAddButton { Anchor: (Left: 1376, Top: 354, Width: 88, Height: 34); Text: "Anadir"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
   Label #RewardCatEditItemsLabel { Anchor: (Left: 980, Top: 402, Width: 240, Height: 22); Text: "Items en categoria"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
   $C.@TextField #RewardCatEditItems { @Anchor = (Left: 0, Top: 0, Width: 1, Height: 1); Value: ""; Visible: false; }
   Panel #RewardCatItemRow1 { Anchor: (Left: 1148, Top: 430, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName1 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete1 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
@@ -1196,7 +1196,10 @@ Group {
   Panel #RewardCatItemRow8 { Anchor: (Left: 1148, Top: 626, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName8 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete8 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
   Panel #RewardCatItemRow9 { Anchor: (Left: 1148, Top: 654, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName9 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete9 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
   Panel #RewardCatItemRow10 { Anchor: (Left: 1148, Top: 682, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName10 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete10 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Label #RewardCatItemsOverflowLabel { Anchor: (Left: 1148, Top: 710, Width: 316, Height: 20); Text: ""; Visible: false; Style: (FontSize: 11, TextColor: #f2c48b, VerticalAlignment: Center); }
+  TextButton #RewardCatItemsPagePrevButton { Anchor: (Left: 1148, Top: 712, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #RewardCatItemsPageLabel { Anchor: (Left: 1184, Top: 714, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, VerticalAlignment: Center); }
+  TextButton #RewardCatItemsPageNextButton { Anchor: (Left: 1284, Top: 712, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #RewardCatItemsOverflowLabel { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Text: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
   Label #RewardCatEditItemsHelpLabel { Anchor: (Left: 980, Top: 732, Width: 484, Height: 28); Text: "Usa desplegable para anadir item IDs"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center); }
   Label #RewardCatStatusLabel { Anchor: (Left: 980, Top: 770, Width: 484, Height: 40); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
 
@@ -1371,8 +1374,8 @@ Group {
   Label #EnemyCatEditIdLabel { Anchor: (Left: 980, Top: 312, Width: 160, Height: 22); Text: "Categoria ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
   $C.@TextField #EnemyCatEditId { @Anchor = (Left: 1148, Top: 308, Width: 316); Value: ""; }
   Label #EnemyCatRolePickerLabel { Anchor: (Left: 980, Top: 358, Width: 160, Height: 22); Text: "Enemy ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@DropdownBox #EnemyCatRolePicker { @Anchor = (Left: 1148, Top: 354, Width: 232, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 232); }
-  TextButton #EnemyCatRoleAddButton { Anchor: (Left: 1388, Top: 354, Width: 76, Height: 34); Text: "Anadir"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  $C.@DropdownBox #EnemyCatRolePicker { @Anchor = (Left: 1148, Top: 354, Width: 220, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 220); }
+  TextButton #EnemyCatRoleAddButton { Anchor: (Left: 1376, Top: 354, Width: 88, Height: 34); Text: "Anadir"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
   Label #EnemyCatEditRolesLabel { Anchor: (Left: 980, Top: 402, Width: 240, Height: 22); Text: "Enemy IDs en categoria"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
   $C.@TextField #EnemyCatEditRoles { @Anchor = (Left: 0, Top: 0, Width: 1, Height: 1); Value: ""; Visible: false; }
   Panel #EnemyCatRoleRow1 { Anchor: (Left: 1148, Top: 430, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName1 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete1 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
@@ -1385,7 +1388,10 @@ Group {
   Panel #EnemyCatRoleRow8 { Anchor: (Left: 1148, Top: 626, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName8 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete8 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
   Panel #EnemyCatRoleRow9 { Anchor: (Left: 1148, Top: 654, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName9 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete9 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
   Panel #EnemyCatRoleRow10 { Anchor: (Left: 1148, Top: 682, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName10 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete10 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Label #EnemyCatRolesOverflowLabel { Anchor: (Left: 1148, Top: 710, Width: 316, Height: 20); Text: ""; Visible: false; Style: (FontSize: 11, TextColor: #f2c48b, VerticalAlignment: Center); }
+  TextButton #EnemyCatRolesPagePrevButton { Anchor: (Left: 1148, Top: 712, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #EnemyCatRolesPageLabel { Anchor: (Left: 1184, Top: 714, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, VerticalAlignment: Center); }
+  TextButton #EnemyCatRolesPageNextButton { Anchor: (Left: 1284, Top: 712, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #EnemyCatRolesOverflowLabel { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Text: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
 
   Label #EnemyCatEditRolesHelpLabel {
     Anchor: (Left: 980, Top: 732, Width: 484, Height: 28);
