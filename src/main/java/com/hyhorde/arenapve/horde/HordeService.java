@@ -521,6 +521,25 @@ public final class HordeService {
         return rows;
     }
 
+    public synchronized List<RewardCategorySnapshot> getRewardCategoryDefinitionsSnapshot() {
+        ArrayList<RewardCategorySnapshot> rows = new ArrayList<RewardCategorySnapshot>();
+        for (Map.Entry<String, List<String>> entry : REWARD_CATEGORY_ITEMS.entrySet()) {
+            if (entry == null || entry.getKey() == null || entry.getKey().isBlank()) {
+                continue;
+            }
+            String categoryId = HordeService.normalizeRewardCategoryKey(entry.getKey());
+            if (categoryId.isBlank()) {
+                continue;
+            }
+            List<String> cleanedItems = HordeService.sanitizeRoleIdList(entry.getValue());
+            if (cleanedItems.isEmpty()) {
+                continue;
+            }
+            rows.add(new RewardCategorySnapshot(categoryId, cleanedItems));
+        }
+        return rows;
+    }
+
     public synchronized OperationResult createEnemyCategoryDraft(String requestedCategoryId) {
         boolean english = HordeService.isEnglishLanguage(this.config.language);
         if (this.pluginReloadInProgress) {
@@ -608,6 +627,91 @@ public final class HordeService {
         this.saveEnemyCategoriesEditorConfig(editableConfig);
         this.loadEnemyCategoriesFromDisk(false);
         return OperationResult.ok(english ? "Enemy category deleted: " + normalizedCategoryId + "." : "Categoria de enemigos eliminada: " + normalizedCategoryId + ".");
+    }
+
+    public synchronized OperationResult createRewardCategoryDraft(String requestedCategoryId) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        RewardItemsConfig editableConfig = this.readRewardItemsConfigForEditor(true);
+        if (editableConfig.categories == null) {
+            editableConfig.categories = new LinkedHashMap<String, List<String>>();
+        }
+        String baseCategoryId = HordeService.normalizeRewardCategoryKey(requestedCategoryId == null ? "" : requestedCategoryId.trim());
+        if (baseCategoryId.isBlank()) {
+            baseCategoryId = "reward_category";
+        }
+        String uniqueCategoryId = baseCategoryId;
+        int suffix = 1;
+        while (editableConfig.categories.containsKey(uniqueCategoryId)) {
+            ++suffix;
+            uniqueCategoryId = baseCategoryId + "_" + suffix;
+        }
+        String fallbackItemId = HordeService.resolveDefaultRewardItemId();
+        if (fallbackItemId == null || fallbackItemId.isBlank()) {
+            fallbackItemId = "Item_Misc_Mushroom";
+        }
+        editableConfig.categories.put(uniqueCategoryId, List.of(fallbackItemId));
+        this.saveRewardItemsEditorConfig(editableConfig);
+        this.loadRewardItemsFromDisk(false);
+        return OperationResult.ok(english ? "Reward category created: " + uniqueCategoryId + "." : "Categoria de recompensa creada: " + uniqueCategoryId + ".");
+    }
+
+    public synchronized OperationResult saveRewardCategoryFromUi(Map<String, String> values) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        String selectedRaw = HordeService.trimToEmpty(values == null ? "" : values.get("rewardCatSelected"));
+        String requestedRaw = HordeService.firstNonBlankValue(values == null ? "" : values.get("rewardCatEditId"), selectedRaw);
+        String requestedCategoryId = HordeService.normalizeRewardCategoryKey(requestedRaw);
+        if (requestedCategoryId.isBlank()) {
+            return OperationResult.fail(english ? "Reward category ID is invalid." : "El ID de categoria de recompensa es invalido.");
+        }
+        String selectedCategoryId = HordeService.normalizeRewardCategoryKey(selectedRaw);
+        String itemsRaw = HordeService.trimToEmpty(values == null ? "" : values.get("rewardCatEditItems"));
+        List<String> cleanedItems = HordeService.parseRewardCategoryItems(itemsRaw);
+        if (cleanedItems.isEmpty()) {
+            return OperationResult.fail(english ? "Reward items list cannot be empty." : "La lista de items de recompensa no puede estar vacia.");
+        }
+        RewardItemsConfig editableConfig = this.readRewardItemsConfigForEditor(true);
+        if (editableConfig.categories == null) {
+            editableConfig.categories = new LinkedHashMap<String, List<String>>();
+        }
+        boolean creating = selectedCategoryId.isBlank() || !editableConfig.categories.containsKey(selectedCategoryId);
+        if (!selectedCategoryId.equals(requestedCategoryId) && editableConfig.categories.containsKey(requestedCategoryId)) {
+            return OperationResult.fail(english ? "A reward category with that ID already exists." : "Ya existe una categoria de recompensa con ese ID.");
+        }
+        if (!selectedCategoryId.isBlank() && !selectedCategoryId.equals(requestedCategoryId)) {
+            editableConfig.categories.remove(selectedCategoryId);
+        }
+        editableConfig.categories.put(requestedCategoryId, cleanedItems);
+        this.saveRewardItemsEditorConfig(editableConfig);
+        this.loadRewardItemsFromDisk(false);
+        return OperationResult.ok(english ? (creating ? "Reward category saved: " : "Reward category updated: ") + requestedCategoryId + "." : (creating ? "Categoria de recompensa guardada: " : "Categoria de recompensa actualizada: ") + requestedCategoryId + ".");
+    }
+
+    public synchronized OperationResult deleteRewardCategoryDefinition(String categoryId) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        String normalizedCategoryId = HordeService.normalizeRewardCategoryKey(HordeService.trimToEmpty(categoryId));
+        if (normalizedCategoryId.isBlank()) {
+            return OperationResult.fail(english ? "Reward category ID is invalid." : "El ID de categoria de recompensa es invalido.");
+        }
+        RewardItemsConfig editableConfig = this.readRewardItemsConfigForEditor(true);
+        if (editableConfig.categories == null || editableConfig.categories.isEmpty()) {
+            return OperationResult.ok(english ? "Reward category already removed: " + normalizedCategoryId + "." : "Categoria de recompensa ya eliminada: " + normalizedCategoryId + ".");
+        }
+        List<String> removed = editableConfig.categories.remove(normalizedCategoryId);
+        if (removed == null) {
+            return OperationResult.ok(english ? "Reward category already removed: " + normalizedCategoryId + "." : "Categoria de recompensa ya eliminada: " + normalizedCategoryId + ".");
+        }
+        this.saveRewardItemsEditorConfig(editableConfig);
+        this.loadRewardItemsFromDisk(false);
+        return OperationResult.ok(english ? "Reward category deleted: " + normalizedCategoryId + "." : "Categoria de recompensa eliminada: " + normalizedCategoryId + ".");
     }
 
     public synchronized OperationResult createHordeDefinitionDraft(String requestedHordeId) {
@@ -3080,6 +3184,26 @@ public final class HordeService {
         return HordeService.sanitizeRoleIdList(roles);
     }
 
+    private static List<String> parseRewardCategoryItems(String rawInput) {
+        if (rawInput == null || rawInput.isBlank()) {
+            return List.of();
+        }
+        String normalized = rawInput.replace('\r', '\n').replace(',', '\n').replace(';', '\n');
+        String[] parts = normalized.split("\\n");
+        ArrayList<String> items = new ArrayList<String>();
+        for (String part : parts) {
+            if (part == null) {
+                continue;
+            }
+            String value = part.trim();
+            if (value.isBlank()) {
+                continue;
+            }
+            items.add(value);
+        }
+        return HordeService.sanitizeRoleIdList(items);
+    }
+
     private static String trimToEmpty(String value) {
         return value == null ? "" : value.trim();
     }
@@ -3331,6 +3455,97 @@ public final class HordeService {
         }
         catch (Exception ex) {
             this.plugin.getLogger().at(Level.WARNING).log("No se pudo guardar enemy-categories.json desde editor: %s", (Object)ex.getMessage());
+        }
+    }
+
+    private RewardItemsConfig readRewardItemsConfigForEditor(boolean createTemplateIfMissing) {
+        try {
+            Files.createDirectories(this.plugin.getDataDirectory(), new FileAttribute[0]);
+        }
+        catch (IOException ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo preparar carpeta de datos para reward-items editor: %s", (Object)ex.getMessage());
+            return RewardItemsConfig.fromDefaults();
+        }
+        if (createTemplateIfMissing && !Files.exists(this.rewardItemsPath, new LinkOption[0])) {
+            RewardItemsConfig template = RewardItemsConfig.fromDefaults();
+            try (BufferedWriter writer = Files.newBufferedWriter(this.rewardItemsPath, StandardCharsets.UTF_8, new OpenOption[0]);){
+                this.gson.toJson((Object)template, (Appendable)writer);
+            }
+            catch (Exception ex) {
+                this.plugin.getLogger().at(Level.WARNING).log("No se pudo crear reward-items.json para editor: %s", (Object)ex.getMessage());
+            }
+            return template;
+        }
+        if (!Files.exists(this.rewardItemsPath, new LinkOption[0])) {
+            return RewardItemsConfig.fromDefaults();
+        }
+        RewardItemsConfig loaded;
+        try (BufferedReader reader = Files.newBufferedReader(this.rewardItemsPath, StandardCharsets.UTF_8);){
+            loaded = (RewardItemsConfig)this.gson.fromJson((Reader)reader, RewardItemsConfig.class);
+        }
+        catch (Exception ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo leer reward-items.json para editor, se usaran defaults: %s", (Object)ex.getMessage());
+            return RewardItemsConfig.fromDefaults();
+        }
+        if (loaded == null) {
+            return RewardItemsConfig.fromDefaults();
+        }
+        RewardItemsConfig sanitized = new RewardItemsConfig();
+        sanitized.version = 1;
+        sanitized.categories = new LinkedHashMap<String, List<String>>();
+        if (loaded.categories != null && !loaded.categories.isEmpty()) {
+            for (Map.Entry<String, List<String>> entry : loaded.categories.entrySet()) {
+                if (entry == null || entry.getKey() == null || entry.getKey().isBlank()) {
+                    continue;
+                }
+                String normalizedCategory = HordeService.normalizeRewardCategoryKey(entry.getKey());
+                if (normalizedCategory.isBlank()) {
+                    continue;
+                }
+                List<String> cleanedItems = HordeService.sanitizeRoleIdList(entry.getValue());
+                if (cleanedItems.isEmpty()) {
+                    continue;
+                }
+                sanitized.categories.put(normalizedCategory, cleanedItems);
+            }
+        }
+        if (sanitized.categories.isEmpty()) {
+            sanitized.categories.putAll(RewardItemsConfig.fromDefaults().categories);
+        }
+        return sanitized;
+    }
+
+    private void saveRewardItemsEditorConfig(RewardItemsConfig config) {
+        RewardItemsConfig payload = new RewardItemsConfig();
+        payload.version = 1;
+        payload.categories = new LinkedHashMap<String, List<String>>();
+        if (config != null && config.categories != null) {
+            for (Map.Entry<String, List<String>> entry : config.categories.entrySet()) {
+                if (entry == null || entry.getKey() == null || entry.getKey().isBlank()) {
+                    continue;
+                }
+                String normalizedCategory = HordeService.normalizeRewardCategoryKey(entry.getKey());
+                if (normalizedCategory.isBlank()) {
+                    continue;
+                }
+                List<String> cleanedItems = HordeService.sanitizeRoleIdList(entry.getValue());
+                if (cleanedItems.isEmpty()) {
+                    continue;
+                }
+                payload.categories.put(normalizedCategory, cleanedItems);
+            }
+        }
+        if (payload.categories.isEmpty()) {
+            payload.categories.putAll(RewardItemsConfig.fromDefaults().categories);
+        }
+        try {
+            Files.createDirectories(this.plugin.getDataDirectory(), new FileAttribute[0]);
+            try (BufferedWriter writer = Files.newBufferedWriter(this.rewardItemsPath, StandardCharsets.UTF_8, new OpenOption[0]);){
+                this.gson.toJson((Object)payload, (Appendable)writer);
+            }
+        }
+        catch (Exception ex) {
+            this.plugin.getLogger().at(Level.WARNING).log("No se pudo guardar reward-items.json desde editor: %s", (Object)ex.getMessage());
         }
     }
 
@@ -5465,6 +5680,23 @@ public final class HordeService {
             this.roleCount = safeRoles.size();
             this.rolesCsv = String.join(", ", safeRoles);
             this.rolesPreview = this.roleCount <= 3 ? this.rolesCsv : String.join(", ", safeRoles.subList(0, 3)) + " ...";
+        }
+    }
+
+    public static final class RewardCategorySnapshot {
+        public final String categoryId;
+        public final List<String> items;
+        public final String itemsCsv;
+        public final String itemsPreview;
+        public final int itemCount;
+
+        private RewardCategorySnapshot(String categoryId, List<String> items) {
+            this.categoryId = categoryId == null ? "" : categoryId;
+            List<String> safeItems = items == null ? List.of() : List.copyOf(items);
+            this.items = safeItems;
+            this.itemCount = safeItems.size();
+            this.itemsCsv = String.join(", ", safeItems);
+            this.itemsPreview = this.itemCount <= 3 ? this.itemsCsv : String.join(", ", safeItems.subList(0, 3)) + " ...";
         }
     }
 

@@ -39,9 +39,12 @@ extends CustomUIPage {
     private static final String TAB_ARENAS = "arenas";
     private static final String TAB_HELP = "help";
     private static final int MAX_AUDIENCE_ROWS = Integer.MAX_VALUE;
+    private static final int MAX_PLAYER_ROWS = 10;
     private static final int MAX_HORDE_ROWS = 10;
     private static final int MAX_ENEMY_CATEGORY_ROWS = 10;
     private static final int MAX_ENEMY_CATEGORY_EDITOR_ROLE_ROWS = 10;
+    private static final int MAX_REWARD_CATEGORY_ROWS = 10;
+    private static final int MAX_REWARD_CATEGORY_EDITOR_ITEM_ROWS = 10;
     private static final int MAX_BOSS_ROWS = 10;
     private static final int MAX_ARENA_ROWS = 10;
     private static final UiFieldBinding[] SNAPSHOT_FIELDS = new UiFieldBinding[]{
@@ -71,6 +74,12 @@ extends CustomUIPage {
             new UiFieldBinding("enemyCategoryEditId", "EnemyCatEditId", "#EnemyCatEditId.Value"),
             new UiFieldBinding("enemyCategoryEditRoles", "EnemyCatEditRoles", "#EnemyCatEditRoles.Value"),
             new UiFieldBinding("enemyCategoryRolePicker", "EnemyCatRolePicker", "#EnemyCatRolePicker.Value"),
+            new UiFieldBinding("playerSelected", "PlayerSelected", "#PlayerSelected.Value"),
+            new UiFieldBinding("playerEditMode", "PlayerEditMode", "#PlayerEditMode.Value"),
+            new UiFieldBinding("rewardCatSelected", "RewardCatSelected", "#RewardCatSelected.Value"),
+            new UiFieldBinding("rewardCatEditId", "RewardCatEditId", "#RewardCatEditId.Value"),
+            new UiFieldBinding("rewardCatEditItems", "RewardCatEditItems", "#RewardCatEditItems.Value"),
+            new UiFieldBinding("rewardCatItemPicker", "RewardCatItemPicker", "#RewardCatItemPicker.Value"),
             new UiFieldBinding("language", "Language", "#Language.Value"),
             new UiFieldBinding("rewardCategory", "RewardCategory", "#RewardCategory.Value"),
             new UiFieldBinding("rewardItemId", "RewardItemId", "#RewardItemId.Value"),
@@ -94,12 +103,16 @@ extends CustomUIPage {
     private final HordeService hordeService;
     private final Map<String, String> draftValues;
     private String activeTab;
+    private int playerPage;
     private int hordePage;
     private int enemyCategoryPage;
+    private int rewardCategoryPage;
     private int bossPage;
     private int arenaPage;
+    private String playerStatusText;
     private String hordeStatusText;
     private String enemyCategoryStatusText;
+    private String rewardCategoryStatusText;
     private String bossStatusText;
     private String arenaStatusText;
 
@@ -108,12 +121,16 @@ extends CustomUIPage {
         this.hordeService = hordeService;
         this.draftValues = new HashMap<String, String>();
         this.activeTab = TAB_GENERAL;
+        this.playerPage = 0;
         this.hordePage = 0;
         this.enemyCategoryPage = 0;
+        this.rewardCategoryPage = 0;
         this.bossPage = 0;
         this.arenaPage = 0;
+        this.playerStatusText = "";
         this.hordeStatusText = "";
         this.enemyCategoryStatusText = "";
+        this.rewardCategoryStatusText = "";
         this.bossStatusText = "";
         this.arenaStatusText = "";
     }
@@ -131,14 +148,11 @@ extends CustomUIPage {
         boolean active = this.hordeService.isActive();
         List<String> enemyTypeOptions = this.hordeService.getEnemyTypeOptionsForCurrentRoles();
         List<String> enemyRoleOptions = this.hordeService.getBossNpcIdOptions();
-        List<String> rewardCategoryOptions = this.hordeService.getRewardCategoryOptions();
         List<String> languageOptions = this.hordeService.getLanguageOptions();
         List<String> roundStartSoundOptions = this.hordeService.getRoundStartSoundOptions();
         List<String> roundVictorySoundOptions = this.hordeService.getRoundVictorySoundOptions();
-        String rewardCategory = HordeConfigPage.normalizeRewardCategoryInput(this.getDraftValue("rewardCategory", HordeConfigPage.firstNonEmpty(config.rewardCategory, this.hordeService.getRewardCategory())));
-        List<String> rewardItemSuggestions = this.hordeService.getRewardItemSuggestions(rewardCategory);
+        List<String> rewardItemCatalogOptions = HordeConfigPage.filterRewardItemPickerOptions(this.hordeService.getRewardItemSuggestions((String)null));
         String enemyTypeValue = HordeConfigPage.normalizeEnemyTypeInput(this.getDraftValue("enemyType", config.enemyType == null ? "undead" : config.enemyType));
-        String rewardItemIdValue = this.getDraftValue("rewardItemId", config.rewardItemId == null ? "" : config.rewardItemId);
         String roundStartSoundValue = this.getDraftValue("roundStartSoundId", this.hordeService.getRoundStartSoundSelection());
         String roundVictorySoundValue = this.getDraftValue("roundVictorySoundId", this.hordeService.getRoundVictorySoundSelection());
         double minRadiusValue = HordeConfigPage.clamp(this.getDraftDouble("minRadius", config.minSpawnRadius), 1.0, 128.0);
@@ -151,13 +165,10 @@ extends CustomUIPage {
         boolean autoStartEnabledValue = this.getDraftBoolean("autoStartEnabled", config.autoStartIntervalMinutes > 0);
         int autoStartIntervalDefaultValue = config.autoStartIntervalMinutes > 0 ? config.autoStartIntervalMinutes : 10;
         int autoStartIntervalMinutesValue = HordeConfigPage.clamp(this.getDraftInt("autoStartIntervalMinutes", autoStartIntervalDefaultValue), 1, 1440);
-        int rewardItemQuantityValue = HordeConfigPage.clamp(this.getDraftInt("rewardItemQuantity", config.rewardItemQuantity), 1, 100);
         double roundStartVolumeValue = HordeConfigPage.clamp(this.getDraftDouble("roundStartVolume", HordeConfigPage.toUiVolumePercent(config.roundStartVolume)), 0.0, 100.0);
         double roundVictoryVolumeValue = HordeConfigPage.clamp(this.getDraftDouble("roundVictoryVolume", HordeConfigPage.toUiVolumePercent(config.roundVictoryVolume)), 0.0, 100.0);
         boolean finalBossEnabledValue = this.getDraftBoolean("finalBossEnabled", config.finalBossEnabled);
         List<DropdownEntryInfo> enemyTypeEntries = HordeConfigPage.buildEnemyTypeEntries(enemyTypeOptions, enemyTypeValue, language, english);
-        List<DropdownEntryInfo> rewardCategoryEntries = HordeConfigPage.buildRewardCategoryEntries(rewardCategoryOptions, rewardCategory, language, english);
-        List<DropdownEntryInfo> rewardItemEntries = HordeConfigPage.buildDropdownEntries(rewardItemSuggestions, rewardItemIdValue);
         List<DropdownEntryInfo> languageEntries = HordeConfigPage.buildLanguageEntries(languageOptions, language);
         List<DropdownEntryInfo> roundStartSoundEntries = HordeConfigPage.buildRoundSoundEntries(roundStartSoundOptions, roundStartSoundValue, language, english);
         List<DropdownEntryInfo> roundVictorySoundEntries = HordeConfigPage.buildRoundSoundEntries(roundVictorySoundOptions, roundVictorySoundValue, language, english);
@@ -167,10 +178,13 @@ extends CustomUIPage {
         World world = entityStore == null ? null : entityStore.getWorld();
         List<HordeService.AudiencePlayerSnapshot> audienceRows = world == null ? List.of() : this.hordeService.getArenaAudiencePlayers(world);
         List<HordeService.EnemyCategorySnapshot> enemyCategoryRows = this.hordeService.getEnemyCategoryDefinitionsSnapshot();
+        List<HordeService.RewardCategorySnapshot> rewardCategoryRows = this.hordeService.getRewardCategoryDefinitionsSnapshot();
         List<HordeDefinitionCatalogService.HordeDefinitionSnapshot> hordeRows = this.hordeService.getHordeDefinitionsSnapshot();
         List<BossArenaCatalogService.BossDefinitionSnapshot> bossRows = this.hordeService.getBossDefinitionsSnapshot();
         List<BossArenaCatalogService.ArenaDefinitionSnapshot> arenaRows = this.hordeService.getArenaDefinitionsSnapshot();
+        this.ensurePlayerDraftDefaults(audienceRows);
         this.ensureEnemyCategoryDraftDefaults(enemyCategoryRows);
+        this.ensureRewardCategoryDraftDefaults(rewardCategoryRows, rewardItemCatalogOptions);
         this.ensureHordeDraftDefaults(hordeRows, config);
         this.ensureBossDraftDefaults(bossRows);
         this.ensureArenaDraftDefaults(arenaRows);
@@ -192,6 +206,8 @@ extends CustomUIPage {
         String bossSelectedValue = this.getDraftValue("bossSelected", "");
         String bossNpcIdValue = this.getDraftValue("bossEditNpcId", "");
         String arenaSelectedValue = this.getDraftValue("arenaSelected", "");
+        String playerSelectedValue = this.getDraftValue("playerSelected", "");
+        String playerEditModeValue = HordeConfigPage.normalizeAudienceMode(this.getDraftValue("playerEditMode", "player"));
         String hordeSelectedValue = this.getDraftValue("hordeSelected", "");
         String enemyCategorySelectedValue = this.getDraftValue("enemyCategorySelected", "");
         String enemyCategoryEditIdValue = this.getDraftValue("enemyCategoryEditId", enemyCategorySelectedValue);
@@ -200,14 +216,25 @@ extends CustomUIPage {
         if (!enemyCategoryRolePickerValue.isBlank()) {
             this.draftValues.put("enemyCategoryRolePicker", enemyCategoryRolePickerValue);
         }
+        String rewardCategorySelectedValue = this.getDraftValue("rewardCatSelected", "");
+        String rewardCategoryEditIdValue = this.getDraftValue("rewardCatEditId", rewardCategorySelectedValue);
+        String rewardCategoryEditItemsValue = this.getDraftValue("rewardCatEditItems", "");
+        String rewardCategoryItemPickerValue = this.getDraftValue("rewardCatItemPicker", HordeConfigPage.firstNonEmpty(HordeConfigPage.firstEnemyRoleOption(rewardItemCatalogOptions), ""));
+        if (!rewardCategoryItemPickerValue.isBlank()) {
+            this.draftValues.put("rewardCatItemPicker", rewardCategoryItemPickerValue);
+        }
         String bossTierValue = this.getDraftValue("bossEditTier", "common");
         List<DropdownEntryInfo> generalArenaEntries = HordeConfigPage.buildDropdownEntries(HordeConfigPage.collectArenaIds(arenaRows), selectedArenaForHordeValue);
         List<DropdownEntryInfo> generalBossEntries = HordeConfigPage.buildDropdownEntries(HordeConfigPage.collectBossIds(bossRows), selectedBossForHordeValue);
         List<DropdownEntryInfo> generalHordeEntries = HordeConfigPage.buildDropdownEntries(HordeConfigPage.collectHordeIds(hordeRows), selectedHordeForConfigValue);
+        List<DropdownEntryInfo> playerModeEntries = HordeConfigPage.buildPlayerModeEntries(language, english, playerEditModeValue);
         List<DropdownEntryInfo> enemyCategoryRolePickerEntries = HordeConfigPage.buildDropdownEntries(enemyRoleOptions, enemyCategoryRolePickerValue);
+        List<DropdownEntryInfo> rewardCategoryItemPickerEntries = HordeConfigPage.buildDropdownEntries(rewardItemCatalogOptions, rewardCategoryItemPickerValue);
         List<DropdownEntryInfo> bossNpcIdEntries = HordeConfigPage.buildDropdownEntries(this.hordeService.getBossNpcIdOptions(), bossNpcIdValue);
         List<DropdownEntryInfo> bossTierEntries = HordeConfigPage.buildDropdownEntries(this.hordeService.getBossTierOptions(), bossTierValue);
+        this.playerPage = HordeConfigPage.clamp(this.playerPage, 0, HordeConfigPage.maxPageIndex(audienceRows == null ? 0 : audienceRows.size(), MAX_PLAYER_ROWS));
         this.enemyCategoryPage = HordeConfigPage.clamp(this.enemyCategoryPage, 0, HordeConfigPage.maxPageIndex(enemyCategoryRows == null ? 0 : enemyCategoryRows.size(), MAX_ENEMY_CATEGORY_ROWS));
+        this.rewardCategoryPage = HordeConfigPage.clamp(this.rewardCategoryPage, 0, HordeConfigPage.maxPageIndex(rewardCategoryRows == null ? 0 : rewardCategoryRows.size(), MAX_REWARD_CATEGORY_ROWS));
         this.hordePage = HordeConfigPage.clamp(this.hordePage, 0, HordeConfigPage.maxPageIndex(hordeRows == null ? 0 : hordeRows.size(), MAX_HORDE_ROWS));
         this.bossPage = HordeConfigPage.clamp(this.bossPage, 0, HordeConfigPage.maxPageIndex(bossRows == null ? 0 : bossRows.size(), MAX_BOSS_ROWS));
         this.arenaPage = HordeConfigPage.clamp(this.arenaPage, 0, HordeConfigPage.maxPageIndex(arenaRows == null ? 0 : arenaRows.size(), MAX_ARENA_ROWS));
@@ -236,22 +263,28 @@ extends CustomUIPage {
                 .set("#HordeSelected.Value", hordeSelectedValue)
                 .set("#HordeEditId.Value", this.getDraftValue("hordeEditId", hordeSelectedValue))
                 .set("#HordeStatusLabel.Text", this.hordeStatusText == null ? "" : this.hordeStatusText)
+                .set("#PlayerSelected.Value", playerSelectedValue)
+                .set("#PlayerEditMode.Value", playerEditModeValue)
+                .set("#PlayerEditMode.Entries", playerModeEntries)
+                .set("#PlayerStatusLabel.Text", this.playerStatusText == null ? "" : this.playerStatusText)
                 .set("#EnemyCatSelected.Value", enemyCategorySelectedValue)
                 .set("#EnemyCatEditId.Value", enemyCategoryEditIdValue)
                 .set("#EnemyCatEditRoles.Value", enemyCategoryEditRolesValue)
                 .set("#EnemyCatRolePicker.Value", enemyCategoryRolePickerValue)
                 .set("#EnemyCatRolePicker.Entries", enemyCategoryRolePickerEntries)
                 .set("#EnemyCatStatusLabel.Text", this.enemyCategoryStatusText == null ? "" : this.enemyCategoryStatusText)
+                .set("#RewardCatSelected.Value", rewardCategorySelectedValue)
+                .set("#RewardCatEditId.Value", rewardCategoryEditIdValue)
+                .set("#RewardCatEditItems.Value", rewardCategoryEditItemsValue)
+                .set("#RewardCatItemPicker.Value", rewardCategoryItemPickerValue)
+                .set("#RewardCatItemPicker.Entries", rewardCategoryItemPickerEntries)
+                .set("#RewardCatStatusLabel.Text", this.rewardCategoryStatusText == null ? "" : this.rewardCategoryStatusText)
                 .set("#AutoStartEnabled.Value", autoStartEnabledValue)
                 .set("#AutoStartInterval.Value", Integer.toString(autoStartIntervalMinutesValue))
                 .set("#EnemyType.Value", enemyTypeValue)
                 .set("#EnemyType.Entries", enemyTypeEntries)
                 .set("#Language.Value", language)
                 .set("#Language.Entries", languageEntries)
-                .set("#RewardCategory.Value", rewardCategory)
-                .set("#RewardCategory.Entries", rewardCategoryEntries)
-                .set("#RewardItemId.Value", rewardItemIdValue)
-                .set("#RewardItemId.Entries", rewardItemEntries)
                 .set("#FinalBossEnabled.Value", finalBossEnabledValue)
                 .set("#RoundStartSoundId.Value", roundStartSoundValue)
                 .set("#RoundStartSoundId.Entries", roundStartSoundEntries)
@@ -273,10 +306,6 @@ extends CustomUIPage {
                 .set("#ArenaEditY.Value", this.getDraftValue("arenaEditY", "64"))
                 .set("#ArenaEditZ.Value", this.getDraftValue("arenaEditZ", "0"))
                 .set("#ArenaStatusLabel.Text", this.arenaStatusText == null ? "" : this.arenaStatusText)
-                .set("#AudienceInfoLabel.Text", HordeConfigPage.buildAudienceInfo(config.arenaJoinRadius, audienceRows.size(), language))
-                .set("#PlayersCountValue.Text", Integer.toString(audienceRows.size()))
-                .set("#PlayersListHint.Text", HordeConfigPage.buildAudienceRowsHint(audienceRows.size(), language))
-                .set("#AudiencePlayersEmptyLabel.Text", audienceRows.isEmpty() ? HordeConfigPage.t(language, english, "No players detected in the current arena radius.", "No hay jugadores detectados en el radio actual de arena.") : "")
                 .set("#SpawnStateLabel.Text", HordeConfigPage.buildSpawnLabel(config, language))
                 .set("#ReloadModButton.Visible", true)
                 .set("#StartButton.Visible", !active)
@@ -285,10 +314,13 @@ extends CustomUIPage {
         this.setLocalizedTexts(commandBuilder, language, english);
         this.applyTabVisibility(commandBuilder, tab);
         if (TAB_PLAYERS.equals(tab)) {
-            this.populateAudienceRows(commandBuilder, eventBuilder, audienceRows, language, english);
+            this.populatePlayerRows(commandBuilder, eventBuilder, audienceRows, language, english);
         }
         if (TAB_ENEMIES.equals(tab)) {
             this.populateEnemyCategoryRows(commandBuilder, eventBuilder, enemyCategoryRows, language, english);
+        }
+        if (TAB_REWARDS.equals(tab)) {
+            this.populateRewardCategoryRows(commandBuilder, eventBuilder, rewardCategoryRows, language, english);
         }
         if (TAB_HORDE.equals(tab)) {
             this.populateHordeRows(commandBuilder, eventBuilder, hordeRows, language, english);
@@ -308,15 +340,23 @@ extends CustomUIPage {
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabHordeButton", this.buildLanguageEvent("tab_horde"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabBossesButton", this.buildLanguageEvent("tab_bosses"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabPlayersButton", this.buildLanguageEvent("tab_players"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#TabSoundsButton", this.buildLanguageEvent("tab_sounds"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabRewardsButton", this.buildLanguageEvent("tab_rewards"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#TabSoundsButton", this.buildLanguageEvent("tab_sounds"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabHelpButton", this.buildLanguageEvent("tab_help"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#PlayersRefreshButton", this.buildLanguageEvent("refresh_players"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#PlayersAddButton", this.buildConfigSnapshotEvent("playerdef_add"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#PlayersSaveButton", this.buildConfigSnapshotEvent("playerdef_save"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#PlayersPagePrevButton", this.buildConfigSnapshotEvent("playerdef_page_prev"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#PlayersPageNextButton", this.buildConfigSnapshotEvent("playerdef_page_next"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#EnemyCatAddButton", this.buildConfigSnapshotEvent("enemycat_add"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#EnemyCatSaveButton", this.buildConfigSnapshotEvent("enemycat_save"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#EnemyCatRoleAddButton", this.buildConfigSnapshotEvent("enemycat_role_add"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#EnemyCatPagePrevButton", this.buildConfigSnapshotEvent("enemycat_page_prev"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#EnemyCatPageNextButton", this.buildConfigSnapshotEvent("enemycat_page_next"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#RewardCatAddButton", this.buildConfigSnapshotEvent("rewardcat_add"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#RewardCatSaveButton", this.buildConfigSnapshotEvent("rewardcat_save"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#RewardCatItemAddButton", this.buildConfigSnapshotEvent("rewardcat_item_add"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#RewardCatPagePrevButton", this.buildConfigSnapshotEvent("rewardcat_page_prev"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#RewardCatPageNextButton", this.buildConfigSnapshotEvent("rewardcat_page_next"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#HordeAddButton", this.buildConfigSnapshotEvent("hordedef_add"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#HordeSaveButton", this.buildConfigSnapshotEvent("hordedef_save"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#HordePagePrevButton", this.buildConfigSnapshotEvent("hordedef_page_prev"))
@@ -467,8 +507,16 @@ extends CustomUIPage {
                         result = this.handleAudienceAction(action, world, english);
                         break;
                     }
+                    if (action != null && action.startsWith("playerdef_")) {
+                        result = this.handlePlayerDefinitionAction(action, world, english);
+                        break;
+                    }
                     if (action != null && action.startsWith("enemycat_")) {
                         result = this.handleEnemyCategoryAction(action, english);
+                        break;
+                    }
+                    if (action != null && action.startsWith("rewardcat_")) {
+                        result = this.handleRewardCategoryAction(action, english);
                         break;
                     }
                     if (action != null && action.startsWith("hordedef_")) {
@@ -518,6 +566,9 @@ extends CustomUIPage {
         if (action.startsWith("audience_set:")) {
             return true;
         }
+        if (action.startsWith("playerdef_save") || action.startsWith("playerdef_delete")) {
+            return true;
+        }
         switch (action) {
             case "set_spawn_here":
             case "apply_auto_start":
@@ -549,6 +600,64 @@ extends CustomUIPage {
             return HordeService.OperationResult.fail(english ? "Could not parse selected player UUID." : "No se pudo interpretar el UUID del jugador seleccionado.");
         }
         return this.hordeService.setArenaAudienceMode(playerId, mode, world);
+    }
+
+    private HordeService.OperationResult handlePlayerDefinitionAction(String action, World world, boolean english) {
+        if (action == null || action.isBlank()) {
+            return HordeService.OperationResult.fail(english ? "Unknown players action." : "Accion de jugadores desconocida.");
+        }
+        if ("playerdef_page_prev".equals(action)) {
+            this.playerPage = Math.max(0, this.playerPage - 1);
+            return null;
+        }
+        if ("playerdef_page_next".equals(action)) {
+            this.playerPage = this.playerPage + 1;
+            return null;
+        }
+        List<HordeService.AudiencePlayerSnapshot> rows = world == null ? List.of() : this.hordeService.getArenaAudiencePlayers(world);
+        if ("playerdef_add".equals(action)) {
+            this.selectAudiencePlayerForEditing(rows, "");
+            HordeService.OperationResult result = HordeService.OperationResult.ok(english ? "Players list refreshed." : "Lista de jugadores actualizada.");
+            this.playerStatusText = result.getMessage();
+            return result;
+        }
+        if ("playerdef_save".equals(action)) {
+            String selected = this.getDraftValue("playerSelected", "");
+            UUID playerId = HordeConfigPage.parseUuid(selected);
+            if (playerId == null) {
+                HordeService.OperationResult result = HordeService.OperationResult.fail(english ? "Select a player first." : "Selecciona primero un jugador.");
+                this.playerStatusText = result.getMessage();
+                return result;
+            }
+            String mode = HordeConfigPage.normalizeAudienceMode(this.getDraftValue("playerEditMode", "player"));
+            HordeService.OperationResult result = this.hordeService.setArenaAudienceMode(playerId, mode, world);
+            this.playerStatusText = result == null ? "" : result.getMessage();
+            if (result != null && result.isSuccess()) {
+                this.selectAudiencePlayerForEditing(this.hordeService.getArenaAudiencePlayers(world), playerId.toString());
+            }
+            return result;
+        }
+        if (action.startsWith("playerdef_open:")) {
+            String playerId = HordeConfigPage.extractActionArgument(action);
+            this.selectAudiencePlayerForEditing(rows, playerId);
+            return null;
+        }
+        if (action.startsWith("playerdef_delete:")) {
+            String playerIdRaw = HordeConfigPage.extractActionArgument(action);
+            UUID playerId = HordeConfigPage.parseUuid(playerIdRaw);
+            if (playerId == null) {
+                HordeService.OperationResult result = HordeService.OperationResult.fail(english ? "Invalid player ID." : "ID de jugador invalido.");
+                this.playerStatusText = result.getMessage();
+                return result;
+            }
+            HordeService.OperationResult result = this.hordeService.setArenaAudienceMode(playerId, "exit", world);
+            this.playerStatusText = result == null ? "" : result.getMessage();
+            if (result != null && result.isSuccess()) {
+                this.selectAudiencePlayerForEditing(this.hordeService.getArenaAudiencePlayers(world), playerId.toString());
+            }
+            return result;
+        }
+        return HordeService.OperationResult.fail(english ? "Unknown players action: " + action : "Accion de jugadores desconocida: " + action);
     }
 
     private HordeService.OperationResult handleEnemyCategoryAction(String action, boolean english) {
@@ -626,6 +735,83 @@ extends CustomUIPage {
             return result;
         }
         return HordeService.OperationResult.fail(english ? "Unknown enemy categories action: " + action : "Accion de categorias de enemigos desconocida: " + action);
+    }
+
+    private HordeService.OperationResult handleRewardCategoryAction(String action, boolean english) {
+        if (action == null || action.isBlank()) {
+            return HordeService.OperationResult.fail(english ? "Unknown rewards action." : "Accion de recompensas desconocida.");
+        }
+        if ("rewardcat_page_prev".equals(action)) {
+            this.rewardCategoryPage = Math.max(0, this.rewardCategoryPage - 1);
+            return null;
+        }
+        if ("rewardcat_page_next".equals(action)) {
+            this.rewardCategoryPage = this.rewardCategoryPage + 1;
+            return null;
+        }
+        if ("rewardcat_add".equals(action)) {
+            HordeService.OperationResult result = this.hordeService.createRewardCategoryDraft("");
+            if (result != null && result.isSuccess()) {
+                this.selectRewardCategoryForEditing("");
+            }
+            this.rewardCategoryStatusText = result == null ? "" : result.getMessage();
+            return result;
+        }
+        if ("rewardcat_item_add".equals(action)) {
+            String candidateItem = this.getDraftValue("rewardCatItemPicker", "");
+            if (candidateItem == null || candidateItem.isBlank()) {
+                HordeService.OperationResult result = HordeService.OperationResult.fail(english ? "Select a reward item first." : "Selecciona primero un item de recompensa.");
+                this.rewardCategoryStatusText = result.getMessage();
+                return result;
+            }
+            List<String> items = HordeConfigPage.parseEnemyCategoryRolesCsv(this.getDraftValue("rewardCatEditItems", ""));
+            if (HordeConfigPage.containsIgnoreCase(items, candidateItem)) {
+                HordeService.OperationResult result = HordeService.OperationResult.fail(english ? "That item is already in the category." : "Ese item ya esta en la categoria.");
+                this.rewardCategoryStatusText = result.getMessage();
+                return result;
+            }
+            items.add(candidateItem.trim());
+            this.draftValues.put("rewardCatEditItems", HordeConfigPage.buildRolesCsv(items));
+            HordeService.OperationResult result = HordeService.OperationResult.ok(english ? "Reward item added to category." : "Item de recompensa anadido a la categoria.");
+            this.rewardCategoryStatusText = result.getMessage();
+            return result;
+        }
+        if ("rewardcat_save".equals(action)) {
+            HordeService.OperationResult result = this.hordeService.saveRewardCategoryFromUi(this.extractRewardCategoryValuesForSave());
+            if (result != null && result.isSuccess()) {
+                this.selectRewardCategoryForEditing(this.getDraftValue("rewardCatEditId", this.getDraftValue("rewardCatSelected", "")));
+            }
+            this.rewardCategoryStatusText = result == null ? "" : result.getMessage();
+            return result;
+        }
+        if (action.startsWith("rewardcat_item_remove:")) {
+            String itemId = HordeConfigPage.extractActionArgument(action);
+            List<String> items = HordeConfigPage.parseEnemyCategoryRolesCsv(this.getDraftValue("rewardCatEditItems", ""));
+            if (!HordeConfigPage.removeIgnoreCase(items, itemId)) {
+                HordeService.OperationResult result = HordeService.OperationResult.fail(english ? "Item not found in category." : "Item no encontrado en la categoria.");
+                this.rewardCategoryStatusText = result.getMessage();
+                return result;
+            }
+            this.draftValues.put("rewardCatEditItems", HordeConfigPage.buildRolesCsv(items));
+            HordeService.OperationResult result = HordeService.OperationResult.ok(english ? "Reward item removed from category." : "Item de recompensa eliminado de la categoria.");
+            this.rewardCategoryStatusText = result.getMessage();
+            return result;
+        }
+        if (action.startsWith("rewardcat_open:")) {
+            String categoryId = HordeConfigPage.extractActionArgument(action);
+            this.selectRewardCategoryForEditing(categoryId);
+            return null;
+        }
+        if (action.startsWith("rewardcat_delete:")) {
+            String categoryId = HordeConfigPage.extractActionArgument(action);
+            HordeService.OperationResult result = this.hordeService.deleteRewardCategoryDefinition(categoryId);
+            this.rewardCategoryStatusText = result == null ? "" : result.getMessage();
+            if (result != null && result.isSuccess()) {
+                this.selectRewardCategoryForEditing("");
+            }
+            return result;
+        }
+        return HordeService.OperationResult.fail(english ? "Unknown rewards action: " + action : "Accion de recompensas desconocida: " + action);
     }
 
     private HordeService.OperationResult handleHordeDefinitionAction(String action, boolean english) {
@@ -986,6 +1172,19 @@ extends CustomUIPage {
         this.ensureDraftDefaults(this.hordeService.getConfigSnapshot());
     }
 
+    private void ensurePlayerDraftDefaults(List<HordeService.AudiencePlayerSnapshot> rows) {
+        HordeService.AudiencePlayerSnapshot selected = HordeConfigPage.findAudienceSnapshot(rows, this.getDraftValue("playerSelected", ""));
+        if (selected == null && rows != null && !rows.isEmpty()) {
+            selected = rows.get(0);
+        }
+        if (selected != null) {
+            this.putDraftIfMissing("playerSelected", selected.playerId == null ? "" : selected.playerId.toString());
+            this.putDraftIfMissing("playerEditMode", HordeConfigPage.normalizeAudienceMode(selected.mode));
+        } else {
+            this.putDraftIfMissing("playerEditMode", "player");
+        }
+    }
+
     private void ensureEnemyCategoryDraftDefaults(List<HordeService.EnemyCategorySnapshot> rows) {
         HordeService.EnemyCategorySnapshot selectedCategory = HordeConfigPage.findEnemyCategorySnapshot(rows, this.getDraftValue("enemyCategorySelected", ""));
         if (selectedCategory == null && rows != null && !rows.isEmpty()) {
@@ -1000,6 +1199,23 @@ extends CustomUIPage {
             this.putDraftIfMissing("enemyCategoryEditId", "enemy_category_1");
             this.putDraftIfMissing("enemyCategoryEditRoles", "enemy");
             this.putDraftIfMissing("enemyCategoryRolePicker", "enemy");
+        }
+    }
+
+    private void ensureRewardCategoryDraftDefaults(List<HordeService.RewardCategorySnapshot> rows, List<String> rewardItemCatalogOptions) {
+        HordeService.RewardCategorySnapshot selectedCategory = HordeConfigPage.findRewardCategorySnapshot(rows, this.getDraftValue("rewardCatSelected", ""));
+        if (selectedCategory == null && rows != null && !rows.isEmpty()) {
+            selectedCategory = rows.get(0);
+        }
+        if (selectedCategory != null) {
+            this.putDraftIfMissing("rewardCatSelected", selectedCategory.categoryId);
+            this.putDraftIfMissing("rewardCatEditId", selectedCategory.categoryId);
+            this.putDraftIfMissing("rewardCatEditItems", selectedCategory.itemsCsv);
+            this.putDraftIfMissing("rewardCatItemPicker", selectedCategory.items == null || selectedCategory.items.isEmpty() ? HordeConfigPage.firstNonEmpty(HordeConfigPage.firstEnemyRoleOption(rewardItemCatalogOptions), "") : selectedCategory.items.get(0));
+        } else {
+            this.putDraftIfMissing("rewardCatEditId", "reward_category_1");
+            this.putDraftIfMissing("rewardCatEditItems", HordeConfigPage.firstNonEmpty(HordeConfigPage.firstEnemyRoleOption(rewardItemCatalogOptions), "Item_Misc_Mushroom"));
+            this.putDraftIfMissing("rewardCatItemPicker", HordeConfigPage.firstNonEmpty(HordeConfigPage.firstEnemyRoleOption(rewardItemCatalogOptions), "Item_Misc_Mushroom"));
         }
     }
 
@@ -1069,6 +1285,23 @@ extends CustomUIPage {
         this.putDraftIfMissing("arenaEditZ", "0");
     }
 
+    private void selectAudiencePlayerForEditing(List<HordeService.AudiencePlayerSnapshot> rows, String requestedPlayerId) {
+        HordeService.AudiencePlayerSnapshot selected = HordeConfigPage.findAudienceSnapshot(rows, requestedPlayerId);
+        if (selected == null && rows != null && !rows.isEmpty()) {
+            selected = rows.get(rows.size() - 1);
+        }
+        if (selected == null) {
+            this.draftValues.remove("playerSelected");
+            this.draftValues.put("playerEditMode", "player");
+            return;
+        }
+        this.applyAudienceDraftFromSnapshot(selected);
+        int selectedIndex = HordeConfigPage.findAudienceIndex(rows, selected.playerId == null ? "" : selected.playerId.toString());
+        if (selectedIndex >= 0) {
+            this.playerPage = selectedIndex / MAX_PLAYER_ROWS;
+        }
+    }
+
     private void selectEnemyCategoryForEditing(String requestedCategoryId) {
         List<HordeService.EnemyCategorySnapshot> rows = this.hordeService.getEnemyCategoryDefinitionsSnapshot();
         HordeService.EnemyCategorySnapshot selected = HordeConfigPage.findEnemyCategorySnapshot(rows, requestedCategoryId);
@@ -1085,6 +1318,25 @@ extends CustomUIPage {
         int selectedIndex = HordeConfigPage.findEnemyCategoryIndex(rows, selected.categoryId);
         if (selectedIndex >= 0) {
             this.enemyCategoryPage = selectedIndex / MAX_ENEMY_CATEGORY_ROWS;
+        }
+    }
+
+    private void selectRewardCategoryForEditing(String requestedCategoryId) {
+        List<HordeService.RewardCategorySnapshot> rows = this.hordeService.getRewardCategoryDefinitionsSnapshot();
+        HordeService.RewardCategorySnapshot selected = HordeConfigPage.findRewardCategorySnapshot(rows, requestedCategoryId);
+        if (selected == null && rows != null && !rows.isEmpty()) {
+            selected = rows.get(rows.size() - 1);
+        }
+        if (selected == null) {
+            this.draftValues.remove("rewardCatSelected");
+            this.draftValues.remove("rewardCatEditId");
+            this.draftValues.remove("rewardCatEditItems");
+            return;
+        }
+        this.applyRewardCategoryDraftFromSnapshot(selected);
+        int selectedIndex = HordeConfigPage.findRewardCategoryIndex(rows, selected.categoryId);
+        if (selectedIndex >= 0) {
+            this.rewardCategoryPage = selectedIndex / MAX_REWARD_CATEGORY_ROWS;
         }
     }
 
@@ -1148,6 +1400,14 @@ extends CustomUIPage {
         }
     }
 
+    private void applyAudienceDraftFromSnapshot(HordeService.AudiencePlayerSnapshot snapshot) {
+        if (snapshot == null || snapshot.playerId == null) {
+            return;
+        }
+        this.draftValues.put("playerSelected", snapshot.playerId.toString());
+        this.draftValues.put("playerEditMode", HordeConfigPage.normalizeAudienceMode(snapshot.mode));
+    }
+
     private void applyBossDraftFromSnapshot(BossArenaCatalogService.BossDefinitionSnapshot snapshot) {
         if (snapshot == null) {
             return;
@@ -1168,6 +1428,18 @@ extends CustomUIPage {
         this.draftValues.put("enemyCategoryEditRoles", snapshot.rolesCsv == null ? "" : snapshot.rolesCsv);
         if (snapshot.roles != null && !snapshot.roles.isEmpty()) {
             this.draftValues.put("enemyCategoryRolePicker", snapshot.roles.get(0));
+        }
+    }
+
+    private void applyRewardCategoryDraftFromSnapshot(HordeService.RewardCategorySnapshot snapshot) {
+        if (snapshot == null) {
+            return;
+        }
+        this.draftValues.put("rewardCatSelected", snapshot.categoryId);
+        this.draftValues.put("rewardCatEditId", snapshot.categoryId);
+        this.draftValues.put("rewardCatEditItems", snapshot.itemsCsv == null ? "" : snapshot.itemsCsv);
+        if (snapshot.items != null && !snapshot.items.isEmpty()) {
+            this.draftValues.put("rewardCatItemPicker", snapshot.items.get(0));
         }
     }
 
@@ -1202,6 +1474,14 @@ extends CustomUIPage {
         HordeConfigPage.putIfNotBlank(values, "enemyCategorySelected", this.getDraftValue("enemyCategorySelected", ""));
         HordeConfigPage.putIfNotBlank(values, "enemyCategoryEditId", this.getDraftValue("enemyCategoryEditId", ""));
         HordeConfigPage.putIfNotBlank(values, "enemyCategoryEditRoles", this.getDraftValue("enemyCategoryEditRoles", ""));
+        return values;
+    }
+
+    private Map<String, String> extractRewardCategoryValuesForSave() {
+        HashMap<String, String> values = new HashMap<String, String>();
+        HordeConfigPage.putIfNotBlank(values, "rewardCatSelected", this.getDraftValue("rewardCatSelected", ""));
+        HordeConfigPage.putIfNotBlank(values, "rewardCatEditId", this.getDraftValue("rewardCatEditId", ""));
+        HordeConfigPage.putIfNotBlank(values, "rewardCatEditItems", this.getDraftValue("rewardCatEditItems", ""));
         return values;
     }
 
@@ -1248,6 +1528,45 @@ extends CustomUIPage {
         HordeConfigPage.putIfNotBlank(values, "arenaEditY", this.getDraftValue("arenaEditY", "64"));
         HordeConfigPage.putIfNotBlank(values, "arenaEditZ", this.getDraftValue("arenaEditZ", "0"));
         return values;
+    }
+
+    private void populatePlayerRows(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<HordeService.AudiencePlayerSnapshot> rows, String language, boolean english) {
+        int total = rows == null ? 0 : rows.size();
+        int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_PLAYER_ROWS));
+        this.playerPage = HordeConfigPage.clamp(this.playerPage, 0, pageCount - 1);
+        int start = this.playerPage * MAX_PLAYER_ROWS;
+        String selectedPlayerId = this.getDraftValue("playerSelected", "");
+        for (int slot = 0; slot < MAX_PLAYER_ROWS; ++slot) {
+            int index = start + slot;
+            int rowNumber = slot + 1;
+            String rowSelector = "#PlayerRow" + rowNumber;
+            if (index < total) {
+                HordeService.AudiencePlayerSnapshot row = rows.get(index);
+                String rowPlayerId = row == null || row.playerId == null ? "" : row.playerId.toString();
+                String mode = HordeConfigPage.normalizeAudienceMode(row == null ? "" : row.mode);
+                commandBuilder.set(rowSelector + ".Visible", true)
+                        .set("#PlayerName" + rowNumber + ".Text", row == null ? "" : HordeConfigPage.compactName(row.username, 22))
+                        .set("#PlayerMode" + rowNumber + ".Text", HordeConfigPage.audienceModeDisplay(mode, language))
+                        .set(rowSelector + ".Background", selectedPlayerId.equalsIgnoreCase(rowPlayerId) ? "#2b4a70" : "#16283f");
+                eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#PlayerOpen" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildPlayerDefinitionAction("open", rowPlayerId)))
+                        .addEventBinding(CustomUIEventBindingType.Activating, "#PlayerDelete" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildPlayerDefinitionAction("delete", rowPlayerId)));
+            } else {
+                commandBuilder.set(rowSelector + ".Visible", false)
+                        .set("#PlayerName" + rowNumber + ".Text", "")
+                        .set("#PlayerMode" + rowNumber + ".Text", "");
+            }
+        }
+        String pageText = total <= 0 ? "0/0" : (this.playerPage + 1) + "/" + pageCount;
+        commandBuilder.set("#PlayersPageLabel.Text", pageText)
+                .set("#PlayersPageLabel.Visible", pageCount > 1)
+                .set("#PlayersPagePrevButton.Visible", pageCount > 1)
+                .set("#PlayersPageNextButton.Visible", pageCount > 1)
+                .set("#PlayersEmptyLabel.Visible", total == 0)
+                .set("#PlayersEmptyLabel.Text", total == 0 ? HordeConfigPage.t(language, english, "No players detected in the current arena radius.", "No hay jugadores detectados en el radio actual de arena.") : "")
+                .set("#PlayersOverflowLabel.Visible", total > MAX_PLAYER_ROWS)
+                .set("#PlayersOverflowLabel.Text", total > MAX_PLAYER_ROWS ? HordeConfigPage.t(language, english, "More players available. Use page controls.", "Hay mas jugadores disponibles. Usa el paginado.") : "")
+                .set("#AudienceInfoLabel.Text", HordeConfigPage.buildAudienceInfo(this.getDraftDouble("arenaJoinRadius", 32.0), total, language))
+                .set("#PlayersCountValue.Text", Integer.toString(total));
     }
 
     private void populateEnemyCategoryRows(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<HordeService.EnemyCategorySnapshot> rows, String language, boolean english) {
@@ -1303,6 +1622,61 @@ extends CustomUIPage {
         }
         commandBuilder.set("#EnemyCatRolesOverflowLabel.Visible", total > MAX_ENEMY_CATEGORY_EDITOR_ROLE_ROWS)
                 .set("#EnemyCatRolesOverflowLabel.Text", total > MAX_ENEMY_CATEGORY_EDITOR_ROLE_ROWS ? HordeConfigPage.t(language, english, "+" + (total - MAX_ENEMY_CATEGORY_EDITOR_ROLE_ROWS) + " more", "+" + (total - MAX_ENEMY_CATEGORY_EDITOR_ROLE_ROWS) + " mas") : "");
+    }
+
+    private void populateRewardCategoryRows(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<HordeService.RewardCategorySnapshot> rows, String language, boolean english) {
+        int total = rows == null ? 0 : rows.size();
+        int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_REWARD_CATEGORY_ROWS));
+        this.rewardCategoryPage = HordeConfigPage.clamp(this.rewardCategoryPage, 0, pageCount - 1);
+        int start = this.rewardCategoryPage * MAX_REWARD_CATEGORY_ROWS;
+        String selectedCategoryId = this.getDraftValue("rewardCatSelected", "");
+        for (int slot = 0; slot < MAX_REWARD_CATEGORY_ROWS; ++slot) {
+            int index = start + slot;
+            int rowNumber = slot + 1;
+            String rowSelector = "#RewardCatRow" + rowNumber;
+            if (index < total) {
+                HordeService.RewardCategorySnapshot row = rows.get(index);
+                commandBuilder.set(rowSelector + ".Visible", true)
+                        .set("#RewardCatName" + rowNumber + ".Text", row.categoryId)
+                        .set("#RewardCatPreview" + rowNumber + ".Text", row.itemsPreview == null ? "" : HordeConfigPage.compactName(row.itemsPreview, 26))
+                        .set(rowSelector + ".Background", selectedCategoryId.equalsIgnoreCase(row.categoryId) ? "#2b4a70" : "#16283f");
+                eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#RewardCatOpen" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildRewardCategoryAction("open", row.categoryId)))
+                        .addEventBinding(CustomUIEventBindingType.Activating, "#RewardCatDelete" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildRewardCategoryAction("delete", row.categoryId)));
+            } else {
+                commandBuilder.set(rowSelector + ".Visible", false)
+                        .set("#RewardCatName" + rowNumber + ".Text", "")
+                        .set("#RewardCatPreview" + rowNumber + ".Text", "");
+            }
+        }
+        String pageText = total <= 0 ? "0/0" : (this.rewardCategoryPage + 1) + "/" + pageCount;
+        commandBuilder.set("#RewardCatPageLabel.Text", pageText)
+                .set("#RewardCatPageLabel.Visible", pageCount > 1)
+                .set("#RewardCatPagePrevButton.Visible", pageCount > 1)
+                .set("#RewardCatPageNextButton.Visible", pageCount > 1)
+                .set("#RewardCatEmptyLabel.Visible", total == 0)
+                .set("#RewardCatEmptyLabel.Text", total == 0 ? HordeConfigPage.t(language, english, "No reward categories yet. Press Add category to create one.", "Aun no hay categorias de recompensa. Pulsa Anadir categoria para crear una.") : "")
+                .set("#RewardCatOverflowLabel.Visible", total > MAX_REWARD_CATEGORY_ROWS)
+                .set("#RewardCatOverflowLabel.Text", total > MAX_REWARD_CATEGORY_ROWS ? HordeConfigPage.t(language, english, "More reward categories available. Use page controls.", "Hay mas categorias de recompensa disponibles. Usa el paginado.") : "");
+        this.populateRewardCategoryEditorItems(commandBuilder, eventBuilder, HordeConfigPage.parseEnemyCategoryRolesCsv(this.getDraftValue("rewardCatEditItems", "")), language, english);
+    }
+
+    private void populateRewardCategoryEditorItems(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<String> items, String language, boolean english) {
+        int total = items == null ? 0 : items.size();
+        for (int slot = 0; slot < MAX_REWARD_CATEGORY_EDITOR_ITEM_ROWS; ++slot) {
+            int rowNumber = slot + 1;
+            String rowSelector = "#RewardCatItemRow" + rowNumber;
+            if (slot < total) {
+                String itemId = items.get(slot);
+                commandBuilder.set(rowSelector + ".Visible", true)
+                        .set("#RewardCatItemName" + rowNumber + ".Text", itemId == null ? "" : HordeConfigPage.compactName(itemId, 28));
+                eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#RewardCatItemDelete" + rowNumber, this.buildConfigSnapshotEvent("rewardcat_item_remove:" + HordeConfigPage.firstNonEmpty(itemId, "")));
+            } else {
+                commandBuilder.set(rowSelector + ".Visible", false)
+                        .set("#RewardCatItemName" + rowNumber + ".Text", "");
+            }
+        }
+        commandBuilder.set("#RewardCatItemsOverflowLabel.Visible", total > MAX_REWARD_CATEGORY_EDITOR_ITEM_ROWS)
+                .set("#RewardCatItemsOverflowLabel.Text", total > MAX_REWARD_CATEGORY_EDITOR_ITEM_ROWS ? HordeConfigPage.t(language, english, "+" + (total - MAX_REWARD_CATEGORY_EDITOR_ITEM_ROWS) + " more", "+" + (total - MAX_REWARD_CATEGORY_EDITOR_ITEM_ROWS) + " mas") : "");
     }
 
     private void populateHordeRows(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<HordeDefinitionCatalogService.HordeDefinitionSnapshot> rows, String language, boolean english) {
@@ -1500,16 +1874,19 @@ extends CustomUIPage {
                         || "enemyCategoryEditRoles".equals(field.configKey)
                         || "enemyCategoryRolePicker".equals(field.configKey);
             case TAB_PLAYERS:
-                return "arenaJoinRadius".equals(field.configKey);
+                return "arenaJoinRadius".equals(field.configKey)
+                        || "playerSelected".equals(field.configKey)
+                        || "playerEditMode".equals(field.configKey);
             case TAB_SOUNDS:
                 return "roundStartSoundId".equals(field.configKey)
                         || "roundStartVolume".equals(field.configKey)
                         || "roundVictorySoundId".equals(field.configKey)
                         || "roundVictoryVolume".equals(field.configKey);
             case TAB_REWARDS:
-                return "rewardCategory".equals(field.configKey)
-                        || "rewardItemId".equals(field.configKey)
-                        || "rewardItemQuantity".equals(field.configKey);
+                return "rewardCatSelected".equals(field.configKey)
+                        || "rewardCatEditId".equals(field.configKey)
+                        || "rewardCatEditItems".equals(field.configKey)
+                        || "rewardCatItemPicker".equals(field.configKey);
             case TAB_BOSSES:
                 return "bossSelected".equals(field.configKey)
                         || "bossEditName".equals(field.configKey)
@@ -1706,6 +2083,50 @@ extends CustomUIPage {
         return entries;
     }
 
+    private static List<DropdownEntryInfo> buildPlayerModeEntries(String language, boolean english, String selectedMode) {
+        ArrayList<String> values = new ArrayList<String>();
+        values.add("player");
+        values.add("spectator");
+        values.add("exit");
+        String selected = HordeConfigPage.normalizeAudienceMode(selectedMode);
+        if (!HordeConfigPage.containsIgnoreCase(values, selected)) {
+            values.add(selected);
+        }
+        ArrayList<DropdownEntryInfo> entries = new ArrayList<DropdownEntryInfo>(values.size());
+        for (String value : values) {
+            String label;
+            if ("spectator".equals(value)) {
+                label = HordeConfigPage.t(language, english, "Spectator", "Espectador");
+            } else if ("exit".equals(value)) {
+                label = HordeConfigPage.t(language, english, "Exit area", "Salir del area");
+            } else {
+                label = HordeConfigPage.t(language, english, "Player", "Jugador");
+            }
+            entries.add(new DropdownEntryInfo(LocalizableString.fromString(label), value));
+        }
+        return entries;
+    }
+
+    private static List<String> filterRewardItemPickerOptions(List<String> options) {
+        ArrayList<String> filtered = new ArrayList<String>();
+        if (options != null) {
+            for (String option : options) {
+                if (option == null) {
+                    continue;
+                }
+                String cleaned = option.trim();
+                if (cleaned.isBlank() || HordeConfigPage.containsIgnoreCase(filtered, cleaned)) {
+                    continue;
+                }
+                filtered.add(cleaned);
+            }
+        }
+        if (filtered.isEmpty()) {
+            filtered.add("Item_Misc_Mushroom");
+        }
+        return filtered;
+    }
+
     private static boolean containsIgnoreCase(List<String> values, String value) {
         if (values == null || values.isEmpty() || value == null) {
             return false;
@@ -1745,8 +2166,8 @@ extends CustomUIPage {
                 .set("#TabHordeButton.Text", HordeConfigPage.t(language, english, "Horde", "Horda"))
                 .set("#TabBossesButton.Text", HordeConfigPage.t(language, english, "Bosses", "Bosses"))
                 .set("#TabPlayersButton.Text", HordeConfigPage.t(language, english, "Players", "Jugadores"))
-                .set("#TabSoundsButton.Text", HordeConfigPage.t(language, english, "Sounds", "Sonidos"))
                 .set("#TabRewardsButton.Text", HordeConfigPage.t(language, english, "Rewards", "Recompensas"))
+                .set("#TabSoundsButton.Text", HordeConfigPage.t(language, english, "Sounds", "Sonidos"))
                 .set("#TabHelpButton.Text", HordeConfigPage.t(language, english, "Help", "Ayuda"))
                 .set("#TabHintLabel.Text", "")
                 .set("#GeneralArenaLabel.Text", HordeConfigPage.t(language, english, "Current horde arena", "Arena actual de la horda"))
@@ -1759,12 +2180,18 @@ extends CustomUIPage {
                 .set("#MinRadiusLabel.Text", HordeConfigPage.t(language, english, "Minimum radius", "Radio minimo"))
                 .set("#MaxRadiusLabel.Text", HordeConfigPage.t(language, english, "Maximum radius", "Radio maximo"))
                 .set("#ArenaJoinRadiusLabel.Text", HordeConfigPage.t(language, english, "Arena players radius", "Radio de jugadores de arena"))
-                .set("#PlayersListTitle.Text", HordeConfigPage.t(language, english, "Players inside current area", "Jugadores dentro del area actual"))
+                .set("#PlayersTitleLabel.Text", HordeConfigPage.t(language, english, "Player audience definitions", "Definiciones de audiencia de jugadores"))
+                .set("#PlayersAddButton.Text", HordeConfigPage.t(language, english, "Refresh players", "Actualizar jugadores"))
                 .set("#PlayersCountLabel.Text", HordeConfigPage.t(language, english, "Detected", "Detectados"))
                 .set("#PlayersHeaderName.Text", HordeConfigPage.t(language, english, "Player", "Jugador"))
                 .set("#PlayersHeaderMode.Text", HordeConfigPage.t(language, english, "Mode", "Modo"))
-                .set("#PlayersRefreshButton.Text", HordeConfigPage.t(language, english, "Refresh list", "Actualizar lista"))
-                .set("#AudienceHelpLabel.Text", HordeConfigPage.t(language, english, "Changes apply to next start. If horde is active, they are applied to current lock immediately.", "Cambios aplican al siguiente inicio. Si la horda esta activa, se aplican al bloqueo actual."))
+                .set("#PlayersHeaderActions.Text", HordeConfigPage.t(language, english, "Actions", "Acciones"))
+                .set("#PlayersEditorTitleLabel.Text", HordeConfigPage.t(language, english, "Player editor", "Editor de jugador"))
+                .set("#PlayerEditModeLabel.Text", HordeConfigPage.t(language, english, "Audience mode", "Modo de audiencia"))
+                .set("#PlayersSaveButton.Text", HordeConfigPage.t(language, english, "Save player mode", "Guardar modo jugador"))
+                .set("#PlayersPagePrevButton.Text", "<")
+                .set("#PlayersPageNextButton.Text", ">")
+                .set("#AudienceHelpLabel.Text", HordeConfigPage.t(language, english, "Changes apply immediately for current audience lock.", "Los cambios se aplican inmediatamente al bloqueo actual de audiencia."))
                 .set("#EnemyCatTitleLabel.Text", HordeConfigPage.t(language, english, "Enemy category definitions", "Definiciones de categorias de enemigos"))
                 .set("#EnemyCatAddButton.Text", HordeConfigPage.t(language, english, "Add category", "Anadir categoria"))
                 .set("#EnemyCatHeaderName.Text", HordeConfigPage.t(language, english, "Category ID", "Categoria ID"))
@@ -1780,6 +2207,21 @@ extends CustomUIPage {
                 .set("#EnemyCatPagePrevButton.Text", "<")
                 .set("#EnemyCatPageNextButton.Text", ">")
                 .set("#EnemyCatSaveButton.Text", HordeConfigPage.t(language, english, "Save category", "Guardar categoria"))
+                .set("#RewardCatTitleLabel.Text", HordeConfigPage.t(language, english, "Reward category definitions", "Definiciones de categorias de recompensa"))
+                .set("#RewardCatAddButton.Text", HordeConfigPage.t(language, english, "Add category", "Anadir categoria"))
+                .set("#RewardCatHeaderName.Text", HordeConfigPage.t(language, english, "Category ID", "Categoria ID"))
+                .set("#RewardCatHeaderPreview.Text", HordeConfigPage.t(language, english, "Items", "Items"))
+                .set("#RewardCatHeaderActions.Text", HordeConfigPage.t(language, english, "Actions", "Acciones"))
+                .set("#RewardCatEditorTitleLabel.Text", HordeConfigPage.t(language, english, "Reward category editor", "Editor de categoria de recompensa"))
+                .set("#RewardCatEditIdLabel.Text", HordeConfigPage.t(language, english, "Category ID", "Categoria ID"))
+                .set("#RewardCatItemPickerLabel.Text", HordeConfigPage.t(language, english, "Reward item ID", "Reward item ID"))
+                .set("#RewardCatItemAddButton.Text", HordeConfigPage.t(language, english, "Add", "Anadir"))
+                .set("#RewardCatEditItemsLabel.Text", HordeConfigPage.t(language, english, "Items in category", "Items en categoria"))
+                .set("#RewardCatEditItemsHelpLabel.Text", HordeConfigPage.t(language, english, "Pick item IDs from the dropdown and add them to the list.", "Elige item IDs del desplegable y anadelos a la lista."))
+                .set("#RewardCatItemsOverflowLabel.Text", "")
+                .set("#RewardCatPagePrevButton.Text", "<")
+                .set("#RewardCatPageNextButton.Text", ">")
+                .set("#RewardCatSaveButton.Text", HordeConfigPage.t(language, english, "Save category", "Guardar categoria"))
                 .set("#HordesTitleLabel.Text", HordeConfigPage.t(language, english, "Horde definitions", "Definiciones de hordas"))
                 .set("#HordeAddButton.Text", HordeConfigPage.t(language, english, "Add horde", "Anadir horda"))
                 .set("#HordeHeaderId.Text", HordeConfigPage.t(language, english, "Horde ID", "Horde ID"))
@@ -1802,10 +2244,6 @@ extends CustomUIPage {
                 .set("#AutoStartEnabledLabel.Text", HordeConfigPage.t(language, english, "Automatic horde mode", "Modo horda automatica"))
                 .set("#AutoStartIntervalLabel.Text", HordeConfigPage.t(language, english, "Start every (minutes)", "Iniciar cada (minutos)"))
                 .set("#AutoStartApplyButton.Text", HordeConfigPage.t(language, english, "Apply auto mode", "Aplicar modo auto"))
-                .set("#RewardEveryRoundsLabel.Text", HordeConfigPage.t(language, english, "Reward every round(s)", "Recompensa por ronda(s)"))
-                .set("#RewardCategoryLabel.Text", HordeConfigPage.t(language, english, "Reward category", "Categoria recompensa"))
-                .set("#RewardCommandsLabel.Text", HordeConfigPage.t(language, english, "Reward item", "Item recompensa"))
-                .set("#RewardItemQuantityLabel.Text", HordeConfigPage.t(language, english, "Qty.", "Cant."))
                 .set("#FinalBossLabel.Text", HordeConfigPage.t(language, english, "Final boss", "Boss final"))
                 .set("#RoundStartSoundLabel.Text", HordeConfigPage.t(language, english, "Round start sound", "Sonido inicio ronda"))
                 .set("#RoundVictorySoundLabel.Text", HordeConfigPage.t(language, english, "Round victory sound", "Sonido victoria ronda"))
@@ -1879,9 +2317,9 @@ extends CustomUIPage {
         this.setVisible(commandBuilder, generalTab, "#GeneralArenaLabel", "#GeneralArenaId", "#GeneralBossLabel", "#GeneralBossId", "#GeneralHordeLabel", "#GeneralHordeId", "#FinalBossLabel", "#FinalBossEnabled", "#LanguageLabel", "#Language", "#AutoStartEnabledLabel", "#AutoStartEnabled", "#AutoStartIntervalLabel", "#AutoStartInterval", "#AutoStartApplyButton");
         this.setVisible(commandBuilder, enemiesTab, "#EnemyCatTitleLabel", "#EnemyCatAddButton", "#EnemyCatHeaderName", "#EnemyCatHeaderPreview", "#EnemyCatHeaderActions", "#EnemyCatPagePrevButton", "#EnemyCatPageNextButton", "#EnemyCatPageLabel", "#EnemyCatEmptyLabel", "#EnemyCatOverflowLabel", "#EnemyCatEditorTitleLabel", "#EnemyCatEditIdLabel", "#EnemyCatEditId", "#EnemyCatRolePickerLabel", "#EnemyCatRolePicker", "#EnemyCatRoleAddButton", "#EnemyCatEditRolesLabel", "#EnemyCatEditRolesHelpLabel", "#EnemyCatRolesOverflowLabel", "#EnemyCatSaveButton", "#EnemyCatStatusLabel", "#EnemyCatRow1", "#EnemyCatRow2", "#EnemyCatRow3", "#EnemyCatRow4", "#EnemyCatRow5", "#EnemyCatRow6", "#EnemyCatRow7", "#EnemyCatRow8", "#EnemyCatRow9", "#EnemyCatRow10", "#EnemyCatRoleRow1", "#EnemyCatRoleRow2", "#EnemyCatRoleRow3", "#EnemyCatRoleRow4", "#EnemyCatRoleRow5", "#EnemyCatRoleRow6", "#EnemyCatRoleRow7", "#EnemyCatRoleRow8", "#EnemyCatRoleRow9", "#EnemyCatRoleRow10");
         this.setVisible(commandBuilder, hordeTab, "#HordesTitleLabel", "#HordeAddButton", "#HordeHeaderId", "#HordeHeaderType", "#HordeHeaderRounds", "#HordeHeaderActions", "#HordePagePrevButton", "#HordePageNextButton", "#HordePageLabel", "#HordeEmptyLabel", "#HordeOverflowLabel", "#HordeEditorTitleLabel", "#HordeEditIdLabel", "#HordeEditId", "#RoleLabel", "#EnemyType", "#MinRadiusLabel", "#MinRadius", "#MaxRadiusLabel", "#MaxRadius", "#RoundLabel", "#Rounds", "#WaveDelayLabel", "#WaveDelay", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound", "#HordeSaveButton", "#HordeStatusLabel", "#HordeRow1", "#HordeRow2", "#HordeRow3", "#HordeRow4", "#HordeRow5", "#HordeRow6", "#HordeRow7", "#HordeRow8", "#HordeRow9", "#HordeRow10");
-        this.setVisible(commandBuilder, playersTab, "#AudienceInfoLabel", "#PlayersListTitle", "#PlayersCountLabel", "#PlayersCountValue", "#PlayersListHint", "#PlayersRefreshButton", "#PlayersHeaderName", "#PlayersHeaderMode", "#AudiencePlayersRows", "#AudiencePlayersEmptyLabel", "#AudienceHelpLabel", "#ArenaJoinRadiusLabel", "#ArenaJoinRadius");
+        this.setVisible(commandBuilder, playersTab, "#AudienceInfoLabel", "#PlayersTitleLabel", "#PlayersAddButton", "#PlayersHeaderName", "#PlayersHeaderMode", "#PlayersHeaderActions", "#PlayersPagePrevButton", "#PlayersPageNextButton", "#PlayersPageLabel", "#PlayersEmptyLabel", "#PlayersOverflowLabel", "#PlayersEditorTitleLabel", "#PlayerSelected", "#PlayerEditModeLabel", "#PlayerEditMode", "#PlayersSaveButton", "#PlayerStatusLabel", "#PlayersCountLabel", "#PlayersCountValue", "#AudienceHelpLabel", "#ArenaJoinRadiusLabel", "#ArenaJoinRadius", "#PlayerRow1", "#PlayerRow2", "#PlayerRow3", "#PlayerRow4", "#PlayerRow5", "#PlayerRow6", "#PlayerRow7", "#PlayerRow8", "#PlayerRow9", "#PlayerRow10");
         this.setVisible(commandBuilder, soundsTab, "#RoundStartSoundLabel", "#RoundStartSoundId", "#RoundStartVolumeLabel", "#RoundStartVolume", "#RoundVictorySoundLabel", "#RoundVictorySoundId", "#RoundVictoryVolumeLabel", "#RoundVictoryVolume");
-        this.setVisible(commandBuilder, rewardsTab, "#RewardCategoryLabel", "#RewardCategory", "#RewardCommandsLabel", "#RewardItemId", "#RewardItemQuantityLabel", "#RewardItemQuantity");
+        this.setVisible(commandBuilder, rewardsTab, "#RewardCatTitleLabel", "#RewardCatAddButton", "#RewardCatHeaderName", "#RewardCatHeaderPreview", "#RewardCatHeaderActions", "#RewardCatPagePrevButton", "#RewardCatPageNextButton", "#RewardCatPageLabel", "#RewardCatEmptyLabel", "#RewardCatOverflowLabel", "#RewardCatEditorTitleLabel", "#RewardCatEditIdLabel", "#RewardCatEditId", "#RewardCatItemPickerLabel", "#RewardCatItemPicker", "#RewardCatItemAddButton", "#RewardCatEditItemsLabel", "#RewardCatEditItemsHelpLabel", "#RewardCatItemsOverflowLabel", "#RewardCatSaveButton", "#RewardCatStatusLabel", "#RewardCatRow1", "#RewardCatRow2", "#RewardCatRow3", "#RewardCatRow4", "#RewardCatRow5", "#RewardCatRow6", "#RewardCatRow7", "#RewardCatRow8", "#RewardCatRow9", "#RewardCatRow10", "#RewardCatItemRow1", "#RewardCatItemRow2", "#RewardCatItemRow3", "#RewardCatItemRow4", "#RewardCatItemRow5", "#RewardCatItemRow6", "#RewardCatItemRow7", "#RewardCatItemRow8", "#RewardCatItemRow9", "#RewardCatItemRow10");
         this.setVisible(commandBuilder, bossesTab, "#BossesTitleLabel", "#BossAddButton", "#BossHeaderName", "#BossHeaderNpc", "#BossHeaderTier", "#BossHeaderAmount", "#BossHeaderActions", "#BossPagePrevButton", "#BossPageNextButton", "#BossPageLabel", "#BossEmptyLabel", "#BossOverflowLabel", "#BossEditorTitleLabel", "#BossEditNameLabel", "#BossEditName", "#BossEditNpcIdLabel", "#BossEditNpcId", "#BossEditTierLabel", "#BossEditTier", "#BossEditAmountLabel", "#BossEditAmount", "#BossSaveButton", "#BossRow1", "#BossRow2", "#BossRow3", "#BossRow4", "#BossRow5", "#BossRow6", "#BossRow7", "#BossRow8", "#BossRow9", "#BossRow10");
         this.setVisible(commandBuilder, arenasTab, "#ArenasTitleLabel", "#ArenaAddButton", "#ArenaHeaderName", "#ArenaHeaderCoords", "#ArenaHeaderActions", "#ArenaPagePrevButton", "#ArenaPageNextButton", "#ArenaPageLabel", "#ArenaEmptyLabel", "#ArenaOverflowLabel", "#ArenaEditorTitleLabel", "#ArenaEditIdLabel", "#ArenaEditId", "#ArenaEditXLabel", "#ArenaEditX", "#ArenaEditYLabel", "#ArenaEditY", "#ArenaEditZLabel", "#ArenaEditZ", "#ArenaUseCurrentPositionButton", "#ArenaSaveButton", "#ArenaRow1", "#ArenaRow2", "#ArenaRow3", "#ArenaRow4", "#ArenaRow5", "#ArenaRow6", "#ArenaRow7", "#ArenaRow8", "#ArenaRow9", "#ArenaRow10");
         this.setVisible(commandBuilder, helpTab, "#HelpIntroLabel", "#HelpCommandsLabel", "#HelpCommandsLine1", "#HelpCommandsLine2", "#HelpCommandsLine3", "#HelpConfigLabel", "#HelpConfigLine1", "#HelpConfigLine2", "#HelpConfigLine3", "#HelpExternalLabel", "#HelpExternalLine1", "#HelpExternalLine2", "#HelpExternalLine3", "#HelpReloadLabel", "#HelpReloadLine1", "#HelpReloadLine2");
@@ -1894,7 +2332,7 @@ extends CustomUIPage {
         this.setVisible(commandBuilder, soundsTab, "#TabSoundsActiveTop", "#TabSoundsActiveNotch");
         this.setVisible(commandBuilder, rewardsTab, "#TabRewardsActiveTop", "#TabRewardsActiveNotch");
         this.setVisible(commandBuilder, helpTab, "#TabHelpActiveTop", "#TabHelpActiveNotch");
-        this.setVisible(commandBuilder, false, "#SubTitleLabel", "#TabHintLabel", "#StatusTitleLabel", "#StatusPanel", "#StatusLabel", "#SpawnStateLabel", "#SpawnLabel", "#SpawnX", "#SpawnY", "#SpawnZ", "#SetSpawnButton", "#HordeSelected", "#BossSelectedLabel", "#BossSelected", "#ArenaSelectedLabel", "#ArenaSelected", "#BossStatusLabel", "#ArenaStatusLabel", "#RoleHelpLabel", "#RoundSoundHelpLabel", "#RewardCommandsHelpLabel", "#PlayerMultiplierLabel", "#PlayerMultiplier", "#RadiusLabel", "#RoundConfigLabel", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel", "#EnemyLevelMin", "#EnemyLevelRangeSeparator", "#EnemyLevelMax", "#LanguagePrevButton", "#LanguageNextButton", "#FinalBossPrevButton", "#FinalBossNextButton", "#RoundStartSoundPrevButton", "#RoundStartSoundNextButton", "#RoundVictorySoundPrevButton", "#RoundVictorySoundNextButton", "#RewardCategoryPrevButton", "#RewardCategoryNextButton", "#RewardItemPrevButton", "#RewardItemNextButton", "#RewardEveryRoundsLabel", "#RewardEveryRounds", "#HelpDiscordButton", "#HelpCurseForgeButton", "#TabGeneralPlate", "#TabArenasPlate", "#TabEnemiesPlate", "#TabHordePlate", "#TabBossesPlate", "#TabPlayersPlate", "#TabSoundsPlate", "#TabRewardsPlate", "#TabHelpPlate", "#TabGeneralActiveBack", "#TabArenasActiveBack", "#TabEnemiesActiveBack", "#TabHordeActiveBack", "#TabBossesActiveBack", "#TabPlayersActiveBack", "#TabSoundsActiveBack", "#TabRewardsActiveBack", "#TabHelpActiveBack", "#CategoryBar", "#CategoryOuterTop", "#CategoryOuterBottom", "#CategoryOuterLeft", "#CategoryOuterRight", "#CategoryInnerTop", "#CategoryInnerBottom", "#CategoryCornerTL", "#CategoryCornerTR", "#CategoryCornerBL", "#CategoryCornerBR", "#CategoryBarInset", "#CategoryBarBottomEdge", "#CategoryLine");
+        this.setVisible(commandBuilder, false, "#SubTitleLabel", "#TabHintLabel", "#StatusTitleLabel", "#StatusPanel", "#StatusLabel", "#SpawnStateLabel", "#SpawnLabel", "#SpawnX", "#SpawnY", "#SpawnZ", "#SetSpawnButton", "#HordeSelected", "#BossSelectedLabel", "#BossSelected", "#ArenaSelectedLabel", "#ArenaSelected", "#BossStatusLabel", "#ArenaStatusLabel", "#RoleHelpLabel", "#RoundSoundHelpLabel", "#RewardCommandsHelpLabel", "#PlayerMultiplierLabel", "#PlayerMultiplier", "#RadiusLabel", "#RoundConfigLabel", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel", "#EnemyLevelMin", "#EnemyLevelRangeSeparator", "#EnemyLevelMax", "#LanguagePrevButton", "#LanguageNextButton", "#FinalBossPrevButton", "#FinalBossNextButton", "#RoundStartSoundPrevButton", "#RoundStartSoundNextButton", "#RoundVictorySoundPrevButton", "#RoundVictorySoundNextButton", "#RewardCategoryPrevButton", "#RewardCategoryNextButton", "#RewardItemPrevButton", "#RewardItemNextButton", "#RewardEveryRoundsLabel", "#RewardEveryRounds", "#RewardCategoryLabel", "#RewardCategory", "#RewardCommandsLabel", "#RewardItemId", "#RewardItemQuantityLabel", "#RewardItemQuantity", "#PlayersListTitle", "#PlayersListHint", "#PlayersRefreshButton", "#AudiencePlayersRows", "#AudiencePlayersEmptyLabel", "#HelpDiscordButton", "#HelpCurseForgeButton", "#TabGeneralPlate", "#TabArenasPlate", "#TabEnemiesPlate", "#TabHordePlate", "#TabBossesPlate", "#TabPlayersPlate", "#TabSoundsPlate", "#TabRewardsPlate", "#TabHelpPlate", "#TabGeneralActiveBack", "#TabArenasActiveBack", "#TabEnemiesActiveBack", "#TabHordeActiveBack", "#TabBossesActiveBack", "#TabPlayersActiveBack", "#TabSoundsActiveBack", "#TabRewardsActiveBack", "#TabHelpActiveBack", "#CategoryBar", "#CategoryOuterTop", "#CategoryOuterBottom", "#CategoryOuterLeft", "#CategoryOuterRight", "#CategoryInnerTop", "#CategoryInnerBottom", "#CategoryCornerTL", "#CategoryCornerTR", "#CategoryCornerBL", "#CategoryCornerBR", "#CategoryBarInset", "#CategoryBarBottomEdge", "#CategoryLine");
     }
 
     private void setVisible(UICommandBuilder commandBuilder, boolean visible, String ... elementIds) {
@@ -2132,8 +2570,24 @@ extends CustomUIPage {
         return action.substring(separator + 1).trim();
     }
 
+    private static UUID parseUuid(String rawValue) {
+        if (rawValue == null || rawValue.isBlank()) {
+            return null;
+        }
+        try {
+            return UUID.fromString(rawValue.trim());
+        }
+        catch (Exception ignored) {
+            return null;
+        }
+    }
+
     private static String buildBossAction(String action, String bossId) {
         return "boss_" + action + ":" + HordeConfigPage.firstNonEmpty(bossId, "");
+    }
+
+    private static String buildPlayerDefinitionAction(String action, String playerId) {
+        return "playerdef_" + action + ":" + HordeConfigPage.firstNonEmpty(playerId, "");
     }
 
     private static String buildHordeDefinitionAction(String action, String hordeId) {
@@ -2142,6 +2596,10 @@ extends CustomUIPage {
 
     private static String buildEnemyCategoryAction(String action, String categoryId) {
         return "enemycat_" + action + ":" + HordeConfigPage.firstNonEmpty(categoryId, "");
+    }
+
+    private static String buildRewardCategoryAction(String action, String categoryId) {
+        return "rewardcat_" + action + ":" + HordeConfigPage.firstNonEmpty(categoryId, "");
     }
 
     private static String buildArenaAction(String action, String arenaId) {
@@ -2252,6 +2710,55 @@ extends CustomUIPage {
         return null;
     }
 
+    private static HordeService.RewardCategorySnapshot findRewardCategorySnapshot(List<HordeService.RewardCategorySnapshot> rows, String categoryId) {
+        if (rows == null || rows.isEmpty()) {
+            return null;
+        }
+        String requested = categoryId == null ? "" : categoryId.trim();
+        if (requested.isBlank()) {
+            return null;
+        }
+        for (HordeService.RewardCategorySnapshot row : rows) {
+            if (row == null || row.categoryId == null) {
+                continue;
+            }
+            if (row.categoryId.equalsIgnoreCase(requested)) {
+                return row;
+            }
+        }
+        return null;
+    }
+
+    private static HordeService.AudiencePlayerSnapshot findAudienceSnapshot(List<HordeService.AudiencePlayerSnapshot> rows, String playerId) {
+        if (rows == null || rows.isEmpty()) {
+            return null;
+        }
+        UUID requestedId = HordeConfigPage.parseUuid(playerId);
+        if (requestedId != null) {
+            for (HordeService.AudiencePlayerSnapshot row : rows) {
+                if (row == null || row.playerId == null) {
+                    continue;
+                }
+                if (requestedId.equals((Object)row.playerId)) {
+                    return row;
+                }
+            }
+        }
+        String requested = playerId == null ? "" : playerId.trim();
+        if (requested.isBlank()) {
+            return null;
+        }
+        for (HordeService.AudiencePlayerSnapshot row : rows) {
+            if (row == null || row.playerId == null) {
+                continue;
+            }
+            if (row.playerId.toString().equalsIgnoreCase(requested)) {
+                return row;
+            }
+        }
+        return null;
+    }
+
     private static BossArenaCatalogService.BossDefinitionSnapshot findBossSnapshot(List<BossArenaCatalogService.BossDefinitionSnapshot> rows, String bossId) {
         if (rows == null || rows.isEmpty()) {
             return null;
@@ -2351,6 +2858,42 @@ extends CustomUIPage {
                 continue;
             }
             if (row.categoryId.equalsIgnoreCase(categoryId)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static int findRewardCategoryIndex(List<HordeService.RewardCategorySnapshot> rows, String categoryId) {
+        if (rows == null || rows.isEmpty() || categoryId == null || categoryId.isBlank()) {
+            return -1;
+        }
+        for (int i = 0; i < rows.size(); ++i) {
+            HordeService.RewardCategorySnapshot row = rows.get(i);
+            if (row == null || row.categoryId == null) {
+                continue;
+            }
+            if (row.categoryId.equalsIgnoreCase(categoryId)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static int findAudienceIndex(List<HordeService.AudiencePlayerSnapshot> rows, String playerId) {
+        if (rows == null || rows.isEmpty() || playerId == null || playerId.isBlank()) {
+            return -1;
+        }
+        UUID requestedId = HordeConfigPage.parseUuid(playerId);
+        for (int i = 0; i < rows.size(); ++i) {
+            HordeService.AudiencePlayerSnapshot row = rows.get(i);
+            if (row == null || row.playerId == null) {
+                continue;
+            }
+            if (requestedId != null && requestedId.equals((Object)row.playerId)) {
+                return i;
+            }
+            if (row.playerId.toString().equalsIgnoreCase(playerId.trim())) {
                 return i;
             }
         }
