@@ -63,6 +63,7 @@ extends CustomUIPage {
             new UiFieldBinding("autoStartIntervalMinutes", "AutoStartIntervalMinutes", "#AutoStartInterval.Value"),
             new UiFieldBinding("selectedArenaId", "GeneralArenaId", "#GeneralArenaId.Value"),
             new UiFieldBinding("selectedBossId", "GeneralBossId", "#GeneralBossId.Value"),
+            new UiFieldBinding("selectedHordeId", "GeneralHordeId", "#GeneralHordeId.Value"),
             new UiFieldBinding("hordeSelected", "HordeSelected", "#HordeSelected.Value"),
             new UiFieldBinding("hordeEditId", "HordeEditId", "#HordeEditId.Value"),
             new UiFieldBinding("enemyType", "EnemyType", "#EnemyType.Value", "role", "@Role", "Role"),
@@ -183,6 +184,11 @@ extends CustomUIPage {
             this.draftValues.put("selectedBossId", selectedBossForHordeValue);
         }
         selectedBossForHordeValue = this.getDraftValue("selectedBossId", "");
+        String selectedHordeForConfigValue = HordeConfigPage.firstNonEmpty(this.getDraftValue("selectedHordeId", ""), config.selectedHordeId, HordeConfigPage.firstHordeId(hordeRows));
+        if (!selectedHordeForConfigValue.isBlank()) {
+            this.draftValues.put("selectedHordeId", selectedHordeForConfigValue);
+        }
+        selectedHordeForConfigValue = this.getDraftValue("selectedHordeId", "");
         String bossSelectedValue = this.getDraftValue("bossSelected", "");
         String bossNpcIdValue = this.getDraftValue("bossEditNpcId", "");
         String arenaSelectedValue = this.getDraftValue("arenaSelected", "");
@@ -197,6 +203,7 @@ extends CustomUIPage {
         String bossTierValue = this.getDraftValue("bossEditTier", "common");
         List<DropdownEntryInfo> generalArenaEntries = HordeConfigPage.buildDropdownEntries(HordeConfigPage.collectArenaIds(arenaRows), selectedArenaForHordeValue);
         List<DropdownEntryInfo> generalBossEntries = HordeConfigPage.buildDropdownEntries(HordeConfigPage.collectBossIds(bossRows), selectedBossForHordeValue);
+        List<DropdownEntryInfo> generalHordeEntries = HordeConfigPage.buildDropdownEntries(HordeConfigPage.collectHordeIds(hordeRows), selectedHordeForConfigValue);
         List<DropdownEntryInfo> enemyCategoryRolePickerEntries = HordeConfigPage.buildDropdownEntries(enemyRoleOptions, enemyCategoryRolePickerValue);
         List<DropdownEntryInfo> bossNpcIdEntries = HordeConfigPage.buildDropdownEntries(this.hordeService.getBossNpcIdOptions(), bossNpcIdValue);
         List<DropdownEntryInfo> bossTierEntries = HordeConfigPage.buildDropdownEntries(this.hordeService.getBossTierOptions(), bossTierValue);
@@ -224,6 +231,8 @@ extends CustomUIPage {
                 .set("#GeneralArenaId.Entries", generalArenaEntries)
                 .set("#GeneralBossId.Value", selectedBossForHordeValue)
                 .set("#GeneralBossId.Entries", generalBossEntries)
+                .set("#GeneralHordeId.Value", selectedHordeForConfigValue)
+                .set("#GeneralHordeId.Entries", generalHordeEntries)
                 .set("#HordeSelected.Value", hordeSelectedValue)
                 .set("#HordeEditId.Value", this.getDraftValue("hordeEditId", hordeSelectedValue))
                 .set("#HordeStatusLabel.Text", this.hordeStatusText == null ? "" : this.hordeStatusText)
@@ -898,6 +907,7 @@ extends CustomUIPage {
         this.putDraftIfMissing("autoStartIntervalMinutes", Integer.toString(config.autoStartIntervalMinutes > 0 ? config.autoStartIntervalMinutes : 10));
         this.putDraftIfMissing("selectedArenaId", config.selectedArenaId == null ? "" : config.selectedArenaId.trim());
         this.putDraftIfMissing("selectedBossId", config.selectedBossId == null ? "" : config.selectedBossId.trim());
+        this.putDraftIfMissing("selectedHordeId", config.selectedHordeId == null ? "" : config.selectedHordeId.trim());
         this.putDraftIfMissing("enemyType", config.enemyType == null ? "undead" : config.enemyType);
         this.putDraftIfMissing("language", HordeService.normalizeLanguage(config.language));
         this.putDraftIfMissing("rewardCategory", HordeConfigPage.firstNonEmpty(config.rewardCategory, this.hordeService.getRewardCategory()));
@@ -1014,7 +1024,6 @@ extends CustomUIPage {
             this.putDraftIfMissing("baseEnemies", Integer.toString(selectedHorde.baseEnemies));
             this.putDraftIfMissing("enemiesPerRound", Integer.toString(selectedHorde.enemiesPerRound));
             this.putDraftIfMissing("waveDelay", Integer.toString(selectedHorde.waveDelay));
-            this.putDraftIfMissing("finalBossEnabled", Boolean.toString(selectedHorde.finalBossEnabled));
         } else {
             this.putDraftIfMissing("hordeEditId", "horde_1");
             this.putDraftIfMissing("enemyType", config.enemyType == null ? "undead" : config.enemyType);
@@ -1024,7 +1033,6 @@ extends CustomUIPage {
             this.putDraftIfMissing("baseEnemies", Integer.toString(config.baseEnemiesPerRound));
             this.putDraftIfMissing("enemiesPerRound", Integer.toString(config.enemiesPerRoundIncrement));
             this.putDraftIfMissing("waveDelay", Integer.toString(config.waveDelaySeconds));
-            this.putDraftIfMissing("finalBossEnabled", Boolean.toString(config.finalBossEnabled));
         }
     }
 
@@ -1176,7 +1184,6 @@ extends CustomUIPage {
         this.draftValues.put("baseEnemies", Integer.toString(snapshot.baseEnemies));
         this.draftValues.put("enemiesPerRound", Integer.toString(snapshot.enemiesPerRound));
         this.draftValues.put("waveDelay", Integer.toString(snapshot.waveDelay));
-        this.draftValues.put("finalBossEnabled", Boolean.toString(snapshot.finalBossEnabled));
     }
 
     private void applyArenaDraftFromSnapshot(BossArenaCatalogService.ArenaDefinitionSnapshot snapshot) {
@@ -1230,7 +1237,6 @@ extends CustomUIPage {
         HordeConfigPage.putIfNotBlank(values, "baseEnemies", this.getDraftValue("baseEnemies", ""));
         HordeConfigPage.putIfNotBlank(values, "enemiesPerRound", this.getDraftValue("enemiesPerRound", ""));
         HordeConfigPage.putIfNotBlank(values, "waveDelay", this.getDraftValue("waveDelay", ""));
-        HordeConfigPage.putIfNotBlank(values, "finalBossEnabled", this.getDraftValue("finalBossEnabled", "false"));
         return values;
     }
 
@@ -1475,6 +1481,8 @@ extends CustomUIPage {
                         || "autoStartIntervalMinutes".equals(field.configKey)
                         || "selectedArenaId".equals(field.configKey)
                         || "selectedBossId".equals(field.configKey)
+                        || "selectedHordeId".equals(field.configKey)
+                        || "finalBossEnabled".equals(field.configKey)
                         || "language".equals(field.configKey);
             case TAB_HORDE:
                 return "hordeSelected".equals(field.configKey)
@@ -1485,8 +1493,7 @@ extends CustomUIPage {
                         || "baseEnemies".equals(field.configKey)
                         || "enemiesPerRound".equals(field.configKey)
                         || "waveDelay".equals(field.configKey)
-                        || "enemyType".equals(field.configKey)
-                        || "finalBossEnabled".equals(field.configKey);
+                        || "enemyType".equals(field.configKey);
             case TAB_ENEMIES:
                 return "enemyCategorySelected".equals(field.configKey)
                         || "enemyCategoryEditId".equals(field.configKey)
@@ -1744,6 +1751,7 @@ extends CustomUIPage {
                 .set("#TabHintLabel.Text", "")
                 .set("#GeneralArenaLabel.Text", HordeConfigPage.t(language, english, "Current horde arena", "Arena actual de la horda"))
                 .set("#GeneralBossLabel.Text", HordeConfigPage.t(language, english, "Current horde boss", "Boss actual de la horda"))
+                .set("#GeneralHordeLabel.Text", HordeConfigPage.t(language, english, "Current horde", "Horda actual"))
                 .set("#SpawnLabel.Text", HordeConfigPage.t(language, english, "Center (X Y Z)", "Centro (X Y Z)"))
                 .set("#SetSpawnButton.Text", HordeConfigPage.t(language, english, "Use my current position", "Usar mi posicion actual"))
                 .set("#RadiusLabel.Text", HordeConfigPage.t(language, english, "Enemy spawn radius setup", "Configuracion del radio de aparicion de enemigos"))
@@ -1763,7 +1771,6 @@ extends CustomUIPage {
                 .set("#EnemyCatHeaderPreview.Text", HordeConfigPage.t(language, english, "Enemy IDs", "Enemy IDs"))
                 .set("#EnemyCatHeaderActions.Text", HordeConfigPage.t(language, english, "Actions", "Acciones"))
                 .set("#EnemyCatEditorTitleLabel.Text", HordeConfigPage.t(language, english, "Enemy category editor", "Editor de categoria de enemigos"))
-                .set("#EnemyCatSelectedLabel.Text", HordeConfigPage.t(language, english, "Selected category", "Categoria seleccionada"))
                 .set("#EnemyCatEditIdLabel.Text", HordeConfigPage.t(language, english, "Category ID", "Categoria ID"))
                 .set("#EnemyCatRolePickerLabel.Text", HordeConfigPage.t(language, english, "Enemy ID", "Enemy ID"))
                 .set("#EnemyCatRoleAddButton.Text", HordeConfigPage.t(language, english, "Add", "Anadir"))
@@ -1846,7 +1853,7 @@ extends CustomUIPage {
                 .set("#HelpCommandsLine3.Text", HordeConfigPage.t(language, english, "/hordeconfig enemy <type> | enemytypes | role <npcRole|auto> | roles | reward <rounds> | spectator <on|off> | player | arearadius <blocks>.", "/hordeconfig enemy <tipo> | tipos | role <rolNpc|auto> | roles | reward <rondas> | spectator <on|off> | player | arearadius <bloques>."))
                 .set("#HelpConfigLabel.Text", HordeConfigPage.t(language, english, "What Save Config stores", "Que guarda Guardar config"))
                 .set("#HelpConfigLine1.Text", HordeConfigPage.t(language, english, "Center/world, min-max spawn radius, players area radius and interface language.", "Centro/mundo, radio minimo-maximo de aparicion, radio de area de jugadores e idioma interfaz."))
-                .set("#HelpConfigLine2.Text", HordeConfigPage.t(language, english, "Horde definitions by ID (enemy type, radii, rounds, scaling) plus selected arena/boss.", "Definiciones de horda por ID (tipo enemigo, radios, rondas, escalado) mas arena/boss seleccionados."))
+                .set("#HelpConfigLine2.Text", HordeConfigPage.t(language, english, "Horde definitions by ID (enemy type, radii, rounds, scaling) plus selected arena/boss/horde.", "Definiciones de horda por ID (tipo enemigo, radios, rondas, escalado) mas arena/boss/horda seleccionados."))
                 .set("#HelpConfigLine3.Text", HordeConfigPage.t(language, english, "Rewards and sounds (start/victory ID and volume) are also persisted.", "Recompensas y sonidos (ID de inicio/victoria y volumen) tambien se guardan."))
                 .set("#HelpExternalLabel.Text", HordeConfigPage.t(language, english, "External JSON files (plugin data folder)", "JSON externos (carpeta de datos del plugin)"))
                 .set("#HelpExternalLine1.Text", HordeConfigPage.t(language, english, "horde-definitions.json: editable horde presets shown in the Horde tab.", "horde-definitions.json: presets editables de horda mostrados en la pestana Horda."))
@@ -1869,9 +1876,9 @@ extends CustomUIPage {
         boolean arenasTab = TAB_ARENAS.equals(tab);
         boolean helpTab = TAB_HELP.equals(tab);
 
-        this.setVisible(commandBuilder, generalTab, "#GeneralArenaLabel", "#GeneralArenaId", "#GeneralBossLabel", "#GeneralBossId", "#LanguageLabel", "#Language", "#AutoStartEnabledLabel", "#AutoStartEnabled", "#AutoStartIntervalLabel", "#AutoStartInterval", "#AutoStartApplyButton");
-        this.setVisible(commandBuilder, enemiesTab, "#EnemyCatTitleLabel", "#EnemyCatAddButton", "#EnemyCatHeaderName", "#EnemyCatHeaderPreview", "#EnemyCatHeaderActions", "#EnemyCatPagePrevButton", "#EnemyCatPageNextButton", "#EnemyCatPageLabel", "#EnemyCatEmptyLabel", "#EnemyCatOverflowLabel", "#EnemyCatEditorTitleLabel", "#EnemyCatSelectedLabel", "#EnemyCatSelected", "#EnemyCatEditIdLabel", "#EnemyCatEditId", "#EnemyCatRolePickerLabel", "#EnemyCatRolePicker", "#EnemyCatRoleAddButton", "#EnemyCatEditRolesLabel", "#EnemyCatEditRolesHelpLabel", "#EnemyCatRolesOverflowLabel", "#EnemyCatSaveButton", "#EnemyCatStatusLabel", "#EnemyCatRow1", "#EnemyCatRow2", "#EnemyCatRow3", "#EnemyCatRow4", "#EnemyCatRow5", "#EnemyCatRow6", "#EnemyCatRow7", "#EnemyCatRow8", "#EnemyCatRow9", "#EnemyCatRow10", "#EnemyCatRoleRow1", "#EnemyCatRoleRow2", "#EnemyCatRoleRow3", "#EnemyCatRoleRow4", "#EnemyCatRoleRow5", "#EnemyCatRoleRow6", "#EnemyCatRoleRow7", "#EnemyCatRoleRow8", "#EnemyCatRoleRow9", "#EnemyCatRoleRow10");
-        this.setVisible(commandBuilder, hordeTab, "#HordesTitleLabel", "#HordeAddButton", "#HordeHeaderId", "#HordeHeaderType", "#HordeHeaderRounds", "#HordeHeaderActions", "#HordePagePrevButton", "#HordePageNextButton", "#HordePageLabel", "#HordeEmptyLabel", "#HordeOverflowLabel", "#HordeEditorTitleLabel", "#HordeEditIdLabel", "#HordeEditId", "#RoleLabel", "#EnemyType", "#FinalBossLabel", "#FinalBossEnabled", "#MinRadiusLabel", "#MinRadius", "#MaxRadiusLabel", "#MaxRadius", "#RoundLabel", "#Rounds", "#WaveDelayLabel", "#WaveDelay", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound", "#HordeSaveButton", "#HordeStatusLabel", "#HordeRow1", "#HordeRow2", "#HordeRow3", "#HordeRow4", "#HordeRow5", "#HordeRow6", "#HordeRow7", "#HordeRow8", "#HordeRow9", "#HordeRow10");
+        this.setVisible(commandBuilder, generalTab, "#GeneralArenaLabel", "#GeneralArenaId", "#GeneralBossLabel", "#GeneralBossId", "#GeneralHordeLabel", "#GeneralHordeId", "#FinalBossLabel", "#FinalBossEnabled", "#LanguageLabel", "#Language", "#AutoStartEnabledLabel", "#AutoStartEnabled", "#AutoStartIntervalLabel", "#AutoStartInterval", "#AutoStartApplyButton");
+        this.setVisible(commandBuilder, enemiesTab, "#EnemyCatTitleLabel", "#EnemyCatAddButton", "#EnemyCatHeaderName", "#EnemyCatHeaderPreview", "#EnemyCatHeaderActions", "#EnemyCatPagePrevButton", "#EnemyCatPageNextButton", "#EnemyCatPageLabel", "#EnemyCatEmptyLabel", "#EnemyCatOverflowLabel", "#EnemyCatEditorTitleLabel", "#EnemyCatEditIdLabel", "#EnemyCatEditId", "#EnemyCatRolePickerLabel", "#EnemyCatRolePicker", "#EnemyCatRoleAddButton", "#EnemyCatEditRolesLabel", "#EnemyCatEditRolesHelpLabel", "#EnemyCatRolesOverflowLabel", "#EnemyCatSaveButton", "#EnemyCatStatusLabel", "#EnemyCatRow1", "#EnemyCatRow2", "#EnemyCatRow3", "#EnemyCatRow4", "#EnemyCatRow5", "#EnemyCatRow6", "#EnemyCatRow7", "#EnemyCatRow8", "#EnemyCatRow9", "#EnemyCatRow10", "#EnemyCatRoleRow1", "#EnemyCatRoleRow2", "#EnemyCatRoleRow3", "#EnemyCatRoleRow4", "#EnemyCatRoleRow5", "#EnemyCatRoleRow6", "#EnemyCatRoleRow7", "#EnemyCatRoleRow8", "#EnemyCatRoleRow9", "#EnemyCatRoleRow10");
+        this.setVisible(commandBuilder, hordeTab, "#HordesTitleLabel", "#HordeAddButton", "#HordeHeaderId", "#HordeHeaderType", "#HordeHeaderRounds", "#HordeHeaderActions", "#HordePagePrevButton", "#HordePageNextButton", "#HordePageLabel", "#HordeEmptyLabel", "#HordeOverflowLabel", "#HordeEditorTitleLabel", "#HordeEditIdLabel", "#HordeEditId", "#RoleLabel", "#EnemyType", "#MinRadiusLabel", "#MinRadius", "#MaxRadiusLabel", "#MaxRadius", "#RoundLabel", "#Rounds", "#WaveDelayLabel", "#WaveDelay", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound", "#HordeSaveButton", "#HordeStatusLabel", "#HordeRow1", "#HordeRow2", "#HordeRow3", "#HordeRow4", "#HordeRow5", "#HordeRow6", "#HordeRow7", "#HordeRow8", "#HordeRow9", "#HordeRow10");
         this.setVisible(commandBuilder, playersTab, "#AudienceInfoLabel", "#PlayersListTitle", "#PlayersCountLabel", "#PlayersCountValue", "#PlayersListHint", "#PlayersRefreshButton", "#PlayersHeaderName", "#PlayersHeaderMode", "#AudiencePlayersRows", "#AudiencePlayersEmptyLabel", "#AudienceHelpLabel", "#ArenaJoinRadiusLabel", "#ArenaJoinRadius");
         this.setVisible(commandBuilder, soundsTab, "#RoundStartSoundLabel", "#RoundStartSoundId", "#RoundStartVolumeLabel", "#RoundStartVolume", "#RoundVictorySoundLabel", "#RoundVictorySoundId", "#RoundVictoryVolumeLabel", "#RoundVictoryVolume");
         this.setVisible(commandBuilder, rewardsTab, "#RewardCategoryLabel", "#RewardCategory", "#RewardCommandsLabel", "#RewardItemId", "#RewardItemQuantityLabel", "#RewardItemQuantity");
@@ -2169,6 +2176,32 @@ extends CustomUIPage {
         for (BossArenaCatalogService.BossDefinitionSnapshot row : rows) {
             if (row != null && row.bossId != null && !row.bossId.isBlank()) {
                 return row.bossId;
+            }
+        }
+        return "";
+    }
+
+    private static List<String> collectHordeIds(List<HordeDefinitionCatalogService.HordeDefinitionSnapshot> rows) {
+        ArrayList<String> ids = new ArrayList<String>();
+        if (rows == null) {
+            return ids;
+        }
+        for (HordeDefinitionCatalogService.HordeDefinitionSnapshot row : rows) {
+            if (row == null || row.hordeId == null || row.hordeId.isBlank() || HordeConfigPage.containsIgnoreCase(ids, row.hordeId)) {
+                continue;
+            }
+            ids.add(row.hordeId);
+        }
+        return ids;
+    }
+
+    private static String firstHordeId(List<HordeDefinitionCatalogService.HordeDefinitionSnapshot> rows) {
+        if (rows == null || rows.isEmpty()) {
+            return "";
+        }
+        for (HordeDefinitionCatalogService.HordeDefinitionSnapshot row : rows) {
+            if (row != null && row.hordeId != null && !row.hordeId.isBlank()) {
+                return row.hordeId;
             }
         }
         return "";

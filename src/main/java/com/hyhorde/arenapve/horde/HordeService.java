@@ -1135,6 +1135,7 @@ public final class HordeService {
             return OperationResult.fail(ex.getMessage());
         }
         BossArenaCatalogService.ArenaDefinitionSnapshot selectedArenaForHorde = null;
+        HordeDefinitionCatalogService.HordeDefinitionSnapshot selectedHordeForConfig = null;
         String selectedArenaIdValue = values.get("selectedArenaId");
         if (selectedArenaIdValue != null) {
             updated.selectedArenaId = HordeService.cleanArenaSelectionValue(selectedArenaIdValue);
@@ -1164,8 +1165,22 @@ public final class HordeService {
         if (!updated.selectedBossId.isBlank() && HordeService.findBossById(this.bossArenaCatalogService.getBossDefinitionsSnapshot(), updated.selectedBossId) == null) {
             updated.selectedBossId = "";
         }
+        String selectedHordeIdValue = values.get("selectedHordeId");
+        if (selectedHordeIdValue != null) {
+            updated.selectedHordeId = HordeService.cleanHordeSelectionValue(selectedHordeIdValue);
+        } else {
+            updated.selectedHordeId = HordeService.cleanHordeSelectionValue(updated.selectedHordeId);
+        }
+        if (!updated.selectedHordeId.isBlank()) {
+            selectedHordeForConfig = HordeService.findHordeById(this.hordeDefinitionCatalogService.getDefinitionsSnapshot(), updated.selectedHordeId);
+            if (selectedHordeForConfig == null) {
+                updated.selectedHordeId = "";
+            }
+        }
         String enemyTypeValue = values.get("enemyType");
-        if (enemyTypeValue != null && !enemyTypeValue.isBlank()) {
+        if (selectedHordeForConfig != null) {
+            updated.enemyType = HordeService.normalizeEnemyType(selectedHordeForConfig.enemyType);
+        } else if (enemyTypeValue != null && !enemyTypeValue.isBlank()) {
             updated.enemyType = HordeService.normalizeEnemyType(enemyTypeValue);
         } else {
             updated.enemyType = HordeService.normalizeEnemyType(updated.enemyType);
@@ -1196,6 +1211,14 @@ public final class HordeService {
         }
         if (!ENEMY_TYPE_OPTIONS.contains(updated.enemyType)) {
             return OperationResult.fail(english ? "enemyType must be one of: " + String.join((CharSequence)", ", ENEMY_TYPE_OPTIONS) : "enemyType debe ser uno de: " + String.join((CharSequence)", ", ENEMY_TYPE_OPTIONS));
+        }
+        if (selectedHordeForConfig != null) {
+            updated.minSpawnRadius = selectedHordeForConfig.minRadius;
+            updated.maxSpawnRadius = selectedHordeForConfig.maxRadius;
+            updated.rounds = selectedHordeForConfig.rounds;
+            updated.baseEnemiesPerRound = selectedHordeForConfig.baseEnemies;
+            updated.enemiesPerRoundIncrement = selectedHordeForConfig.enemiesPerRound;
+            updated.waveDelaySeconds = selectedHordeForConfig.waveDelay;
         }
         List<String> roles = this.getAvailableRoles();
         if (!roles.isEmpty() && !HordeService.isRandomEnemyType(updated.enemyType) && !HordeService.isRandomAllEnemyType(updated.enemyType) && HordeService.resolveRoleForEnemyType(roles, updated.enemyType) == null) {
@@ -4810,6 +4833,10 @@ public final class HordeService {
         return bossId == null ? "" : bossId.trim();
     }
 
+    private static String cleanHordeSelectionValue(String hordeId) {
+        return hordeId == null ? "" : hordeId.trim();
+    }
+
     private static BossArenaCatalogService.ArenaDefinitionSnapshot findArenaById(List<BossArenaCatalogService.ArenaDefinitionSnapshot> rows, String arenaId) {
         if (rows == null || rows.isEmpty()) {
             return null;
@@ -4842,6 +4869,25 @@ public final class HordeService {
                 continue;
             }
             if (row.bossId.equalsIgnoreCase(requested)) {
+                return row;
+            }
+        }
+        return null;
+    }
+
+    private static HordeDefinitionCatalogService.HordeDefinitionSnapshot findHordeById(List<HordeDefinitionCatalogService.HordeDefinitionSnapshot> rows, String hordeId) {
+        if (rows == null || rows.isEmpty()) {
+            return null;
+        }
+        String requested = HordeService.cleanHordeSelectionValue(hordeId);
+        if (requested.isBlank()) {
+            return null;
+        }
+        for (HordeDefinitionCatalogService.HordeDefinitionSnapshot row : rows) {
+            if (row == null || row.hordeId == null) {
+                continue;
+            }
+            if (row.hordeId.equalsIgnoreCase(requested)) {
                 return row;
             }
         }
@@ -4985,6 +5031,7 @@ public final class HordeService {
         }
         sanitized.selectedArenaId = HordeService.cleanArenaSelectionValue(sanitized.selectedArenaId);
         sanitized.selectedBossId = HordeService.cleanBossSelectionValue(sanitized.selectedBossId);
+        sanitized.selectedHordeId = HordeService.cleanHordeSelectionValue(sanitized.selectedHordeId);
         sanitized.language = HordeService.normalizeLanguage(sanitized.language);
         sanitized.worldName = sanitized.worldName == null || sanitized.worldName.isBlank() ? "default" : sanitized.worldName;
         return sanitized;
@@ -5166,6 +5213,7 @@ public final class HordeService {
         public String npcRole;
         public String selectedArenaId;
         public String selectedBossId;
+        public String selectedHordeId;
         public String language;
         public int rewardEveryRounds;
         public String rewardCategory;
@@ -5199,6 +5247,7 @@ public final class HordeService {
             defaults.npcRole = "";
             defaults.selectedArenaId = "";
             defaults.selectedBossId = "";
+            defaults.selectedHordeId = "";
             defaults.language = LANGUAGE_SPANISH;
             defaults.rewardEveryRounds = HordeConfigRules.DEFAULT_REWARD_EVERY_ROUNDS;
             defaults.rewardCategory = DEFAULT_REWARD_CATEGORY;
@@ -5234,6 +5283,7 @@ public final class HordeService {
             copy.npcRole = this.npcRole;
             copy.selectedArenaId = this.selectedArenaId;
             copy.selectedBossId = this.selectedBossId;
+            copy.selectedHordeId = this.selectedHordeId;
             copy.language = this.language;
             copy.rewardEveryRounds = this.rewardEveryRounds;
             copy.rewardCategory = this.rewardCategory;
