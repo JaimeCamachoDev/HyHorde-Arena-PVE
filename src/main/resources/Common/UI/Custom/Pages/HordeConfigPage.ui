@@ -211,61 +211,73 @@ Group {
   Panel #CategoryCornerBL {
     Anchor: (Left: 843, Top: 76, Width: 10, Height: 1);
     Background: #2b4a70(0.74);
+    Visible: false;
   }
 
   Panel #CategoryCornerBR {
     Anchor: (Left: 1471, Top: 76, Width: 10, Height: 1);
     Background: #2b4a70(0.74);
+    Visible: false;
   }
 
   Panel #CategoryBarInset {
     Anchor: (Left: 844, Top: 18, Width: 636, Height: 56);
     Background: #142033(0.94);
+    Visible: false;
   }
 
   Panel #CategoryBarBottomEdge {
     Anchor: (Left: 844, Top: 74, Width: 636, Height: 2);
     Background: #355172(0.85);
+    Visible: false;
   }
 
   Panel #TabGeneralPlate {
     Anchor: (Left: 845, Top: 20, Width: 78, Height: 50);
     Background: #243448(0.95);
+    Visible: false;
   }
 
   Panel #TabHordePlate {
     Anchor: (Left: 925, Top: 20, Width: 78, Height: 50);
     Background: #243448(0.95);
+    Visible: false;
   }
 
   Panel #TabPlayersPlate {
     Anchor: (Left: 1005, Top: 20, Width: 78, Height: 50);
     Background: #243448(0.95);
+    Visible: false;
   }
 
   Panel #TabSoundsPlate {
     Anchor: (Left: 1085, Top: 20, Width: 78, Height: 50);
     Background: #243448(0.95);
+    Visible: false;
   }
 
   Panel #TabRewardsPlate {
     Anchor: (Left: 1165, Top: 20, Width: 78, Height: 50);
     Background: #243448(0.95);
+    Visible: false;
   }
 
   Panel #TabBossesPlate {
     Anchor: (Left: 1245, Top: 20, Width: 78, Height: 50);
     Background: #243448(0.95);
+    Visible: false;
   }
 
   Panel #TabArenasPlate {
     Anchor: (Left: 1325, Top: 20, Width: 78, Height: 50);
     Background: #243448(0.95);
+    Visible: false;
   }
 
   Panel #TabHelpPlate {
     Anchor: (Left: 1405, Top: 20, Width: 78, Height: 50);
     Background: #243448(0.95);
+    Visible: false;
   }
 
   Panel #TabGeneralActiveBack {
@@ -1323,15 +1335,13 @@ Group {
   }
 
   Label #BossEditNameLabel { Anchor: (Left: 1048, Top: 280, Width: 170, Height: 22); Text: "Boss ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossEditName { @Anchor = (Left: 1228, Top: 276, Width: 236); Value: ""; }
-  Label #BossEditNpcIdLabel { Anchor: (Left: 1048, Top: 322, Width: 170, Height: 22); Text: "Enemy ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@DropdownBox #BossEditNpcId { @Anchor = (Left: 1228, Top: 318, Width: 236); Value: ""; }
-  Label #BossEditTierLabel { Anchor: (Left: 1048, Top: 364, Width: 170, Height: 22); Text: "Tier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@DropdownBox #BossEditTier { @Anchor = (Left: 1228, Top: 360, Width: 236); Value: "common"; }
-  Label #BossEditAmountLabel { Anchor: (Left: 1048, Top: 406, Width: 100, Height: 22); Text: "Cantidad"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossEditAmount { @Anchor = (Left: 1152, Top: 402, Width: 88); Value: "1"; }
-  Label #BossEditLevelOverrideLabel { Anchor: (Left: 1250, Top: 406, Width: 120, Height: 22); Text: "Nivel fijo"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossEditLevelOverride { @Anchor = (Left: 1372, Top: 402, Width: 92); Value: "0"; }
+  $C.@TextField #BossEditName { @Anchor = (Left: 1228, Top: 276, Width: 220); Value: ""; }
+  Label #BossEditAmountLabel { Anchor: (Left: 1048, Top: 322, Width: 170, Height: 22); Text: "Cantidad"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #BossEditAmount { @Anchor = (Left: 1228, Top: 318, Width: 220); Value: "1"; }
+  Label #BossEditNpcIdLabel { Anchor: (Left: 1048, Top: 364, Width: 170, Height: 22); Text: "Enemy ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@DropdownBox #BossEditNpcId { @Anchor = (Left: 1228, Top: 360, Width: 220); Value: ""; }
+  Label #BossEditTierLabel { Anchor: (Left: 1048, Top: 406, Width: 170, Height: 22); Text: "Tier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@DropdownBox #BossEditTier { @Anchor = (Left: 1228, Top: 402, Width: 220); Value: "common"; }
 
   TextButton #BossSaveButton {
     Anchor: (Left: 1228, Top: 454, Width: 236, Height: 34);
@@ -1577,28 +1587,28 @@ Group {
   Label #ArenaEditIdLabel { Anchor: (Left: 1048, Top: 312, Width: 170, Height: 22); Text: "Arena ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
   $C.@TextField #ArenaEditId { @Anchor = (Left: 1228, Top: 308, Width: 236); Value: ""; }
   Label #ArenaEditXLabel { Anchor: (Left: 1048, Top: 360, Width: 20, Height: 22); Text: "X"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #ArenaEditX { @Anchor = (Left: 1072, Top: 356, Width: 112); Value: "0"; }
-  Label #ArenaEditYLabel { Anchor: (Left: 1192, Top: 360, Width: 20, Height: 22); Text: "Y"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #ArenaEditY { @Anchor = (Left: 1216, Top: 356, Width: 112); Value: "64"; }
-  Label #ArenaEditZLabel { Anchor: (Left: 1336, Top: 360, Width: 20, Height: 22); Text: "Z"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #ArenaEditZ { @Anchor = (Left: 1360, Top: 356, Width: 104); Value: "0"; }
+  $C.@TextField #ArenaEditX { @Anchor = (Left: 1228, Top: 356, Width: 236); Value: "0"; }
+  Label #ArenaEditYLabel { Anchor: (Left: 1048, Top: 402, Width: 20, Height: 22); Text: "Y"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #ArenaEditY { @Anchor = (Left: 1228, Top: 398, Width: 236); Value: "64"; }
+  Label #ArenaEditZLabel { Anchor: (Left: 1048, Top: 444, Width: 20, Height: 22); Text: "Z"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #ArenaEditZ { @Anchor = (Left: 1228, Top: 440, Width: 236); Value: "0"; }
 
   TextButton #ArenaUseCurrentPositionButton {
-    Anchor: (Left: 1228, Top: 404, Width: 236, Height: 34);
+    Anchor: (Left: 1228, Top: 488, Width: 236, Height: 34);
     Text: "Usar mi posicion actual";
     Visible: false;
     Style: $C.@SecondaryTextButtonStyle;
   }
 
   TextButton #ArenaSaveButton {
-    Anchor: (Left: 1228, Top: 448, Width: 236, Height: 34);
+    Anchor: (Left: 1228, Top: 532, Width: 236, Height: 34);
     Text: "Guardar arena";
     Visible: false;
     Style: $C.@SecondaryTextButtonStyle;
   }
 
   Label #ArenaStatusLabel {
-    Anchor: (Left: 1048, Top: 490, Width: 416, Height: 40);
+    Anchor: (Left: 1048, Top: 576, Width: 416, Height: 40);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center);
