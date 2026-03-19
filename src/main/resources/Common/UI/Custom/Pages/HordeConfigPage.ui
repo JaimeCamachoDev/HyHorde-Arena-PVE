@@ -643,6 +643,18 @@ Group {
     Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 500);
   }
 
+  Label #GeneralRewardLabel {
+    Anchor: (Left: 456, Top: 444, Width: 500, Height: 24);
+    Text: "Categoria de recompensa actual";
+    Style: (FontSize: 14, TextColor: #dde8f8, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  $C.@DropdownBox #GeneralRewardId {
+    @Anchor = (Left: 456, Top: 472, Width: 500);
+    Value: "";
+    Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 500);
+  }
+
   Label #SpawnLabel {
     Anchor: (Left: 456, Top: 234, Width: 180, Height: 28);
     Text: "Centro (X Y Z)";
@@ -713,12 +725,14 @@ Group {
   Label #MinRadiusLabel {
     Anchor: (Left: 980, Top: 450, Width: 160, Height: 22);
     Text: "Radio minimo";
+    Visible: false;
     Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center);
   }
 
   $C.@SliderNumberField #MinRadius {
     @Anchor = (Left: 1148, Top: 446, Width: 316);
     Value: 5.0;
+    Visible: false;
     Min: 1.0;
     Max: 128.0;
     Step: 0.5;
@@ -1107,7 +1121,7 @@ Group {
   Panel #PlayerRow10 { Anchor: (Left: 456, Top: 678, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName10 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode10 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen10 { Anchor: (Left: 332, Top: 4, Width: 76, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete10 { Anchor: (Left: 414, Top: 4, Width: 76, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
 
   TextButton #PlayersPagePrevButton { Anchor: (Left: 456, Top: 722, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #PlayersPageLabel { Anchor: (Left: 492, Top: 724, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, VerticalAlignment: Center); }
+  Label #PlayersPageLabel { Anchor: (Left: 492, Top: 724, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
   TextButton #PlayersPageNextButton { Anchor: (Left: 592, Top: 722, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
   Label #PlayersEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
   Label #PlayersOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
@@ -1165,7 +1179,7 @@ Group {
   Panel #RewardCatRow10 { Anchor: (Left: 456, Top: 678, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName10 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview10 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen10 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete10 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
 
   TextButton #RewardCatPagePrevButton { Anchor: (Left: 456, Top: 722, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #RewardCatPageLabel { Anchor: (Left: 492, Top: 724, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, VerticalAlignment: Center); }
+  Label #RewardCatPageLabel { Anchor: (Left: 492, Top: 724, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
   TextButton #RewardCatPageNextButton { Anchor: (Left: 592, Top: 722, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
   Label #RewardCatEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
   Label #RewardCatOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
@@ -1197,7 +1211,7 @@ Group {
   Panel #RewardCatItemRow9 { Anchor: (Left: 1148, Top: 684, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName9 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete9 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
   Panel #RewardCatItemRow10 { Anchor: (Left: 1148, Top: 712, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName10 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete10 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
   TextButton #RewardCatItemsPagePrevButton { Anchor: (Left: 1148, Top: 742, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #RewardCatItemsPageLabel { Anchor: (Left: 1184, Top: 744, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, VerticalAlignment: Center); }
+  Label #RewardCatItemsPageLabel { Anchor: (Left: 1184, Top: 744, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
   TextButton #RewardCatItemsPageNextButton { Anchor: (Left: 1284, Top: 742, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
   Label #RewardCatItemsOverflowLabel { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Text: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
   Label #RewardCatEditItemsHelpLabel { Anchor: (Left: 980, Top: 732, Width: 484, Height: 28); Text: "Usa desplegable para anadir item IDs"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center); }
@@ -1343,7 +1357,7 @@ Group {
   }
 
   TextButton #EnemyCatPagePrevButton { Anchor: (Left: 456, Top: 722, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #EnemyCatPageLabel { Anchor: (Left: 492, Top: 724, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, VerticalAlignment: Center); }
+  Label #EnemyCatPageLabel { Anchor: (Left: 492, Top: 724, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
   TextButton #EnemyCatPageNextButton { Anchor: (Left: 592, Top: 722, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
   Label #EnemyCatEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
   Label #EnemyCatOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
@@ -1389,7 +1403,7 @@ Group {
   Panel #EnemyCatRoleRow9 { Anchor: (Left: 1148, Top: 684, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName9 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete9 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
   Panel #EnemyCatRoleRow10 { Anchor: (Left: 1148, Top: 712, Width: 316, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName10 { Anchor: (Left: 8, Top: 3, Width: 272, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete10 { Anchor: (Left: 284, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
   TextButton #EnemyCatRolesPagePrevButton { Anchor: (Left: 1148, Top: 742, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #EnemyCatRolesPageLabel { Anchor: (Left: 1184, Top: 744, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, VerticalAlignment: Center); }
+  Label #EnemyCatRolesPageLabel { Anchor: (Left: 1184, Top: 744, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
   TextButton #EnemyCatRolesPageNextButton { Anchor: (Left: 1284, Top: 742, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
   Label #EnemyCatRolesOverflowLabel { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Text: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
 
@@ -1544,7 +1558,7 @@ Group {
   }
 
   TextButton #HordePagePrevButton { Anchor: (Left: 456, Top: 722, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #HordePageLabel { Anchor: (Left: 492, Top: 724, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, VerticalAlignment: Center); }
+  Label #HordePageLabel { Anchor: (Left: 492, Top: 724, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
   TextButton #HordePageNextButton { Anchor: (Left: 592, Top: 722, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
   Label #HordeEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
   Label #HordeOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
@@ -1793,7 +1807,7 @@ Group {
     Anchor: (Left: 492, Top: 724, Width: 96, Height: 24);
     Text: "0/0";
     Visible: false;
-    Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, VerticalAlignment: Center);
+    Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
 
   TextButton #BossPageNextButton {
@@ -2022,7 +2036,7 @@ Group {
   }
 
   TextButton #ArenaPagePrevButton { Anchor: (Left: 456, Top: 722, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #ArenaPageLabel { Anchor: (Left: 492, Top: 724, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, VerticalAlignment: Center); }
+  Label #ArenaPageLabel { Anchor: (Left: 492, Top: 724, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
   TextButton #ArenaPageNextButton { Anchor: (Left: 592, Top: 722, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
   Label #ArenaEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
   Label #ArenaOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }

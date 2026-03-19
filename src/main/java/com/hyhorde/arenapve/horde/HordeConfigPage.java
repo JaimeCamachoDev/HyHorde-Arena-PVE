@@ -81,7 +81,7 @@ extends CustomUIPage {
             new UiFieldBinding("rewardCatEditItems", "RewardCatEditItems", "#RewardCatEditItems.Value"),
             new UiFieldBinding("rewardCatItemPicker", "RewardCatItemPicker", "#RewardCatItemPicker.Value"),
             new UiFieldBinding("language", "Language", "#Language.Value"),
-            new UiFieldBinding("rewardCategory", "RewardCategory", "#RewardCategory.Value"),
+            new UiFieldBinding("rewardCategory", "RewardCategory", "#GeneralRewardId.Value"),
             new UiFieldBinding("rewardItemId", "RewardItemId", "#RewardItemId.Value"),
             new UiFieldBinding("rewardItemQuantity", "RewardItemQuantity", "#RewardItemQuantity.Value"),
             new UiFieldBinding("finalBossEnabled", "FinalBossEnabled", "#FinalBossEnabled.Value"),
@@ -155,6 +155,7 @@ extends CustomUIPage {
         List<String> languageOptions = this.hordeService.getLanguageOptions();
         List<String> roundStartSoundOptions = this.hordeService.getRoundStartSoundOptions();
         List<String> roundVictorySoundOptions = this.hordeService.getRoundVictorySoundOptions();
+        List<String> rewardCategoryOptions = this.hordeService.getRewardCategoryOptions();
         List<String> rewardItemCatalogOptions = HordeConfigPage.filterRewardItemPickerOptions(this.hordeService.getRewardItemSuggestions((String)null));
         String enemyTypeValue = HordeConfigPage.normalizeEnemyTypeInput(this.getDraftValue("enemyType", config.enemyType == null ? "undead" : config.enemyType));
         String roundStartSoundValue = this.getDraftValue("roundStartSoundId", this.hordeService.getRoundStartSoundSelection());
@@ -207,6 +208,11 @@ extends CustomUIPage {
             this.draftValues.put("selectedHordeId", selectedHordeForConfigValue);
         }
         selectedHordeForConfigValue = this.getDraftValue("selectedHordeId", "");
+        String selectedRewardCategoryForConfigValue = HordeConfigPage.firstNonEmpty(this.getDraftValue("rewardCategory", ""), config.rewardCategory, this.hordeService.getRewardCategory(), HordeConfigPage.firstEnemyRoleOption(rewardCategoryOptions), "");
+        if (!selectedRewardCategoryForConfigValue.isBlank()) {
+            this.draftValues.put("rewardCategory", selectedRewardCategoryForConfigValue);
+        }
+        selectedRewardCategoryForConfigValue = this.getDraftValue("rewardCategory", "");
         String bossSelectedValue = this.getDraftValue("bossSelected", "");
         String bossNpcIdValue = this.getDraftValue("bossEditNpcId", "");
         String arenaSelectedValue = this.getDraftValue("arenaSelected", "");
@@ -231,6 +237,7 @@ extends CustomUIPage {
         List<DropdownEntryInfo> generalArenaEntries = HordeConfigPage.buildDropdownEntries(HordeConfigPage.collectArenaIds(arenaRows), selectedArenaForHordeValue);
         List<DropdownEntryInfo> generalBossEntries = HordeConfigPage.buildDropdownEntries(HordeConfigPage.collectBossIds(bossRows), selectedBossForHordeValue);
         List<DropdownEntryInfo> generalHordeEntries = HordeConfigPage.buildDropdownEntries(HordeConfigPage.collectHordeIds(hordeRows), selectedHordeForConfigValue);
+        List<DropdownEntryInfo> generalRewardEntries = HordeConfigPage.buildRewardCategoryEntries(rewardCategoryOptions, selectedRewardCategoryForConfigValue, language, english);
         List<DropdownEntryInfo> playerModeEntries = HordeConfigPage.buildPlayerModeEntries(language, english, playerEditModeValue);
         List<DropdownEntryInfo> enemyCategoryRolePickerEntries = HordeConfigPage.buildDropdownEntries(enemyRoleOptions, enemyCategoryRolePickerValue);
         List<DropdownEntryInfo> rewardCategoryItemPickerEntries = HordeConfigPage.buildDropdownEntries(rewardItemCatalogOptions, rewardCategoryItemPickerValue);
@@ -264,6 +271,8 @@ extends CustomUIPage {
                 .set("#GeneralBossId.Entries", generalBossEntries)
                 .set("#GeneralHordeId.Value", selectedHordeForConfigValue)
                 .set("#GeneralHordeId.Entries", generalHordeEntries)
+                .set("#GeneralRewardId.Value", selectedRewardCategoryForConfigValue)
+                .set("#GeneralRewardId.Entries", generalRewardEntries)
                 .set("#HordeSelected.Value", hordeSelectedValue)
                 .set("#HordeEditId.Value", this.getDraftValue("hordeEditId", hordeSelectedValue))
                 .set("#HordeStatusLabel.Text", this.hordeStatusText == null ? "" : this.hordeStatusText)
@@ -1541,7 +1550,7 @@ extends CustomUIPage {
         HordeConfigPage.putIfNotBlank(values, "hordeSelected", this.getDraftValue("hordeSelected", ""));
         HordeConfigPage.putIfNotBlank(values, "hordeEditId", this.getDraftValue("hordeEditId", ""));
         HordeConfigPage.putIfNotBlank(values, "enemyType", this.getDraftValue("enemyType", ""));
-        HordeConfigPage.putIfNotBlank(values, "minRadius", this.getDraftValue("minRadius", ""));
+        values.put("minRadius", "1");
         HordeConfigPage.putIfNotBlank(values, "maxRadius", this.getDraftValue("maxRadius", ""));
         HordeConfigPage.putIfNotBlank(values, "rounds", this.getDraftValue("rounds", ""));
         HordeConfigPage.putIfNotBlank(values, "baseEnemies", this.getDraftValue("baseEnemies", ""));
@@ -1903,12 +1912,12 @@ extends CustomUIPage {
                         || "selectedArenaId".equals(field.configKey)
                         || "selectedBossId".equals(field.configKey)
                         || "selectedHordeId".equals(field.configKey)
+                        || "rewardCategory".equals(field.configKey)
                         || "finalBossEnabled".equals(field.configKey)
                         || "language".equals(field.configKey);
             case TAB_HORDE:
                 return "hordeSelected".equals(field.configKey)
                         || "hordeEditId".equals(field.configKey)
-                        || "minRadius".equals(field.configKey)
                         || "maxRadius".equals(field.configKey)
                         || "rounds".equals(field.configKey)
                         || "baseEnemies".equals(field.configKey)
@@ -2220,6 +2229,7 @@ extends CustomUIPage {
                 .set("#GeneralArenaLabel.Text", HordeConfigPage.t(language, english, "Current horde arena", "Arena actual de la horda"))
                 .set("#GeneralBossLabel.Text", HordeConfigPage.t(language, english, "Current horde boss", "Boss actual de la horda"))
                 .set("#GeneralHordeLabel.Text", HordeConfigPage.t(language, english, "Current horde", "Horda actual"))
+                .set("#GeneralRewardLabel.Text", HordeConfigPage.t(language, english, "Current reward category", "Categoria de recompensa actual"))
                 .set("#SpawnLabel.Text", HordeConfigPage.t(language, english, "Center (X Y Z)", "Centro (X Y Z)"))
                 .set("#SetSpawnButton.Text", HordeConfigPage.t(language, english, "Use my current position", "Usar mi posicion actual"))
                 .set("#RadiusLabel.Text", HordeConfigPage.t(language, english, "Enemy spawn radius setup", "Configuracion del radio de aparicion de enemigos"))
@@ -2365,9 +2375,9 @@ extends CustomUIPage {
         boolean arenasTab = TAB_ARENAS.equals(tab);
         boolean helpTab = TAB_HELP.equals(tab);
 
-        this.setVisible(commandBuilder, generalTab, "#GeneralArenaLabel", "#GeneralArenaId", "#GeneralBossLabel", "#GeneralBossId", "#GeneralHordeLabel", "#GeneralHordeId", "#FinalBossLabel", "#FinalBossEnabled", "#LanguageLabel", "#Language", "#AutoStartEnabledLabel", "#AutoStartEnabled", "#AutoStartIntervalLabel", "#AutoStartInterval", "#AutoStartApplyButton");
+        this.setVisible(commandBuilder, generalTab, "#GeneralArenaLabel", "#GeneralArenaId", "#GeneralBossLabel", "#GeneralBossId", "#GeneralHordeLabel", "#GeneralHordeId", "#GeneralRewardLabel", "#GeneralRewardId", "#FinalBossLabel", "#FinalBossEnabled", "#LanguageLabel", "#Language", "#AutoStartEnabledLabel", "#AutoStartEnabled", "#AutoStartIntervalLabel", "#AutoStartInterval", "#AutoStartApplyButton");
         this.setVisible(commandBuilder, enemiesTab, "#EnemyCatTitleLabel", "#EnemyCatAddButton", "#EnemyCatHeaderName", "#EnemyCatHeaderPreview", "#EnemyCatHeaderActions", "#EnemyCatPagePrevButton", "#EnemyCatPageNextButton", "#EnemyCatPageLabel", "#EnemyCatEmptyLabel", "#EnemyCatOverflowLabel", "#EnemyCatEditorTitleLabel", "#EnemyCatEditIdLabel", "#EnemyCatEditId", "#EnemyCatRolePickerLabel", "#EnemyCatRolePicker", "#EnemyCatRoleAddButton", "#EnemyCatEditRolesLabel", "#EnemyCatRolesPagePrevButton", "#EnemyCatRolesPageNextButton", "#EnemyCatRolesPageLabel", "#EnemyCatSaveButton", "#EnemyCatRow1", "#EnemyCatRow2", "#EnemyCatRow3", "#EnemyCatRow4", "#EnemyCatRow5", "#EnemyCatRow6", "#EnemyCatRow7", "#EnemyCatRow8", "#EnemyCatRow9", "#EnemyCatRow10", "#EnemyCatRoleRow1", "#EnemyCatRoleRow2", "#EnemyCatRoleRow3", "#EnemyCatRoleRow4", "#EnemyCatRoleRow5", "#EnemyCatRoleRow6", "#EnemyCatRoleRow7", "#EnemyCatRoleRow8", "#EnemyCatRoleRow9", "#EnemyCatRoleRow10");
-        this.setVisible(commandBuilder, hordeTab, "#HordesTitleLabel", "#HordeAddButton", "#HordeHeaderId", "#HordeHeaderType", "#HordeHeaderRounds", "#HordeHeaderActions", "#HordePagePrevButton", "#HordePageNextButton", "#HordePageLabel", "#HordeEmptyLabel", "#HordeOverflowLabel", "#HordeEditorTitleLabel", "#HordeEditIdLabel", "#HordeEditId", "#RoleLabel", "#EnemyType", "#MinRadiusLabel", "#MinRadius", "#MaxRadiusLabel", "#MaxRadius", "#RoundLabel", "#Rounds", "#WaveDelayLabel", "#WaveDelay", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound", "#HordeSaveButton", "#HordeStatusLabel", "#HordeRow1", "#HordeRow2", "#HordeRow3", "#HordeRow4", "#HordeRow5", "#HordeRow6", "#HordeRow7", "#HordeRow8", "#HordeRow9", "#HordeRow10");
+        this.setVisible(commandBuilder, hordeTab, "#HordesTitleLabel", "#HordeAddButton", "#HordeHeaderId", "#HordeHeaderType", "#HordeHeaderRounds", "#HordeHeaderActions", "#HordePagePrevButton", "#HordePageNextButton", "#HordePageLabel", "#HordeEmptyLabel", "#HordeOverflowLabel", "#HordeEditorTitleLabel", "#HordeEditIdLabel", "#HordeEditId", "#RoleLabel", "#EnemyType", "#MaxRadiusLabel", "#MaxRadius", "#RoundLabel", "#Rounds", "#WaveDelayLabel", "#WaveDelay", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound", "#HordeSaveButton", "#HordeRow1", "#HordeRow2", "#HordeRow3", "#HordeRow4", "#HordeRow5", "#HordeRow6", "#HordeRow7", "#HordeRow8", "#HordeRow9", "#HordeRow10");
         this.setVisible(commandBuilder, playersTab, "#PlayersTitleLabel", "#PlayersAddButton", "#PlayersHeaderName", "#PlayersHeaderMode", "#PlayersHeaderActions", "#PlayersPagePrevButton", "#PlayersPageNextButton", "#PlayersPageLabel", "#PlayersEmptyLabel", "#PlayersOverflowLabel", "#PlayersEditorTitleLabel", "#PlayerSelected", "#PlayerEditModeLabel", "#PlayerEditMode", "#PlayersSaveButton", "#PlayerStatusLabel", "#ArenaJoinRadiusLabel", "#ArenaJoinRadius", "#PlayerRow1", "#PlayerRow2", "#PlayerRow3", "#PlayerRow4", "#PlayerRow5", "#PlayerRow6", "#PlayerRow7", "#PlayerRow8", "#PlayerRow9", "#PlayerRow10");
         this.setVisible(commandBuilder, soundsTab, "#RoundStartSoundLabel", "#RoundStartSoundId", "#RoundStartVolumeLabel", "#RoundStartVolume", "#RoundVictorySoundLabel", "#RoundVictorySoundId", "#RoundVictoryVolumeLabel", "#RoundVictoryVolume");
         this.setVisible(commandBuilder, rewardsTab, "#RewardCatTitleLabel", "#RewardCatAddButton", "#RewardCatHeaderName", "#RewardCatHeaderPreview", "#RewardCatHeaderActions", "#RewardCatPagePrevButton", "#RewardCatPageNextButton", "#RewardCatPageLabel", "#RewardCatEmptyLabel", "#RewardCatOverflowLabel", "#RewardCatEditorTitleLabel", "#RewardCatEditIdLabel", "#RewardCatEditId", "#RewardCatItemPickerLabel", "#RewardCatItemPicker", "#RewardCatItemAddButton", "#RewardCatEditItemsLabel", "#RewardCatItemsPagePrevButton", "#RewardCatItemsPageNextButton", "#RewardCatItemsPageLabel", "#RewardCatSaveButton", "#RewardCatStatusLabel", "#RewardCatRow1", "#RewardCatRow2", "#RewardCatRow3", "#RewardCatRow4", "#RewardCatRow5", "#RewardCatRow6", "#RewardCatRow7", "#RewardCatRow8", "#RewardCatRow9", "#RewardCatRow10", "#RewardCatItemRow1", "#RewardCatItemRow2", "#RewardCatItemRow3", "#RewardCatItemRow4", "#RewardCatItemRow5", "#RewardCatItemRow6", "#RewardCatItemRow7", "#RewardCatItemRow8", "#RewardCatItemRow9", "#RewardCatItemRow10");
