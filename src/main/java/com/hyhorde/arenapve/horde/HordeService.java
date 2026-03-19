@@ -173,6 +173,7 @@ public final class HordeService {
     private final Path enemyCategoriesPath;
     private final Path rewardItemsPath;
     private final Path roundSoundsPath;
+    private final BossArenaCatalogService bossArenaCatalogService;
     private final Map<UUID, HordeStatusPage> statusPages;
     private final Set<UUID> spectatorOverrides;
     private final Set<UUID> audienceExitOverrides;
@@ -195,6 +196,7 @@ public final class HordeService {
         this.enemyCategoriesPath = plugin.getDataDirectory().resolve("enemy-categories.json");
         this.rewardItemsPath = plugin.getDataDirectory().resolve("reward-items.json");
         this.roundSoundsPath = plugin.getDataDirectory().resolve("horde-sounds.json");
+        this.bossArenaCatalogService = new BossArenaCatalogService(plugin, this.gson, plugin.getDataDirectory());
         this.statusPages = new HashMap<UUID, HordeStatusPage>();
         this.spectatorOverrides = new HashSet<UUID>();
         this.audienceExitOverrides = new HashSet<UUID>();
@@ -422,6 +424,66 @@ public final class HordeService {
 
     public synchronized String getRewardCategory() {
         return HordeService.normalizeRewardCategory(this.config.rewardCategory);
+    }
+
+    public synchronized List<String> getBossTierOptions() {
+        return this.bossArenaCatalogService.getBossTierOptions();
+    }
+
+    public synchronized List<BossArenaCatalogService.BossDefinitionSnapshot> getBossDefinitionsSnapshot() {
+        return this.bossArenaCatalogService.getBossDefinitionsSnapshot();
+    }
+
+    public synchronized List<BossArenaCatalogService.ArenaDefinitionSnapshot> getArenaDefinitionsSnapshot() {
+        return this.bossArenaCatalogService.getArenaDefinitionsSnapshot();
+    }
+
+    public synchronized OperationResult createBossDraft(String requestedBossId) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        return this.bossArenaCatalogService.createBossDraft(requestedBossId, english);
+    }
+
+    public synchronized OperationResult saveBossDefinitionFromUi(Map<String, String> values) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        return this.bossArenaCatalogService.upsertBossFromValues(values, english);
+    }
+
+    public synchronized OperationResult deleteBossDefinition(String bossId) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        return this.bossArenaCatalogService.deleteBoss(bossId, english);
+    }
+
+    public synchronized OperationResult createArenaFromPlayerDraft(PlayerRef playerRef, World world, String requestedArenaId) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        return this.bossArenaCatalogService.createArenaFromPlayer(playerRef, world, requestedArenaId, english);
+    }
+
+    public synchronized OperationResult saveArenaDefinitionFromUi(Map<String, String> values, String fallbackWorldName) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        return this.bossArenaCatalogService.upsertArenaFromValues(values, fallbackWorldName, english);
+    }
+
+    public synchronized OperationResult deleteArenaDefinition(String arenaId) {
+        boolean english = HordeService.isEnglishLanguage(this.config.language);
+        if (this.pluginReloadInProgress) {
+            return OperationResult.fail(english ? "Plugin reload in progress. Try again in a few seconds." : "Recarga de plugin en progreso. Prueba de nuevo en unos segundos.");
+        }
+        return this.bossArenaCatalogService.deleteArena(arenaId, english);
     }
 
     public synchronized List<String> getRoundStartSoundOptions() {

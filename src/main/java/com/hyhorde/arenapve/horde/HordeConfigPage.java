@@ -17,6 +17,8 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.math.vector.Transform;
+import com.hypixel.hytale.math.vector.Vector3d;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +34,13 @@ extends CustomUIPage {
     private static final String TAB_PLAYERS = "players";
     private static final String TAB_SOUNDS = "sounds";
     private static final String TAB_REWARDS = "rewards";
+    private static final String TAB_BOSSES = "bosses";
+    private static final String TAB_ARENAS = "arenas";
     private static final String TAB_HELP = "help";
     private static final int MAX_AUDIENCE_ROWS = Integer.MAX_VALUE;
+    private static final int MAX_BOSS_ROWS = 4;
+    private static final int MAX_ARENA_ROWS = 10;
+    private static final List<String> BOSS_SPAWN_TRIGGER_OPTIONS = List.of("before_boss", "on_spawn", "after_spawn_seconds", "since_last_wave", "boss_hp_percent");
     private static final UiFieldBinding[] SNAPSHOT_FIELDS = new UiFieldBinding[]{
             new UiFieldBinding("spawnX", "SpawnX", "#SpawnX.Value"),
             new UiFieldBinding("spawnY", "SpawnY", "#SpawnY.Value"),
@@ -60,17 +67,46 @@ extends CustomUIPage {
             new UiFieldBinding("roundStartSoundId", "RoundStartSoundId", "#RoundStartSoundId.Value"),
             new UiFieldBinding("roundStartVolume", "RoundStartVolume", "#RoundStartVolume.Value"),
             new UiFieldBinding("roundVictorySoundId", "RoundVictorySoundId", "#RoundVictorySoundId.Value"),
-            new UiFieldBinding("roundVictoryVolume", "RoundVictoryVolume", "#RoundVictoryVolume.Value")
+            new UiFieldBinding("roundVictoryVolume", "RoundVictoryVolume", "#RoundVictoryVolume.Value"),
+            new UiFieldBinding("bossCreateId", "BossCreateId", "#BossCreateId.Value"),
+            new UiFieldBinding("bossSelected", "BossSelected", "#BossSelected.Value"),
+            new UiFieldBinding("bossEditName", "BossEditName", "#BossEditName.Value"),
+            new UiFieldBinding("bossEditNpcId", "BossEditNpcId", "#BossEditNpcId.Value"),
+            new UiFieldBinding("bossEditTier", "BossEditTier", "#BossEditTier.Value"),
+            new UiFieldBinding("bossEditAmount", "BossEditAmount", "#BossEditAmount.Value"),
+            new UiFieldBinding("bossEditLevelOverride", "BossEditLevelOverride", "#BossEditLevelOverride.Value"),
+            new UiFieldBinding("bossEditLootRadius", "BossEditLootRadius", "#BossEditLootRadius.Value"),
+            new UiFieldBinding("bossSpawnTrigger", "BossSpawnTrigger", "#BossSpawnTrigger.Value"),
+            new UiFieldBinding("bossSpawnTriggerValue", "BossSpawnTriggerValue", "#BossSpawnTriggerValue.Value"),
+            new UiFieldBinding("bossWaveRandomLocations", "BossWaveRandomLocations", "#BossWaveRandomLocations.Value"),
+            new UiFieldBinding("bossWaveRandomRadius", "BossWaveRandomRadius", "#BossWaveRandomRadius.Value"),
+            new UiFieldBinding("bossTimedProximityEnabled", "BossTimedProximityEnabled", "#BossTimedProximityEnabled.Value"),
+            new UiFieldBinding("bossTimedProximityArena", "BossTimedProximityArena", "#BossTimedProximityArena.Value"),
+            new UiFieldBinding("bossTimedProximityRadius", "BossTimedProximityRadius", "#BossTimedProximityRadius.Value"),
+            new UiFieldBinding("bossTimedProximityCooldown", "BossTimedProximityCooldown", "#BossTimedProximityCooldown.Value"),
+            new UiFieldBinding("arenaSelected", "ArenaSelected", "#ArenaSelected.Value"),
+            new UiFieldBinding("arenaEditId", "ArenaEditId", "#ArenaEditId.Value"),
+            new UiFieldBinding("arenaEditX", "ArenaEditX", "#ArenaEditX.Value"),
+            new UiFieldBinding("arenaEditY", "ArenaEditY", "#ArenaEditY.Value"),
+            new UiFieldBinding("arenaEditZ", "ArenaEditZ", "#ArenaEditZ.Value")
     };
     private final HordeService hordeService;
     private final Map<String, String> draftValues;
     private String activeTab;
+    private int bossPage;
+    private int arenaPage;
+    private String bossStatusText;
+    private String arenaStatusText;
 
     private HordeConfigPage(PlayerRef playerRef, HordeService hordeService) {
         super(playerRef, CustomPageLifetime.CanDismiss);
         this.hordeService = hordeService;
         this.draftValues = new HashMap<String, String>();
         this.activeTab = TAB_GENERAL;
+        this.bossPage = 0;
+        this.arenaPage = 0;
+        this.bossStatusText = "";
+        this.arenaStatusText = "";
     }
 
     public static void open(Ref<EntityStore> playerEntityRef, Store<EntityStore> store, Player player, PlayerRef playerRef, HordeService hordeService) {
@@ -120,6 +156,20 @@ extends CustomUIPage {
         EntityStore entityStore = (EntityStore)store.getExternalData();
         World world = entityStore == null ? null : entityStore.getWorld();
         List<HordeService.AudiencePlayerSnapshot> audienceRows = world == null ? List.of() : this.hordeService.getArenaAudiencePlayers(world);
+        List<BossArenaCatalogService.BossDefinitionSnapshot> bossRows = this.hordeService.getBossDefinitionsSnapshot();
+        List<BossArenaCatalogService.ArenaDefinitionSnapshot> arenaRows = this.hordeService.getArenaDefinitionsSnapshot();
+        this.ensureBossDraftDefaults(bossRows, arenaRows);
+        this.ensureArenaDraftDefaults(arenaRows);
+        String bossSelectedValue = this.getDraftValue("bossSelected", "");
+        String arenaSelectedValue = this.getDraftValue("arenaSelected", "");
+        String bossTierValue = this.getDraftValue("bossEditTier", "common");
+        String bossSpawnTriggerValue = this.getDraftValue("bossSpawnTrigger", "before_boss");
+        String bossTimedProximityArenaValue = this.getDraftValue("bossTimedProximityArena", "");
+        List<DropdownEntryInfo> bossTierEntries = HordeConfigPage.buildDropdownEntries(this.hordeService.getBossTierOptions(), bossTierValue);
+        List<DropdownEntryInfo> bossSpawnTriggerEntries = HordeConfigPage.buildBossSpawnTriggerEntries(BOSS_SPAWN_TRIGGER_OPTIONS, bossSpawnTriggerValue, language, english);
+        List<DropdownEntryInfo> bossTimedProximityArenaEntries = HordeConfigPage.buildDropdownEntries(HordeConfigPage.collectArenaIds(arenaRows), bossTimedProximityArenaValue);
+        this.bossPage = HordeConfigPage.clamp(this.bossPage, 0, HordeConfigPage.maxPageIndex(bossRows == null ? 0 : bossRows.size(), MAX_BOSS_ROWS));
+        this.arenaPage = HordeConfigPage.clamp(this.arenaPage, 0, HordeConfigPage.maxPageIndex(arenaRows == null ? 0 : arenaRows.size(), MAX_ARENA_ROWS));
         // IMPORTANT (recurring crash pattern in Hytale CustomUI):
         // Do NOT push SliderNumberField `.Value` from Java on build/rebuild.
         // In this runtime it repeatedly crashes clients/servers with:
@@ -153,6 +203,32 @@ extends CustomUIPage {
                 .set("#RoundVictorySoundId.Entries", roundVictorySoundEntries)
                 .set("#EnemyLevelMin.Value", this.getDraftValue("enemyLevelMin", Integer.toString(config.enemyLevelMin)))
                 .set("#EnemyLevelMax.Value", this.getDraftValue("enemyLevelMax", Integer.toString(config.enemyLevelMax)))
+                .set("#BossCreateId.Value", this.getDraftValue("bossCreateId", ""))
+                .set("#BossSelected.Value", bossSelectedValue)
+                .set("#BossEditName.Value", this.getDraftValue("bossEditName", bossSelectedValue))
+                .set("#BossEditNpcId.Value", this.getDraftValue("bossEditNpcId", ""))
+                .set("#BossEditTier.Value", bossTierValue)
+                .set("#BossEditTier.Entries", bossTierEntries)
+                .set("#BossEditAmount.Value", this.getDraftValue("bossEditAmount", "1"))
+                .set("#BossEditLevelOverride.Value", this.getDraftValue("bossEditLevelOverride", "0"))
+                .set("#BossEditLootRadius.Value", this.getDraftValue("bossEditLootRadius", "0"))
+                .set("#BossSpawnTrigger.Value", bossSpawnTriggerValue)
+                .set("#BossSpawnTrigger.Entries", bossSpawnTriggerEntries)
+                .set("#BossSpawnTriggerValue.Value", this.getDraftValue("bossSpawnTriggerValue", "0"))
+                .set("#BossWaveRandomLocations.Value", this.getDraftBoolean("bossWaveRandomLocations", false))
+                .set("#BossWaveRandomRadius.Value", this.getDraftValue("bossWaveRandomRadius", "0"))
+                .set("#BossTimedProximityEnabled.Value", this.getDraftBoolean("bossTimedProximityEnabled", false))
+                .set("#BossTimedProximityArena.Value", bossTimedProximityArenaValue)
+                .set("#BossTimedProximityArena.Entries", bossTimedProximityArenaEntries)
+                .set("#BossTimedProximityRadius.Value", this.getDraftValue("bossTimedProximityRadius", "0"))
+                .set("#BossTimedProximityCooldown.Value", this.getDraftValue("bossTimedProximityCooldown", "0"))
+                .set("#BossStatusLabel.Text", this.bossStatusText == null ? "" : this.bossStatusText)
+                .set("#ArenaSelected.Value", arenaSelectedValue)
+                .set("#ArenaEditId.Value", this.getDraftValue("arenaEditId", arenaSelectedValue))
+                .set("#ArenaEditX.Value", this.getDraftValue("arenaEditX", "0"))
+                .set("#ArenaEditY.Value", this.getDraftValue("arenaEditY", "64"))
+                .set("#ArenaEditZ.Value", this.getDraftValue("arenaEditZ", "0"))
+                .set("#ArenaStatusLabel.Text", this.arenaStatusText == null ? "" : this.arenaStatusText)
                 .set("#AudienceInfoLabel.Text", HordeConfigPage.buildAudienceInfo(config.arenaJoinRadius, audienceRows.size(), language))
                 .set("#PlayersCountValue.Text", Integer.toString(audienceRows.size()))
                 .set("#PlayersListHint.Text", HordeConfigPage.buildAudienceRowsHint(audienceRows.size(), language))
@@ -164,7 +240,15 @@ extends CustomUIPage {
                 .set("#SkipRoundButton.Visible", active);
         this.setLocalizedTexts(commandBuilder, language, english);
         this.applyTabVisibility(commandBuilder, tab);
-        this.populateAudienceRows(commandBuilder, eventBuilder, audienceRows, language, english);
+        if (TAB_PLAYERS.equals(tab)) {
+            this.populateAudienceRows(commandBuilder, eventBuilder, audienceRows, language, english);
+        }
+        if (TAB_BOSSES.equals(tab)) {
+            this.populateBossRows(commandBuilder, eventBuilder, bossRows, language, english);
+        }
+        if (TAB_ARENAS.equals(tab)) {
+            this.populateArenaRows(commandBuilder, eventBuilder, arenaRows, language, english);
+        }
         // IMPORTANT: Dropdowns like #Language must use ValueChanged.
         // Using Activating on dropdowns triggers client crash: "Failed to apply CustomUI event bindings".
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#HordeCloseButton", EventData.of((String)"action", (String)"close"))
@@ -173,9 +257,19 @@ extends CustomUIPage {
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabPlayersButton", this.buildLanguageEvent("tab_players"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabSoundsButton", this.buildLanguageEvent("tab_sounds"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabRewardsButton", this.buildLanguageEvent("tab_rewards"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#TabBossesButton", this.buildLanguageEvent("tab_bosses"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#TabArenasButton", this.buildLanguageEvent("tab_arenas"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#TabHelpButton", this.buildLanguageEvent("tab_help"))
-                .addEventBinding(CustomUIEventBindingType.Activating, "#SetSpawnButton", this.buildLanguageEvent("set_spawn_here"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#PlayersRefreshButton", this.buildLanguageEvent("refresh_players"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#BossAddButton", this.buildConfigSnapshotEvent("boss_add"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#BossSaveButton", this.buildConfigSnapshotEvent("boss_save"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#BossPagePrevButton", this.buildConfigSnapshotEvent("boss_page_prev"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#BossPageNextButton", this.buildConfigSnapshotEvent("boss_page_next"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaAddButton", this.buildConfigSnapshotEvent("arena_add_from_player"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaSaveButton", this.buildConfigSnapshotEvent("arena_save"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaUseCurrentPositionButton", this.buildConfigSnapshotEvent("arena_use_current_position"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaPagePrevButton", this.buildConfigSnapshotEvent("arena_page_prev"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaPageNextButton", this.buildConfigSnapshotEvent("arena_page_next"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#ReloadModButton", this.buildLanguageEvent("reload_config"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#AutoStartApplyButton", this.buildConfigSnapshotEvent("apply_auto_start"))
                 .addEventBinding(CustomUIEventBindingType.ValueChanged, "#Language", this.buildLanguageEvent("set_language"))
@@ -246,6 +340,16 @@ extends CustomUIPage {
                     tabSwitched = true;
                     break;
                 }
+                case "tab_bosses": {
+                    this.activeTab = TAB_BOSSES;
+                    tabSwitched = true;
+                    break;
+                }
+                case "tab_arenas": {
+                    this.activeTab = TAB_ARENAS;
+                    tabSwitched = true;
+                    break;
+                }
                 case "tab_help": {
                     this.activeTab = TAB_HELP;
                     tabSwitched = true;
@@ -294,7 +398,19 @@ extends CustomUIPage {
                     break;
                 }
                 default: {
-                    result = this.handleAudienceAction(action, world, english);
+                    if (action != null && action.startsWith("audience_set:")) {
+                        result = this.handleAudienceAction(action, world, english);
+                        break;
+                    }
+                    if (action != null && action.startsWith("boss_")) {
+                        result = this.handleBossAction(action, english);
+                        break;
+                    }
+                    if (action != null && action.startsWith("arena_")) {
+                        result = this.handleArenaAction(action, world, fallbackWorldName(world), english);
+                        break;
+                    }
+                    result = HordeService.OperationResult.fail(english ? "Unknown UI action: " + action : "Accion de UI desconocida: " + action);
                 }
             }
             if (tabSwitched) {
@@ -333,7 +449,8 @@ extends CustomUIPage {
             case "apply_auto_start":
             case "save":
             case "skip_round":
-            case "start": {
+            case "start":
+            case "arena_add_from_player": {
                 return true;
             }
         }
@@ -358,6 +475,135 @@ extends CustomUIPage {
             return HordeService.OperationResult.fail(english ? "Could not parse selected player UUID." : "No se pudo interpretar el UUID del jugador seleccionado.");
         }
         return this.hordeService.setArenaAudienceMode(playerId, mode, world);
+    }
+
+    private HordeService.OperationResult handleBossAction(String action, boolean english) {
+        if (action == null || action.isBlank()) {
+            return HordeService.OperationResult.fail(english ? "Unknown boss action." : "Accion de bosses desconocida.");
+        }
+        if ("boss_page_prev".equals(action)) {
+            this.bossPage = Math.max(0, this.bossPage - 1);
+            return null;
+        }
+        if ("boss_page_next".equals(action)) {
+            this.bossPage = this.bossPage + 1;
+            return null;
+        }
+        if ("boss_add".equals(action)) {
+            String requestedBossId = this.getDraftValue("bossCreateId", "");
+            HordeService.OperationResult result = this.hordeService.createBossDraft(requestedBossId);
+            if (result != null && result.isSuccess()) {
+                this.draftValues.put("bossCreateId", "");
+                this.selectBossForEditing(requestedBossId);
+            }
+            this.bossStatusText = result == null ? "" : result.getMessage();
+            return result;
+        }
+        if ("boss_save".equals(action)) {
+            HordeService.OperationResult result = this.hordeService.saveBossDefinitionFromUi(this.extractBossValuesForSave());
+            if (result != null && result.isSuccess()) {
+                this.selectBossForEditing(this.getDraftValue("bossEditName", this.getDraftValue("bossSelected", "")));
+            }
+            this.bossStatusText = result == null ? "" : result.getMessage();
+            return result;
+        }
+        if (action.startsWith("boss_open:")) {
+            String bossId = HordeConfigPage.extractActionArgument(action);
+            this.selectBossForEditing(bossId);
+            return null;
+        }
+        if (action.startsWith("boss_delete:")) {
+            String bossId = HordeConfigPage.extractActionArgument(action);
+            HordeService.OperationResult result = this.hordeService.deleteBossDefinition(bossId);
+            this.bossStatusText = result == null ? "" : result.getMessage();
+            if (result != null && result.isSuccess()) {
+                this.selectBossForEditing("");
+            }
+            return result;
+        }
+        return HordeService.OperationResult.fail(english ? "Unknown boss action: " + action : "Accion de bosses desconocida: " + action);
+    }
+
+    private HordeService.OperationResult handleArenaAction(String action, World world, String fallbackWorldName, boolean english) {
+        if (action == null || action.isBlank()) {
+            return HordeService.OperationResult.fail(english ? "Unknown arenas action." : "Accion de arenas desconocida.");
+        }
+        if ("arena_page_prev".equals(action)) {
+            this.arenaPage = Math.max(0, this.arenaPage - 1);
+            return null;
+        }
+        if ("arena_page_next".equals(action)) {
+            this.arenaPage = this.arenaPage + 1;
+            return null;
+        }
+        if ("arena_add_from_player".equals(action)) {
+            if (world == null) {
+                HordeService.OperationResult result = HordeService.OperationResult.fail(english ? "Could not resolve active world for arena creation." : "No se pudo resolver el mundo activo para crear arena.");
+                this.arenaStatusText = result.getMessage();
+                return result;
+            }
+            HordeService.OperationResult result = this.hordeService.createArenaFromPlayerDraft(this.playerRef, world, "");
+            if (result != null && result.isSuccess()) {
+                this.selectArenaForEditing("");
+            }
+            this.arenaStatusText = result == null ? "" : result.getMessage();
+            return result;
+        }
+        if ("arena_save".equals(action)) {
+            HordeService.OperationResult result = this.hordeService.saveArenaDefinitionFromUi(this.extractArenaValuesForSave(), fallbackWorldName);
+            if (result != null && result.isSuccess()) {
+                this.selectArenaForEditing(this.getDraftValue("arenaEditId", this.getDraftValue("arenaSelected", "")));
+            }
+            this.arenaStatusText = result == null ? "" : result.getMessage();
+            return result;
+        }
+        if ("arena_use_current_position".equals(action)) {
+            String selectedArenaId = this.getDraftValue("arenaSelected", "");
+            if (selectedArenaId == null || selectedArenaId.isBlank()) {
+                HordeService.OperationResult result = HordeService.OperationResult.fail(english ? "Select an arena first." : "Primero selecciona una arena.");
+                this.arenaStatusText = result.getMessage();
+                return result;
+            }
+            Transform transform = this.playerRef.getTransform();
+            Vector3d position = transform == null ? null : transform.getPosition();
+            if (position == null) {
+                HordeService.OperationResult result = HordeService.OperationResult.fail(english ? "Could not resolve player position." : "No se pudo resolver la posicion del jugador.");
+                this.arenaStatusText = result.getMessage();
+                return result;
+            }
+            this.draftValues.put("arenaEditId", this.getDraftValue("arenaEditId", selectedArenaId));
+            this.draftValues.put("arenaEditX", HordeConfigPage.formatDouble(position.x));
+            this.draftValues.put("arenaEditY", HordeConfigPage.formatDouble(position.y));
+            this.draftValues.put("arenaEditZ", HordeConfigPage.formatDouble(position.z));
+            HordeService.OperationResult result = this.hordeService.saveArenaDefinitionFromUi(this.extractArenaValuesForSave(), fallbackWorldName);
+            if (result != null && result.isSuccess()) {
+                this.selectArenaForEditing(this.getDraftValue("arenaEditId", selectedArenaId));
+            }
+            this.arenaStatusText = result == null ? "" : result.getMessage();
+            return result;
+        }
+        if (action.startsWith("arena_open:")) {
+            String arenaId = HordeConfigPage.extractActionArgument(action);
+            this.selectArenaForEditing(arenaId);
+            return null;
+        }
+        if (action.startsWith("arena_delete:")) {
+            String arenaId = HordeConfigPage.extractActionArgument(action);
+            HordeService.OperationResult result = this.hordeService.deleteArenaDefinition(arenaId);
+            this.arenaStatusText = result == null ? "" : result.getMessage();
+            if (result != null && result.isSuccess()) {
+                this.selectArenaForEditing("");
+            }
+            return result;
+        }
+        return HordeService.OperationResult.fail(english ? "Unknown arenas action: " + action : "Accion de arenas desconocida: " + action);
+    }
+
+    private static String fallbackWorldName(World world) {
+        if (world == null || world.getName() == null || world.getName().isBlank()) {
+            return "default";
+        }
+        return world.getName();
     }
 
     private void safeRebuild() {
@@ -543,6 +789,250 @@ extends CustomUIPage {
         this.ensureDraftDefaults(this.hordeService.getConfigSnapshot());
     }
 
+    private void ensureBossDraftDefaults(List<BossArenaCatalogService.BossDefinitionSnapshot> bossRows, List<BossArenaCatalogService.ArenaDefinitionSnapshot> arenaRows) {
+        BossArenaCatalogService.BossDefinitionSnapshot selectedBoss = HordeConfigPage.findBossSnapshot(bossRows, this.getDraftValue("bossSelected", ""));
+        if (selectedBoss == null && bossRows != null && !bossRows.isEmpty()) {
+            selectedBoss = bossRows.get(0);
+        }
+        if (selectedBoss != null) {
+            this.putDraftIfMissing("bossSelected", selectedBoss.bossId);
+            this.putDraftIfMissing("bossEditName", selectedBoss.bossId);
+            this.putDraftIfMissing("bossEditNpcId", selectedBoss.npcId);
+            this.putDraftIfMissing("bossEditTier", selectedBoss.tier);
+            this.putDraftIfMissing("bossEditAmount", Integer.toString(selectedBoss.amount));
+            this.putDraftIfMissing("bossEditLevelOverride", Integer.toString(selectedBoss.levelOverride));
+            this.putDraftIfMissing("bossEditLootRadius", HordeConfigPage.formatDouble(selectedBoss.lootRadius));
+            this.putDraftIfMissing("bossSpawnTrigger", selectedBoss.bossSpawnTrigger);
+            this.putDraftIfMissing("bossSpawnTriggerValue", HordeConfigPage.formatDouble(selectedBoss.bossSpawnTriggerValue));
+            this.putDraftIfMissing("bossWaveRandomLocations", Boolean.toString(selectedBoss.useRandomSpawnLocations));
+            this.putDraftIfMissing("bossWaveRandomRadius", HordeConfigPage.formatDouble(selectedBoss.randomSpawnRadius));
+            this.putDraftIfMissing("bossTimedProximityEnabled", Boolean.toString(selectedBoss.timedProximityEnabled));
+            this.putDraftIfMissing("bossTimedProximityArena", selectedBoss.timedProximityArenaId);
+            this.putDraftIfMissing("bossTimedProximityRadius", HordeConfigPage.formatDouble(selectedBoss.timedProximityRadius));
+            this.putDraftIfMissing("bossTimedProximityCooldown", Integer.toString(selectedBoss.timedProximityCooldownSeconds));
+        }
+        this.putDraftIfMissing("bossCreateId", "");
+        this.putDraftIfMissing("bossEditTier", "common");
+        this.putDraftIfMissing("bossEditAmount", "1");
+        this.putDraftIfMissing("bossEditLevelOverride", "0");
+        this.putDraftIfMissing("bossEditLootRadius", "0");
+        this.putDraftIfMissing("bossSpawnTrigger", "before_boss");
+        this.putDraftIfMissing("bossSpawnTriggerValue", "0");
+        this.putDraftIfMissing("bossWaveRandomLocations", "false");
+        this.putDraftIfMissing("bossWaveRandomRadius", "0");
+        this.putDraftIfMissing("bossTimedProximityEnabled", "false");
+        this.putDraftIfMissing("bossTimedProximityRadius", "0");
+        this.putDraftIfMissing("bossTimedProximityCooldown", "0");
+        this.putDraftIfMissing("bossTimedProximityArena", HordeConfigPage.firstArenaId(arenaRows));
+    }
+
+    private void ensureArenaDraftDefaults(List<BossArenaCatalogService.ArenaDefinitionSnapshot> arenaRows) {
+        BossArenaCatalogService.ArenaDefinitionSnapshot selectedArena = HordeConfigPage.findArenaSnapshot(arenaRows, this.getDraftValue("arenaSelected", ""));
+        if (selectedArena == null && arenaRows != null && !arenaRows.isEmpty()) {
+            selectedArena = arenaRows.get(0);
+        }
+        if (selectedArena != null) {
+            this.putDraftIfMissing("arenaSelected", selectedArena.arenaId);
+            this.putDraftIfMissing("arenaEditId", selectedArena.arenaId);
+            this.putDraftIfMissing("arenaEditX", HordeConfigPage.formatDouble(selectedArena.x));
+            this.putDraftIfMissing("arenaEditY", HordeConfigPage.formatDouble(selectedArena.y));
+            this.putDraftIfMissing("arenaEditZ", HordeConfigPage.formatDouble(selectedArena.z));
+        }
+        this.putDraftIfMissing("arenaEditX", "0");
+        this.putDraftIfMissing("arenaEditY", "64");
+        this.putDraftIfMissing("arenaEditZ", "0");
+    }
+
+    private void selectBossForEditing(String requestedBossId) {
+        List<BossArenaCatalogService.BossDefinitionSnapshot> bossRows = this.hordeService.getBossDefinitionsSnapshot();
+        BossArenaCatalogService.BossDefinitionSnapshot selected = HordeConfigPage.findBossSnapshot(bossRows, requestedBossId);
+        if (selected == null && bossRows != null && !bossRows.isEmpty()) {
+            selected = bossRows.get(bossRows.size() - 1);
+        }
+        if (selected == null) {
+            this.draftValues.remove("bossSelected");
+            this.draftValues.remove("bossEditName");
+            this.draftValues.remove("bossEditNpcId");
+            this.draftValues.remove("bossEditTier");
+            this.draftValues.remove("bossEditAmount");
+            this.draftValues.remove("bossEditLevelOverride");
+            this.draftValues.remove("bossEditLootRadius");
+            this.draftValues.remove("bossSpawnTrigger");
+            this.draftValues.remove("bossSpawnTriggerValue");
+            this.draftValues.remove("bossWaveRandomLocations");
+            this.draftValues.remove("bossWaveRandomRadius");
+            this.draftValues.remove("bossTimedProximityEnabled");
+            this.draftValues.remove("bossTimedProximityArena");
+            this.draftValues.remove("bossTimedProximityRadius");
+            this.draftValues.remove("bossTimedProximityCooldown");
+            return;
+        }
+        this.applyBossDraftFromSnapshot(selected);
+        int selectedIndex = HordeConfigPage.findBossIndex(bossRows, selected.bossId);
+        if (selectedIndex >= 0) {
+            this.bossPage = selectedIndex / MAX_BOSS_ROWS;
+        }
+    }
+
+    private void selectArenaForEditing(String requestedArenaId) {
+        List<BossArenaCatalogService.ArenaDefinitionSnapshot> arenaRows = this.hordeService.getArenaDefinitionsSnapshot();
+        BossArenaCatalogService.ArenaDefinitionSnapshot selected = HordeConfigPage.findArenaSnapshot(arenaRows, requestedArenaId);
+        if (selected == null && arenaRows != null && !arenaRows.isEmpty()) {
+            selected = arenaRows.get(arenaRows.size() - 1);
+        }
+        if (selected == null) {
+            this.draftValues.remove("arenaSelected");
+            this.draftValues.remove("arenaEditId");
+            this.draftValues.remove("arenaEditX");
+            this.draftValues.remove("arenaEditY");
+            this.draftValues.remove("arenaEditZ");
+            return;
+        }
+        this.applyArenaDraftFromSnapshot(selected);
+        int selectedIndex = HordeConfigPage.findArenaIndex(arenaRows, selected.arenaId);
+        if (selectedIndex >= 0) {
+            this.arenaPage = selectedIndex / MAX_ARENA_ROWS;
+        }
+    }
+
+    private void applyBossDraftFromSnapshot(BossArenaCatalogService.BossDefinitionSnapshot snapshot) {
+        if (snapshot == null) {
+            return;
+        }
+        this.draftValues.put("bossSelected", snapshot.bossId);
+        this.draftValues.put("bossEditName", snapshot.bossId);
+        this.draftValues.put("bossEditNpcId", snapshot.npcId == null ? "" : snapshot.npcId);
+        this.draftValues.put("bossEditTier", snapshot.tier == null ? "common" : snapshot.tier);
+        this.draftValues.put("bossEditAmount", Integer.toString(snapshot.amount));
+        this.draftValues.put("bossEditLevelOverride", Integer.toString(snapshot.levelOverride));
+        this.draftValues.put("bossEditLootRadius", HordeConfigPage.formatDouble(snapshot.lootRadius));
+        this.draftValues.put("bossSpawnTrigger", snapshot.bossSpawnTrigger == null ? "before_boss" : snapshot.bossSpawnTrigger);
+        this.draftValues.put("bossSpawnTriggerValue", HordeConfigPage.formatDouble(snapshot.bossSpawnTriggerValue));
+        this.draftValues.put("bossWaveRandomLocations", Boolean.toString(snapshot.useRandomSpawnLocations));
+        this.draftValues.put("bossWaveRandomRadius", HordeConfigPage.formatDouble(snapshot.randomSpawnRadius));
+        this.draftValues.put("bossTimedProximityEnabled", Boolean.toString(snapshot.timedProximityEnabled));
+        this.draftValues.put("bossTimedProximityArena", snapshot.timedProximityArenaId == null ? "" : snapshot.timedProximityArenaId);
+        this.draftValues.put("bossTimedProximityRadius", HordeConfigPage.formatDouble(snapshot.timedProximityRadius));
+        this.draftValues.put("bossTimedProximityCooldown", Integer.toString(snapshot.timedProximityCooldownSeconds));
+    }
+
+    private void applyArenaDraftFromSnapshot(BossArenaCatalogService.ArenaDefinitionSnapshot snapshot) {
+        if (snapshot == null) {
+            return;
+        }
+        this.draftValues.put("arenaSelected", snapshot.arenaId);
+        this.draftValues.put("arenaEditId", snapshot.arenaId);
+        this.draftValues.put("arenaEditX", HordeConfigPage.formatDouble(snapshot.x));
+        this.draftValues.put("arenaEditY", HordeConfigPage.formatDouble(snapshot.y));
+        this.draftValues.put("arenaEditZ", HordeConfigPage.formatDouble(snapshot.z));
+    }
+
+    private Map<String, String> extractBossValuesForSave() {
+        HashMap<String, String> values = new HashMap<String, String>();
+        HordeConfigPage.putIfNotBlank(values, "bossSelected", this.getDraftValue("bossSelected", ""));
+        HordeConfigPage.putIfNotBlank(values, "bossEditName", this.getDraftValue("bossEditName", ""));
+        HordeConfigPage.putIfNotBlank(values, "bossEditNpcId", this.getDraftValue("bossEditNpcId", ""));
+        HordeConfigPage.putIfNotBlank(values, "bossEditTier", this.getDraftValue("bossEditTier", "common"));
+        HordeConfigPage.putIfNotBlank(values, "bossEditAmount", this.getDraftValue("bossEditAmount", "1"));
+        HordeConfigPage.putIfNotBlank(values, "bossEditLevelOverride", this.getDraftValue("bossEditLevelOverride", "0"));
+        HordeConfigPage.putIfNotBlank(values, "bossEditLootRadius", this.getDraftValue("bossEditLootRadius", "0"));
+        HordeConfigPage.putIfNotBlank(values, "bossSpawnTrigger", this.getDraftValue("bossSpawnTrigger", "before_boss"));
+        HordeConfigPage.putIfNotBlank(values, "bossSpawnTriggerValue", this.getDraftValue("bossSpawnTriggerValue", "0"));
+        values.put("bossWaveRandomLocations", Boolean.toString(this.getDraftBoolean("bossWaveRandomLocations", false)));
+        HordeConfigPage.putIfNotBlank(values, "bossWaveRandomRadius", this.getDraftValue("bossWaveRandomRadius", "0"));
+        values.put("bossTimedProximityEnabled", Boolean.toString(this.getDraftBoolean("bossTimedProximityEnabled", false)));
+        HordeConfigPage.putIfNotBlank(values, "bossTimedProximityArena", this.getDraftValue("bossTimedProximityArena", ""));
+        HordeConfigPage.putIfNotBlank(values, "bossTimedProximityRadius", this.getDraftValue("bossTimedProximityRadius", "0"));
+        HordeConfigPage.putIfNotBlank(values, "bossTimedProximityCooldown", this.getDraftValue("bossTimedProximityCooldown", "0"));
+        return values;
+    }
+
+    private Map<String, String> extractArenaValuesForSave() {
+        HashMap<String, String> values = new HashMap<String, String>();
+        HordeConfigPage.putIfNotBlank(values, "arenaSelected", this.getDraftValue("arenaSelected", ""));
+        HordeConfigPage.putIfNotBlank(values, "arenaEditId", this.getDraftValue("arenaEditId", ""));
+        HordeConfigPage.putIfNotBlank(values, "arenaEditX", this.getDraftValue("arenaEditX", "0"));
+        HordeConfigPage.putIfNotBlank(values, "arenaEditY", this.getDraftValue("arenaEditY", "64"));
+        HordeConfigPage.putIfNotBlank(values, "arenaEditZ", this.getDraftValue("arenaEditZ", "0"));
+        return values;
+    }
+
+    private void populateBossRows(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<BossArenaCatalogService.BossDefinitionSnapshot> rows, String language, boolean english) {
+        int total = rows == null ? 0 : rows.size();
+        int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_BOSS_ROWS));
+        this.bossPage = HordeConfigPage.clamp(this.bossPage, 0, pageCount - 1);
+        int start = this.bossPage * MAX_BOSS_ROWS;
+        String selectedBossId = this.getDraftValue("bossSelected", "");
+        for (int slot = 0; slot < MAX_BOSS_ROWS; ++slot) {
+            int index = start + slot;
+            int rowNumber = slot + 1;
+            String rowSelector = "#BossRow" + rowNumber;
+            if (index < total) {
+                BossArenaCatalogService.BossDefinitionSnapshot row = rows.get(index);
+                String tierText = HordeConfigPage.t(language, english, "Tier", "Tier") + ": " + HordeConfigPage.compactName(row.tier, 12);
+                commandBuilder.set(rowSelector + ".Visible", true)
+                        .set("#BossName" + rowNumber + ".Text", row.bossId)
+                        .set("#BossNpc" + rowNumber + ".Text", row.npcId == null ? "" : row.npcId)
+                        .set("#BossTier" + rowNumber + ".Text", tierText)
+                        .set("#BossAmount" + rowNumber + ".Text", Integer.toString(row.amount))
+                        .set(rowSelector + ".Background", selectedBossId.equalsIgnoreCase(row.bossId) ? "#2b4a70" : "#16283f");
+                eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#BossOpen" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildBossAction("open", row.bossId)))
+                        .addEventBinding(CustomUIEventBindingType.Activating, "#BossDelete" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildBossAction("delete", row.bossId)));
+            } else {
+                commandBuilder.set(rowSelector + ".Visible", false)
+                        .set("#BossName" + rowNumber + ".Text", "")
+                        .set("#BossNpc" + rowNumber + ".Text", "")
+                        .set("#BossTier" + rowNumber + ".Text", "")
+                        .set("#BossAmount" + rowNumber + ".Text", "0");
+            }
+        }
+        String pageText = total <= 0 ? "0/0" : (this.bossPage + 1) + "/" + pageCount;
+        commandBuilder.set("#BossPageLabel.Text", pageText)
+                .set("#BossPageLabel.Visible", pageCount > 1)
+                .set("#BossPagePrevButton.Visible", pageCount > 1)
+                .set("#BossPageNextButton.Visible", pageCount > 1)
+                .set("#BossEmptyLabel.Visible", total == 0)
+                .set("#BossEmptyLabel.Text", total == 0 ? HordeConfigPage.t(language, english, "No bosses yet. Press Add Boss to create one.", "Aun no hay bosses. Pulsa Anadir Boss para crear uno.") : "")
+                .set("#BossOverflowLabel.Visible", total > MAX_BOSS_ROWS)
+                .set("#BossOverflowLabel.Text", total > MAX_BOSS_ROWS ? HordeConfigPage.t(language, english, "More bosses available. Use page controls.", "Hay mas bosses disponibles. Usa el paginado.") : "");
+    }
+
+    private void populateArenaRows(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<BossArenaCatalogService.ArenaDefinitionSnapshot> rows, String language, boolean english) {
+        int total = rows == null ? 0 : rows.size();
+        int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_ARENA_ROWS));
+        this.arenaPage = HordeConfigPage.clamp(this.arenaPage, 0, pageCount - 1);
+        int start = this.arenaPage * MAX_ARENA_ROWS;
+        String selectedArenaId = this.getDraftValue("arenaSelected", "");
+        for (int slot = 0; slot < MAX_ARENA_ROWS; ++slot) {
+            int index = start + slot;
+            int rowNumber = slot + 1;
+            String rowSelector = "#ArenaRow" + rowNumber;
+            if (index < total) {
+                BossArenaCatalogService.ArenaDefinitionSnapshot row = rows.get(index);
+                String coords = String.format(Locale.ROOT, "%.1f %.1f %.1f", row.x, row.y, row.z);
+                commandBuilder.set(rowSelector + ".Visible", true)
+                        .set("#ArenaName" + rowNumber + ".Text", row.arenaId)
+                        .set("#ArenaCoords" + rowNumber + ".Text", coords)
+                        .set(rowSelector + ".Background", selectedArenaId.equalsIgnoreCase(row.arenaId) ? "#2b4a70" : "#16283f");
+                eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#ArenaOpen" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildArenaAction("open", row.arenaId)))
+                        .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaDelete" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildArenaAction("delete", row.arenaId)));
+            } else {
+                commandBuilder.set(rowSelector + ".Visible", false)
+                        .set("#ArenaName" + rowNumber + ".Text", "")
+                        .set("#ArenaCoords" + rowNumber + ".Text", "");
+            }
+        }
+        String pageText = total <= 0 ? "0/0" : (this.arenaPage + 1) + "/" + pageCount;
+        commandBuilder.set("#ArenaPageLabel.Text", pageText)
+                .set("#ArenaPageLabel.Visible", pageCount > 1)
+                .set("#ArenaPagePrevButton.Visible", pageCount > 1)
+                .set("#ArenaPageNextButton.Visible", pageCount > 1)
+                .set("#ArenaEmptyLabel.Visible", total == 0)
+                .set("#ArenaEmptyLabel.Text", total == 0 ? HordeConfigPage.t(language, english, "No arenas yet. Use Add Arena here to create one from your position.", "Aun no hay arenas. Usa Anadir Arena aqui para crear una desde tu posicion.") : "")
+                .set("#ArenaOverflowLabel.Visible", total > MAX_ARENA_ROWS)
+                .set("#ArenaOverflowLabel.Text", total > MAX_ARENA_ROWS ? HordeConfigPage.t(language, english, "More arenas available. Use page controls.", "Hay mas arenas disponibles. Usa el paginado.") : "");
+    }
+
     private void populateAudienceRows(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<HordeService.AudiencePlayerSnapshot> rows, String language, boolean english) {
         if (rows == null || rows.isEmpty()) {
             return;
@@ -625,6 +1115,29 @@ extends CustomUIPage {
                 return "rewardCategory".equals(field.configKey)
                         || "rewardItemId".equals(field.configKey)
                         || "rewardItemQuantity".equals(field.configKey);
+            case TAB_BOSSES:
+                return "bossCreateId".equals(field.configKey)
+                        || "bossSelected".equals(field.configKey)
+                        || "bossEditName".equals(field.configKey)
+                        || "bossEditNpcId".equals(field.configKey)
+                        || "bossEditTier".equals(field.configKey)
+                        || "bossEditAmount".equals(field.configKey)
+                        || "bossEditLevelOverride".equals(field.configKey)
+                        || "bossEditLootRadius".equals(field.configKey)
+                        || "bossSpawnTrigger".equals(field.configKey)
+                        || "bossSpawnTriggerValue".equals(field.configKey)
+                        || "bossWaveRandomLocations".equals(field.configKey)
+                        || "bossWaveRandomRadius".equals(field.configKey)
+                        || "bossTimedProximityEnabled".equals(field.configKey)
+                        || "bossTimedProximityArena".equals(field.configKey)
+                        || "bossTimedProximityRadius".equals(field.configKey)
+                        || "bossTimedProximityCooldown".equals(field.configKey);
+            case TAB_ARENAS:
+                return "arenaSelected".equals(field.configKey)
+                        || "arenaEditId".equals(field.configKey)
+                        || "arenaEditX".equals(field.configKey)
+                        || "arenaEditY".equals(field.configKey)
+                        || "arenaEditZ".equals(field.configKey);
             default:
                 return false;
         }
@@ -716,6 +1229,15 @@ extends CustomUIPage {
         return localizedEntries;
     }
 
+    private static List<DropdownEntryInfo> buildBossSpawnTriggerEntries(List<String> options, String selectedValue, String language, boolean english) {
+        List<String> values = HordeConfigPage.collectDropdownValues(options, selectedValue);
+        ArrayList<DropdownEntryInfo> localizedEntries = new ArrayList<DropdownEntryInfo>(values.size());
+        for (String value : values) {
+            localizedEntries.add(new DropdownEntryInfo(LocalizableString.fromString(HordeConfigPage.bossSpawnTriggerDisplay(value, language, english)), value));
+        }
+        return localizedEntries;
+    }
+
     private static List<String> collectDropdownValues(List<String> options, String selectedValue) {
         ArrayList<String> values = new ArrayList<String>();
         if (options != null) {
@@ -731,6 +1253,24 @@ extends CustomUIPage {
             values.add(0, selected);
         }
         return values;
+    }
+
+    private static String bossSpawnTriggerDisplay(String value, String language, boolean english) {
+        String normalized = value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
+        switch (normalized) {
+            case "before_boss":
+                return HordeConfigPage.t(language, english, "Before boss", "Antes del boss");
+            case "on_spawn":
+                return HordeConfigPage.t(language, english, "On spawn", "Al aparecer");
+            case "after_spawn_seconds":
+                return HordeConfigPage.t(language, english, "After spawn (s)", "Tras spawn (s)");
+            case "since_last_wave":
+                return HordeConfigPage.t(language, english, "Since last wave (s)", "Desde ultima wave (s)");
+            case "boss_hp_percent":
+                return HordeConfigPage.t(language, english, "Boss HP %", "HP del boss %");
+            default:
+                return value == null ? "" : value;
+        }
     }
 
     private static String enemyTypeDisplay(String value, String language, boolean english) {
@@ -847,6 +1387,8 @@ extends CustomUIPage {
                 .set("#TabPlayersButton.Text", HordeConfigPage.t(language, english, "Players", "Jugadores"))
                 .set("#TabSoundsButton.Text", HordeConfigPage.t(language, english, "Sounds", "Sonidos"))
                 .set("#TabRewardsButton.Text", HordeConfigPage.t(language, english, "Rewards", "Recompensas"))
+                .set("#TabBossesButton.Text", HordeConfigPage.t(language, english, "Bosses", "Bosses"))
+                .set("#TabArenasButton.Text", HordeConfigPage.t(language, english, "Arenas", "Arenas"))
                 .set("#TabHelpButton.Text", HordeConfigPage.t(language, english, "Help", "Ayuda"))
                 .set("#TabHintLabel.Text", "")
                 .set("#SpawnLabel.Text", HordeConfigPage.t(language, english, "Center (X Y Z)", "Centro (X Y Z)"))
@@ -882,6 +1424,48 @@ extends CustomUIPage {
                 .set("#RoundVictorySoundLabel.Text", HordeConfigPage.t(language, english, "Round victory sound", "Sonido victoria ronda"))
                 .set("#RoundStartVolumeLabel.Text", HordeConfigPage.t(language, english, "Start volume (%)", "Volumen inicio (%)"))
                 .set("#RoundVictoryVolumeLabel.Text", HordeConfigPage.t(language, english, "Victory volume (%)", "Volumen victoria (%)"))
+                .set("#BossesTitleLabel.Text", HordeConfigPage.t(language, english, "Boss definitions", "Definiciones de bosses"))
+                .set("#BossCreateIdLabel.Text", HordeConfigPage.t(language, english, "New boss ID", "Nuevo ID de boss"))
+                .set("#BossAddButton.Text", HordeConfigPage.t(language, english, "Add boss", "Anadir boss"))
+                .set("#BossHeaderName.Text", HordeConfigPage.t(language, english, "Boss ID", "Boss ID"))
+                .set("#BossHeaderNpc.Text", HordeConfigPage.t(language, english, "NPC ID", "NPC ID"))
+                .set("#BossHeaderTier.Text", HordeConfigPage.t(language, english, "Tier", "Tier"))
+                .set("#BossHeaderAmount.Text", HordeConfigPage.t(language, english, "Amt", "Cant"))
+                .set("#BossHeaderActions.Text", HordeConfigPage.t(language, english, "Actions", "Acciones"))
+                .set("#BossEditorTitleLabel.Text", HordeConfigPage.t(language, english, "Boss editor", "Editor de boss"))
+                .set("#BossSelectedLabel.Text", HordeConfigPage.t(language, english, "Selected boss", "Boss seleccionado"))
+                .set("#BossEditNameLabel.Text", HordeConfigPage.t(language, english, "Boss ID", "Boss ID"))
+                .set("#BossEditNpcIdLabel.Text", HordeConfigPage.t(language, english, "NPC ID", "NPC ID"))
+                .set("#BossEditTierLabel.Text", HordeConfigPage.t(language, english, "Tier", "Tier"))
+                .set("#BossEditAmountLabel.Text", HordeConfigPage.t(language, english, "Amount", "Cantidad"))
+                .set("#BossEditLevelOverrideLabel.Text", HordeConfigPage.t(language, english, "Level override", "Nivel fijo"))
+                .set("#BossEditLootRadiusLabel.Text", HordeConfigPage.t(language, english, "Loot radius", "Radio de loot"))
+                .set("#BossSpawnTriggerLabel.Text", HordeConfigPage.t(language, english, "Spawn trigger", "Disparador de spawn"))
+                .set("#BossSpawnTriggerValueLabel.Text", HordeConfigPage.t(language, english, "Trigger value", "Valor del disparador"))
+                .set("#BossWaveRandomLocationsLabel.Text", HordeConfigPage.t(language, english, "Random locations", "Ubicaciones aleatorias"))
+                .set("#BossWaveRandomRadiusLabel.Text", HordeConfigPage.t(language, english, "Random radius", "Radio aleatorio"))
+                .set("#BossTimedProximityEnabledLabel.Text", HordeConfigPage.t(language, english, "Timed proximity", "Proximidad temporizada"))
+                .set("#BossTimedProximityArenaLabel.Text", HordeConfigPage.t(language, english, "Timed arena", "Arena temporizada"))
+                .set("#BossTimedProximityRadiusLabel.Text", HordeConfigPage.t(language, english, "Proximity radius", "Radio de proximidad"))
+                .set("#BossTimedProximityCooldownLabel.Text", HordeConfigPage.t(language, english, "Cooldown (s)", "Cooldown (s)"))
+                .set("#BossPagePrevButton.Text", "<")
+                .set("#BossPageNextButton.Text", ">")
+                .set("#BossSaveButton.Text", HordeConfigPage.t(language, english, "Save boss", "Guardar boss"))
+                .set("#ArenasTitleLabel.Text", HordeConfigPage.t(language, english, "Arena definitions", "Definiciones de arenas"))
+                .set("#ArenaAddButton.Text", HordeConfigPage.t(language, english, "Add arena here", "Anadir arena aqui"))
+                .set("#ArenaHeaderName.Text", HordeConfigPage.t(language, english, "Arena ID", "Arena ID"))
+                .set("#ArenaHeaderCoords.Text", HordeConfigPage.t(language, english, "Coordinates", "Coordenadas"))
+                .set("#ArenaHeaderActions.Text", HordeConfigPage.t(language, english, "Actions", "Acciones"))
+                .set("#ArenaEditorTitleLabel.Text", HordeConfigPage.t(language, english, "Arena editor", "Editor de arena"))
+                .set("#ArenaSelectedLabel.Text", HordeConfigPage.t(language, english, "Selected arena", "Arena seleccionada"))
+                .set("#ArenaEditIdLabel.Text", HordeConfigPage.t(language, english, "Arena ID", "Arena ID"))
+                .set("#ArenaEditXLabel.Text", "X")
+                .set("#ArenaEditYLabel.Text", "Y")
+                .set("#ArenaEditZLabel.Text", "Z")
+                .set("#ArenaUseCurrentPositionButton.Text", HordeConfigPage.t(language, english, "Use my current position", "Usar mi posicion actual"))
+                .set("#ArenaPagePrevButton.Text", "<")
+                .set("#ArenaPageNextButton.Text", ">")
+                .set("#ArenaSaveButton.Text", HordeConfigPage.t(language, english, "Save arena", "Guardar arena"))
                 .set("#StatusTitleLabel.Text", "")
                 .set("#ReloadModButton.Text", HordeConfigPage.t(language, english, "Reload config", "Recargar config"))
                 .set("#SaveButton.Text", HordeConfigPage.t(language, english, "Save config", "Guardar config"))
@@ -913,21 +1497,27 @@ extends CustomUIPage {
         boolean playersTab = TAB_PLAYERS.equals(tab);
         boolean soundsTab = TAB_SOUNDS.equals(tab);
         boolean rewardsTab = TAB_REWARDS.equals(tab);
+        boolean bossesTab = TAB_BOSSES.equals(tab);
+        boolean arenasTab = TAB_ARENAS.equals(tab);
         boolean helpTab = TAB_HELP.equals(tab);
 
-        this.setVisible(commandBuilder, generalTab, "#SpawnStateLabel", "#SpawnLabel", "#SpawnX", "#SpawnY", "#SpawnZ", "#SetSpawnButton", "#LanguageLabel", "#Language", "#AutoStartEnabledLabel", "#AutoStartEnabled", "#AutoStartIntervalLabel", "#AutoStartInterval", "#AutoStartApplyButton");
+        this.setVisible(commandBuilder, generalTab, "#LanguageLabel", "#Language", "#AutoStartEnabledLabel", "#AutoStartEnabled", "#AutoStartIntervalLabel", "#AutoStartInterval", "#AutoStartApplyButton");
         this.setVisible(commandBuilder, hordeTab, "#RoleLabel", "#EnemyType", "#FinalBossLabel", "#FinalBossEnabled", "#RadiusLabel", "#MinRadiusLabel", "#MinRadius", "#MaxRadiusLabel", "#MaxRadius", "#RoundConfigLabel", "#RoundLabel", "#Rounds", "#WaveDelayLabel", "#WaveDelay", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound");
         this.setVisible(commandBuilder, playersTab, "#AudienceInfoLabel", "#PlayersListTitle", "#PlayersCountLabel", "#PlayersCountValue", "#PlayersListHint", "#PlayersRefreshButton", "#PlayersHeaderName", "#PlayersHeaderMode", "#AudiencePlayersRows", "#AudiencePlayersEmptyLabel", "#AudienceHelpLabel", "#ArenaJoinRadiusLabel", "#ArenaJoinRadius");
         this.setVisible(commandBuilder, soundsTab, "#RoundStartSoundLabel", "#RoundStartSoundId", "#RoundStartVolumeLabel", "#RoundStartVolume", "#RoundVictorySoundLabel", "#RoundVictorySoundId", "#RoundVictoryVolumeLabel", "#RoundVictoryVolume");
         this.setVisible(commandBuilder, rewardsTab, "#RewardCategoryLabel", "#RewardCategory", "#RewardCommandsLabel", "#RewardItemId", "#RewardItemQuantityLabel", "#RewardItemQuantity");
+        this.setVisible(commandBuilder, bossesTab, "#BossesTitleLabel", "#BossCreateIdLabel", "#BossCreateId", "#BossAddButton", "#BossHeaderName", "#BossHeaderNpc", "#BossHeaderTier", "#BossHeaderAmount", "#BossHeaderActions", "#BossPagePrevButton", "#BossPageNextButton", "#BossPageLabel", "#BossEmptyLabel", "#BossOverflowLabel", "#BossEditorTitleLabel", "#BossSelectedLabel", "#BossEditNameLabel", "#BossEditName", "#BossEditNpcIdLabel", "#BossEditNpcId", "#BossEditTierLabel", "#BossEditTier", "#BossEditAmountLabel", "#BossEditAmount", "#BossEditLevelOverrideLabel", "#BossEditLevelOverride", "#BossEditLootRadiusLabel", "#BossEditLootRadius", "#BossSpawnTriggerLabel", "#BossSpawnTrigger", "#BossSpawnTriggerValueLabel", "#BossSpawnTriggerValue", "#BossWaveRandomLocationsLabel", "#BossWaveRandomLocations", "#BossWaveRandomRadiusLabel", "#BossWaveRandomRadius", "#BossTimedProximityEnabledLabel", "#BossTimedProximityEnabled", "#BossTimedProximityArenaLabel", "#BossTimedProximityArena", "#BossTimedProximityRadiusLabel", "#BossTimedProximityRadius", "#BossTimedProximityCooldownLabel", "#BossTimedProximityCooldown", "#BossSaveButton", "#BossStatusLabel", "#BossRow1", "#BossRow2", "#BossRow3", "#BossRow4");
+        this.setVisible(commandBuilder, arenasTab, "#ArenasTitleLabel", "#ArenaAddButton", "#ArenaHeaderName", "#ArenaHeaderCoords", "#ArenaHeaderActions", "#ArenaPagePrevButton", "#ArenaPageNextButton", "#ArenaPageLabel", "#ArenaEmptyLabel", "#ArenaOverflowLabel", "#ArenaEditorTitleLabel", "#ArenaSelectedLabel", "#ArenaSelected", "#ArenaEditIdLabel", "#ArenaEditId", "#ArenaEditXLabel", "#ArenaEditX", "#ArenaEditYLabel", "#ArenaEditY", "#ArenaEditZLabel", "#ArenaEditZ", "#ArenaUseCurrentPositionButton", "#ArenaSaveButton", "#ArenaStatusLabel", "#ArenaRow1", "#ArenaRow2", "#ArenaRow3", "#ArenaRow4", "#ArenaRow5", "#ArenaRow6", "#ArenaRow7", "#ArenaRow8", "#ArenaRow9", "#ArenaRow10");
         this.setVisible(commandBuilder, helpTab, "#HelpIntroLabel", "#HelpCommandsLabel", "#HelpCommandsLine1", "#HelpCommandsLine2", "#HelpCommandsLine3", "#HelpConfigLabel", "#HelpConfigLine1", "#HelpConfigLine2", "#HelpConfigLine3", "#HelpExternalLabel", "#HelpExternalLine1", "#HelpExternalLine2", "#HelpExternalLine3", "#HelpReloadLabel", "#HelpReloadLine1", "#HelpReloadLine2");
         this.setVisible(commandBuilder, generalTab, "#TabGeneralActiveBack", "#TabGeneralActiveTop", "#TabGeneralActiveNotch");
         this.setVisible(commandBuilder, hordeTab, "#TabHordeActiveBack", "#TabHordeActiveTop", "#TabHordeActiveNotch");
         this.setVisible(commandBuilder, playersTab, "#TabPlayersActiveBack", "#TabPlayersActiveTop", "#TabPlayersActiveNotch");
         this.setVisible(commandBuilder, soundsTab, "#TabSoundsActiveBack", "#TabSoundsActiveTop", "#TabSoundsActiveNotch");
         this.setVisible(commandBuilder, rewardsTab, "#TabRewardsActiveBack", "#TabRewardsActiveTop", "#TabRewardsActiveNotch");
+        this.setVisible(commandBuilder, bossesTab, "#TabBossesActiveBack", "#TabBossesActiveTop", "#TabBossesActiveNotch");
+        this.setVisible(commandBuilder, arenasTab, "#TabArenasActiveBack", "#TabArenasActiveTop", "#TabArenasActiveNotch");
         this.setVisible(commandBuilder, helpTab, "#TabHelpActiveBack", "#TabHelpActiveTop", "#TabHelpActiveNotch");
-        this.setVisible(commandBuilder, false, "#SubTitleLabel", "#TabHintLabel", "#StatusTitleLabel", "#StatusPanel", "#StatusLabel", "#RoleHelpLabel", "#RoundSoundHelpLabel", "#RewardCommandsHelpLabel", "#PlayerMultiplierLabel", "#PlayerMultiplier", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel", "#EnemyLevelMin", "#EnemyLevelRangeSeparator", "#EnemyLevelMax", "#LanguagePrevButton", "#LanguageNextButton", "#FinalBossPrevButton", "#FinalBossNextButton", "#RoundStartSoundPrevButton", "#RoundStartSoundNextButton", "#RoundVictorySoundPrevButton", "#RoundVictorySoundNextButton", "#RewardCategoryPrevButton", "#RewardCategoryNextButton", "#RewardItemPrevButton", "#RewardItemNextButton", "#RewardEveryRoundsLabel", "#RewardEveryRounds", "#HelpDiscordButton", "#HelpCurseForgeButton");
+        this.setVisible(commandBuilder, false, "#SubTitleLabel", "#TabHintLabel", "#StatusTitleLabel", "#StatusPanel", "#StatusLabel", "#SpawnStateLabel", "#SpawnLabel", "#SpawnX", "#SpawnY", "#SpawnZ", "#SetSpawnButton", "#RoleHelpLabel", "#RoundSoundHelpLabel", "#RewardCommandsHelpLabel", "#PlayerMultiplierLabel", "#PlayerMultiplier", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel", "#EnemyLevelMin", "#EnemyLevelRangeSeparator", "#EnemyLevelMax", "#LanguagePrevButton", "#LanguageNextButton", "#FinalBossPrevButton", "#FinalBossNextButton", "#RoundStartSoundPrevButton", "#RoundStartSoundNextButton", "#RoundVictorySoundPrevButton", "#RoundVictorySoundNextButton", "#RewardCategoryPrevButton", "#RewardCategoryNextButton", "#RewardItemPrevButton", "#RewardItemNextButton", "#RewardEveryRoundsLabel", "#RewardEveryRounds", "#HelpDiscordButton", "#HelpCurseForgeButton");
     }
 
     private void setVisible(UICommandBuilder commandBuilder, boolean visible, String ... elementIds) {
@@ -951,6 +1541,8 @@ extends CustomUIPage {
             case TAB_PLAYERS:
             case TAB_SOUNDS:
             case TAB_REWARDS:
+            case TAB_BOSSES:
+            case TAB_ARENAS:
             case TAB_HELP: {
                 return normalized;
             }
@@ -1149,6 +1741,128 @@ extends CustomUIPage {
             return value;
         }
         return "";
+    }
+
+    private static String extractActionArgument(String action) {
+        if (action == null || action.isBlank()) {
+            return "";
+        }
+        int separator = action.indexOf(':');
+        if (separator < 0 || separator >= action.length() - 1) {
+            return "";
+        }
+        return action.substring(separator + 1).trim();
+    }
+
+    private static String buildBossAction(String action, String bossId) {
+        return "boss_" + action + ":" + HordeConfigPage.firstNonEmpty(bossId, "");
+    }
+
+    private static String buildArenaAction(String action, String arenaId) {
+        return "arena_" + action + ":" + HordeConfigPage.firstNonEmpty(arenaId, "");
+    }
+
+    private static int maxPageIndex(int totalItems, int pageSize) {
+        if (totalItems <= 0 || pageSize <= 0) {
+            return 0;
+        }
+        return Math.max(0, (int)Math.ceil(totalItems / (double)pageSize) - 1);
+    }
+
+    private static List<String> collectArenaIds(List<BossArenaCatalogService.ArenaDefinitionSnapshot> rows) {
+        ArrayList<String> ids = new ArrayList<String>();
+        if (rows == null) {
+            return ids;
+        }
+        for (BossArenaCatalogService.ArenaDefinitionSnapshot row : rows) {
+            if (row == null || row.arenaId == null || row.arenaId.isBlank() || HordeConfigPage.containsIgnoreCase(ids, row.arenaId)) {
+                continue;
+            }
+            ids.add(row.arenaId);
+        }
+        return ids;
+    }
+
+    private static String firstArenaId(List<BossArenaCatalogService.ArenaDefinitionSnapshot> rows) {
+        if (rows == null || rows.isEmpty()) {
+            return "";
+        }
+        for (BossArenaCatalogService.ArenaDefinitionSnapshot row : rows) {
+            if (row != null && row.arenaId != null && !row.arenaId.isBlank()) {
+                return row.arenaId;
+            }
+        }
+        return "";
+    }
+
+    private static BossArenaCatalogService.BossDefinitionSnapshot findBossSnapshot(List<BossArenaCatalogService.BossDefinitionSnapshot> rows, String bossId) {
+        if (rows == null || rows.isEmpty()) {
+            return null;
+        }
+        String requested = bossId == null ? "" : bossId.trim();
+        if (requested.isBlank()) {
+            return null;
+        }
+        for (BossArenaCatalogService.BossDefinitionSnapshot row : rows) {
+            if (row == null || row.bossId == null) {
+                continue;
+            }
+            if (row.bossId.equalsIgnoreCase(requested)) {
+                return row;
+            }
+        }
+        return null;
+    }
+
+    private static BossArenaCatalogService.ArenaDefinitionSnapshot findArenaSnapshot(List<BossArenaCatalogService.ArenaDefinitionSnapshot> rows, String arenaId) {
+        if (rows == null || rows.isEmpty()) {
+            return null;
+        }
+        String requested = arenaId == null ? "" : arenaId.trim();
+        if (requested.isBlank()) {
+            return null;
+        }
+        for (BossArenaCatalogService.ArenaDefinitionSnapshot row : rows) {
+            if (row == null || row.arenaId == null) {
+                continue;
+            }
+            if (row.arenaId.equalsIgnoreCase(requested)) {
+                return row;
+            }
+        }
+        return null;
+    }
+
+    private static int findBossIndex(List<BossArenaCatalogService.BossDefinitionSnapshot> rows, String bossId) {
+        if (rows == null || rows.isEmpty() || bossId == null || bossId.isBlank()) {
+            return -1;
+        }
+        for (int i = 0; i < rows.size(); ++i) {
+            BossArenaCatalogService.BossDefinitionSnapshot row = rows.get(i);
+            if (row == null || row.bossId == null) {
+                continue;
+            }
+            if (row.bossId.equalsIgnoreCase(bossId)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static int findArenaIndex(List<BossArenaCatalogService.ArenaDefinitionSnapshot> rows, String arenaId) {
+        if (rows == null || rows.isEmpty() || arenaId == null || arenaId.isBlank()) {
+            return -1;
+        }
+        for (int i = 0; i < rows.size(); ++i) {
+            BossArenaCatalogService.ArenaDefinitionSnapshot row = rows.get(i);
+            if (row == null || row.arenaId == null) {
+                continue;
+            }
+            if (row.arenaId.equalsIgnoreCase(arenaId)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private static String compactName(String value, int maxLength) {
