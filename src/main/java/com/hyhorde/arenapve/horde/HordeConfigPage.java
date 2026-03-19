@@ -69,7 +69,6 @@ extends CustomUIPage {
             new UiFieldBinding("roundStartVolume", "RoundStartVolume", "#RoundStartVolume.Value"),
             new UiFieldBinding("roundVictorySoundId", "RoundVictorySoundId", "#RoundVictorySoundId.Value"),
             new UiFieldBinding("roundVictoryVolume", "RoundVictoryVolume", "#RoundVictoryVolume.Value"),
-            new UiFieldBinding("bossCreateId", "BossCreateId", "#BossCreateId.Value"),
             new UiFieldBinding("bossSelected", "BossSelected", "#BossSelected.Value"),
             new UiFieldBinding("bossEditName", "BossEditName", "#BossEditName.Value"),
             new UiFieldBinding("bossEditNpcId", "BossEditNpcId", "#BossEditNpcId.Value"),
@@ -80,7 +79,6 @@ extends CustomUIPage {
             new UiFieldBinding("bossSpawnTrigger", "BossSpawnTrigger", "#BossSpawnTrigger.Value"),
             new UiFieldBinding("bossSpawnTriggerValue", "BossSpawnTriggerValue", "#BossSpawnTriggerValue.Value"),
             new UiFieldBinding("bossWaveRandomLocations", "BossWaveRandomLocations", "#BossWaveRandomLocations.Value"),
-            new UiFieldBinding("bossWaveRandomRadius", "BossWaveRandomRadius", "#BossWaveRandomRadius.Value"),
             new UiFieldBinding("bossTimedProximityEnabled", "BossTimedProximityEnabled", "#BossTimedProximityEnabled.Value"),
             new UiFieldBinding("bossTimedProximityArena", "BossTimedProximityArena", "#BossTimedProximityArena.Value"),
             new UiFieldBinding("bossTimedProximityRadius", "BossTimedProximityRadius", "#BossTimedProximityRadius.Value"),
@@ -212,7 +210,6 @@ extends CustomUIPage {
                 .set("#RoundVictorySoundId.Entries", roundVictorySoundEntries)
                 .set("#EnemyLevelMin.Value", this.getDraftValue("enemyLevelMin", Integer.toString(config.enemyLevelMin)))
                 .set("#EnemyLevelMax.Value", this.getDraftValue("enemyLevelMax", Integer.toString(config.enemyLevelMax)))
-                .set("#BossCreateId.Value", this.getDraftValue("bossCreateId", ""))
                 .set("#BossSelected.Value", bossSelectedValue)
                 .set("#BossEditName.Value", this.getDraftValue("bossEditName", bossSelectedValue))
                 .set("#BossEditNpcId.Value", this.getDraftValue("bossEditNpcId", ""))
@@ -225,7 +222,6 @@ extends CustomUIPage {
                 .set("#BossSpawnTrigger.Entries", bossSpawnTriggerEntries)
                 .set("#BossSpawnTriggerValue.Value", this.getDraftValue("bossSpawnTriggerValue", "0"))
                 .set("#BossWaveRandomLocations.Value", this.getDraftBoolean("bossWaveRandomLocations", false))
-                .set("#BossWaveRandomRadius.Value", this.getDraftValue("bossWaveRandomRadius", "0"))
                 .set("#BossTimedProximityEnabled.Value", this.getDraftBoolean("bossTimedProximityEnabled", false))
                 .set("#BossTimedProximityArena.Value", bossTimedProximityArenaValue)
                 .set("#BossTimedProximityArena.Entries", bossTimedProximityArenaEntries)
@@ -433,6 +429,7 @@ extends CustomUIPage {
                 this.playerRef.sendMessage(Message.raw((String)HordeI18n.translateLegacy(language, result.getMessage())));
             }
             if ("save".equals(action)) {
+                this.safeRebuild();
                 return;
             }
             if ("start".equals(action) || "stop".equals(action) || "skip_round".equals(action)) {
@@ -499,11 +496,9 @@ extends CustomUIPage {
             return null;
         }
         if ("boss_add".equals(action)) {
-            String requestedBossId = this.getDraftValue("bossCreateId", "");
-            HordeService.OperationResult result = this.hordeService.createBossDraft(requestedBossId);
+            HordeService.OperationResult result = this.hordeService.createBossDraft("");
             if (result != null && result.isSuccess()) {
-                this.draftValues.put("bossCreateId", "");
-                this.selectBossForEditing(requestedBossId);
+                this.selectBossForEditing("");
             }
             this.bossStatusText = result == null ? "" : result.getMessage();
             return result;
@@ -815,13 +810,11 @@ extends CustomUIPage {
             this.putDraftIfMissing("bossSpawnTrigger", selectedBoss.bossSpawnTrigger);
             this.putDraftIfMissing("bossSpawnTriggerValue", HordeConfigPage.formatDouble(selectedBoss.bossSpawnTriggerValue));
             this.putDraftIfMissing("bossWaveRandomLocations", Boolean.toString(selectedBoss.useRandomSpawnLocations));
-            this.putDraftIfMissing("bossWaveRandomRadius", HordeConfigPage.formatDouble(selectedBoss.randomSpawnRadius));
             this.putDraftIfMissing("bossTimedProximityEnabled", Boolean.toString(selectedBoss.timedProximityEnabled));
             this.putDraftIfMissing("bossTimedProximityArena", selectedBoss.timedProximityArenaId);
             this.putDraftIfMissing("bossTimedProximityRadius", HordeConfigPage.formatDouble(selectedBoss.timedProximityRadius));
             this.putDraftIfMissing("bossTimedProximityCooldown", Integer.toString(selectedBoss.timedProximityCooldownSeconds));
         }
-        this.putDraftIfMissing("bossCreateId", "");
         this.putDraftIfMissing("bossEditTier", "common");
         this.putDraftIfMissing("bossEditAmount", "1");
         this.putDraftIfMissing("bossEditLevelOverride", "0");
@@ -829,7 +822,6 @@ extends CustomUIPage {
         this.putDraftIfMissing("bossSpawnTrigger", "before_boss");
         this.putDraftIfMissing("bossSpawnTriggerValue", "0");
         this.putDraftIfMissing("bossWaveRandomLocations", "false");
-        this.putDraftIfMissing("bossWaveRandomRadius", "0");
         this.putDraftIfMissing("bossTimedProximityEnabled", "false");
         this.putDraftIfMissing("bossTimedProximityRadius", "0");
         this.putDraftIfMissing("bossTimedProximityCooldown", "0");
@@ -870,7 +862,6 @@ extends CustomUIPage {
             this.draftValues.remove("bossSpawnTrigger");
             this.draftValues.remove("bossSpawnTriggerValue");
             this.draftValues.remove("bossWaveRandomLocations");
-            this.draftValues.remove("bossWaveRandomRadius");
             this.draftValues.remove("bossTimedProximityEnabled");
             this.draftValues.remove("bossTimedProximityArena");
             this.draftValues.remove("bossTimedProximityRadius");
@@ -919,7 +910,6 @@ extends CustomUIPage {
         this.draftValues.put("bossSpawnTrigger", snapshot.bossSpawnTrigger == null ? "before_boss" : snapshot.bossSpawnTrigger);
         this.draftValues.put("bossSpawnTriggerValue", HordeConfigPage.formatDouble(snapshot.bossSpawnTriggerValue));
         this.draftValues.put("bossWaveRandomLocations", Boolean.toString(snapshot.useRandomSpawnLocations));
-        this.draftValues.put("bossWaveRandomRadius", HordeConfigPage.formatDouble(snapshot.randomSpawnRadius));
         this.draftValues.put("bossTimedProximityEnabled", Boolean.toString(snapshot.timedProximityEnabled));
         this.draftValues.put("bossTimedProximityArena", snapshot.timedProximityArenaId == null ? "" : snapshot.timedProximityArenaId);
         this.draftValues.put("bossTimedProximityRadius", HordeConfigPage.formatDouble(snapshot.timedProximityRadius));
@@ -949,7 +939,6 @@ extends CustomUIPage {
         HordeConfigPage.putIfNotBlank(values, "bossSpawnTrigger", this.getDraftValue("bossSpawnTrigger", "before_boss"));
         HordeConfigPage.putIfNotBlank(values, "bossSpawnTriggerValue", this.getDraftValue("bossSpawnTriggerValue", "0"));
         values.put("bossWaveRandomLocations", Boolean.toString(this.getDraftBoolean("bossWaveRandomLocations", false)));
-        HordeConfigPage.putIfNotBlank(values, "bossWaveRandomRadius", this.getDraftValue("bossWaveRandomRadius", "0"));
         values.put("bossTimedProximityEnabled", Boolean.toString(this.getDraftBoolean("bossTimedProximityEnabled", false)));
         HordeConfigPage.putIfNotBlank(values, "bossTimedProximityArena", this.getDraftValue("bossTimedProximityArena", ""));
         HordeConfigPage.putIfNotBlank(values, "bossTimedProximityRadius", this.getDraftValue("bossTimedProximityRadius", "0"));
@@ -1127,8 +1116,7 @@ extends CustomUIPage {
                         || "rewardItemId".equals(field.configKey)
                         || "rewardItemQuantity".equals(field.configKey);
             case TAB_BOSSES:
-                return "bossCreateId".equals(field.configKey)
-                        || "bossSelected".equals(field.configKey)
+                return "bossSelected".equals(field.configKey)
                         || "bossEditName".equals(field.configKey)
                         || "bossEditNpcId".equals(field.configKey)
                         || "bossEditTier".equals(field.configKey)
@@ -1138,7 +1126,6 @@ extends CustomUIPage {
                         || "bossSpawnTrigger".equals(field.configKey)
                         || "bossSpawnTriggerValue".equals(field.configKey)
                         || "bossWaveRandomLocations".equals(field.configKey)
-                        || "bossWaveRandomRadius".equals(field.configKey)
                         || "bossTimedProximityEnabled".equals(field.configKey)
                         || "bossTimedProximityArena".equals(field.configKey)
                         || "bossTimedProximityRadius".equals(field.configKey)
@@ -1437,7 +1424,6 @@ extends CustomUIPage {
                 .set("#RoundStartVolumeLabel.Text", HordeConfigPage.t(language, english, "Start volume (%)", "Volumen inicio (%)"))
                 .set("#RoundVictoryVolumeLabel.Text", HordeConfigPage.t(language, english, "Victory volume (%)", "Volumen victoria (%)"))
                 .set("#BossesTitleLabel.Text", HordeConfigPage.t(language, english, "Boss definitions", "Definiciones de bosses"))
-                .set("#BossCreateIdLabel.Text", HordeConfigPage.t(language, english, "New boss ID", "Nuevo ID de boss"))
                 .set("#BossAddButton.Text", HordeConfigPage.t(language, english, "Add boss", "Anadir boss"))
                 .set("#BossHeaderName.Text", HordeConfigPage.t(language, english, "Boss ID", "Boss ID"))
                 .set("#BossHeaderNpc.Text", HordeConfigPage.t(language, english, "NPC ID", "NPC ID"))
@@ -1455,7 +1441,6 @@ extends CustomUIPage {
                 .set("#BossSpawnTriggerLabel.Text", HordeConfigPage.t(language, english, "Spawn trigger", "Disparador de spawn"))
                 .set("#BossSpawnTriggerValueLabel.Text", HordeConfigPage.t(language, english, "Trigger value", "Valor del disparador"))
                 .set("#BossWaveRandomLocationsLabel.Text", HordeConfigPage.t(language, english, "Random locations", "Ubicaciones aleatorias"))
-                .set("#BossWaveRandomRadiusLabel.Text", HordeConfigPage.t(language, english, "Random radius", "Radio aleatorio"))
                 .set("#BossTimedProximityEnabledLabel.Text", HordeConfigPage.t(language, english, "Timed proximity", "Proximidad temporizada"))
                 .set("#BossTimedProximityArenaLabel.Text", HordeConfigPage.t(language, english, "Timed arena", "Arena temporizada"))
                 .set("#BossTimedProximityRadiusLabel.Text", HordeConfigPage.t(language, english, "Proximity radius", "Radio de proximidad"))
@@ -1518,7 +1503,7 @@ extends CustomUIPage {
         this.setVisible(commandBuilder, playersTab, "#AudienceInfoLabel", "#PlayersListTitle", "#PlayersCountLabel", "#PlayersCountValue", "#PlayersListHint", "#PlayersRefreshButton", "#PlayersHeaderName", "#PlayersHeaderMode", "#AudiencePlayersRows", "#AudiencePlayersEmptyLabel", "#AudienceHelpLabel", "#ArenaJoinRadiusLabel", "#ArenaJoinRadius");
         this.setVisible(commandBuilder, soundsTab, "#RoundStartSoundLabel", "#RoundStartSoundId", "#RoundStartVolumeLabel", "#RoundStartVolume", "#RoundVictorySoundLabel", "#RoundVictorySoundId", "#RoundVictoryVolumeLabel", "#RoundVictoryVolume");
         this.setVisible(commandBuilder, rewardsTab, "#RewardCategoryLabel", "#RewardCategory", "#RewardCommandsLabel", "#RewardItemId", "#RewardItemQuantityLabel", "#RewardItemQuantity");
-        this.setVisible(commandBuilder, bossesTab, "#BossesTitleLabel", "#BossCreateIdLabel", "#BossCreateId", "#BossAddButton", "#BossHeaderName", "#BossHeaderNpc", "#BossHeaderTier", "#BossHeaderAmount", "#BossHeaderActions", "#BossPagePrevButton", "#BossPageNextButton", "#BossPageLabel", "#BossEmptyLabel", "#BossOverflowLabel", "#BossEditorTitleLabel", "#BossSelectedLabel", "#BossEditNameLabel", "#BossEditName", "#BossEditNpcIdLabel", "#BossEditNpcId", "#BossEditTierLabel", "#BossEditTier", "#BossEditAmountLabel", "#BossEditAmount", "#BossEditLevelOverrideLabel", "#BossEditLevelOverride", "#BossEditLootRadiusLabel", "#BossEditLootRadius", "#BossSpawnTriggerLabel", "#BossSpawnTrigger", "#BossSpawnTriggerValueLabel", "#BossSpawnTriggerValue", "#BossWaveRandomLocationsLabel", "#BossWaveRandomLocations", "#BossWaveRandomRadiusLabel", "#BossWaveRandomRadius", "#BossTimedProximityEnabledLabel", "#BossTimedProximityEnabled", "#BossTimedProximityArenaLabel", "#BossTimedProximityArena", "#BossTimedProximityRadiusLabel", "#BossTimedProximityRadius", "#BossTimedProximityCooldownLabel", "#BossTimedProximityCooldown", "#BossSaveButton", "#BossStatusLabel", "#BossRow1", "#BossRow2", "#BossRow3", "#BossRow4");
+        this.setVisible(commandBuilder, bossesTab, "#BossesTitleLabel", "#BossAddButton", "#BossHeaderName", "#BossHeaderNpc", "#BossHeaderTier", "#BossHeaderAmount", "#BossHeaderActions", "#BossPagePrevButton", "#BossPageNextButton", "#BossPageLabel", "#BossEmptyLabel", "#BossOverflowLabel", "#BossEditorTitleLabel", "#BossSelectedLabel", "#BossEditNameLabel", "#BossEditName", "#BossEditNpcIdLabel", "#BossEditNpcId", "#BossEditTierLabel", "#BossEditTier", "#BossEditAmountLabel", "#BossEditAmount", "#BossEditLevelOverrideLabel", "#BossEditLevelOverride", "#BossEditLootRadiusLabel", "#BossEditLootRadius", "#BossSpawnTriggerLabel", "#BossSpawnTrigger", "#BossSpawnTriggerValueLabel", "#BossSpawnTriggerValue", "#BossWaveRandomLocationsLabel", "#BossWaveRandomLocations", "#BossTimedProximityEnabledLabel", "#BossTimedProximityEnabled", "#BossTimedProximityArenaLabel", "#BossTimedProximityArena", "#BossTimedProximityRadiusLabel", "#BossTimedProximityRadius", "#BossTimedProximityCooldownLabel", "#BossTimedProximityCooldown", "#BossSaveButton", "#BossRow1", "#BossRow2", "#BossRow3", "#BossRow4");
         this.setVisible(commandBuilder, arenasTab, "#ArenasTitleLabel", "#ArenaAddButton", "#ArenaHeaderName", "#ArenaHeaderCoords", "#ArenaHeaderActions", "#ArenaPagePrevButton", "#ArenaPageNextButton", "#ArenaPageLabel", "#ArenaEmptyLabel", "#ArenaOverflowLabel", "#ArenaEditorTitleLabel", "#ArenaSelectedLabel", "#ArenaSelected", "#ArenaEditIdLabel", "#ArenaEditId", "#ArenaEditXLabel", "#ArenaEditX", "#ArenaEditYLabel", "#ArenaEditY", "#ArenaEditZLabel", "#ArenaEditZ", "#ArenaUseCurrentPositionButton", "#ArenaSaveButton", "#ArenaRow1", "#ArenaRow2", "#ArenaRow3", "#ArenaRow4", "#ArenaRow5", "#ArenaRow6", "#ArenaRow7", "#ArenaRow8", "#ArenaRow9", "#ArenaRow10");
         this.setVisible(commandBuilder, helpTab, "#HelpIntroLabel", "#HelpCommandsLabel", "#HelpCommandsLine1", "#HelpCommandsLine2", "#HelpCommandsLine3", "#HelpConfigLabel", "#HelpConfigLine1", "#HelpConfigLine2", "#HelpConfigLine3", "#HelpExternalLabel", "#HelpExternalLine1", "#HelpExternalLine2", "#HelpExternalLine3", "#HelpReloadLabel", "#HelpReloadLine1", "#HelpReloadLine2");
         this.setVisible(commandBuilder, generalTab, "#TabGeneralActiveBack", "#TabGeneralActiveTop", "#TabGeneralActiveNotch");
@@ -1529,7 +1514,7 @@ extends CustomUIPage {
         this.setVisible(commandBuilder, bossesTab, "#TabBossesActiveBack", "#TabBossesActiveTop", "#TabBossesActiveNotch");
         this.setVisible(commandBuilder, arenasTab, "#TabArenasActiveBack", "#TabArenasActiveTop", "#TabArenasActiveNotch");
         this.setVisible(commandBuilder, helpTab, "#TabHelpActiveBack", "#TabHelpActiveTop", "#TabHelpActiveNotch");
-        this.setVisible(commandBuilder, false, "#SubTitleLabel", "#TabHintLabel", "#StatusTitleLabel", "#StatusPanel", "#StatusLabel", "#SpawnStateLabel", "#SpawnLabel", "#SpawnX", "#SpawnY", "#SpawnZ", "#SetSpawnButton", "#ArenaStatusLabel", "#RoleHelpLabel", "#RoundSoundHelpLabel", "#RewardCommandsHelpLabel", "#PlayerMultiplierLabel", "#PlayerMultiplier", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel", "#EnemyLevelMin", "#EnemyLevelRangeSeparator", "#EnemyLevelMax", "#LanguagePrevButton", "#LanguageNextButton", "#FinalBossPrevButton", "#FinalBossNextButton", "#RoundStartSoundPrevButton", "#RoundStartSoundNextButton", "#RoundVictorySoundPrevButton", "#RoundVictorySoundNextButton", "#RewardCategoryPrevButton", "#RewardCategoryNextButton", "#RewardItemPrevButton", "#RewardItemNextButton", "#RewardEveryRoundsLabel", "#RewardEveryRounds", "#HelpDiscordButton", "#HelpCurseForgeButton");
+        this.setVisible(commandBuilder, false, "#SubTitleLabel", "#TabHintLabel", "#StatusTitleLabel", "#StatusPanel", "#StatusLabel", "#SpawnStateLabel", "#SpawnLabel", "#SpawnX", "#SpawnY", "#SpawnZ", "#SetSpawnButton", "#BossStatusLabel", "#ArenaStatusLabel", "#RoleHelpLabel", "#RoundSoundHelpLabel", "#RewardCommandsHelpLabel", "#PlayerMultiplierLabel", "#PlayerMultiplier", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel", "#EnemyLevelMin", "#EnemyLevelRangeSeparator", "#EnemyLevelMax", "#LanguagePrevButton", "#LanguageNextButton", "#FinalBossPrevButton", "#FinalBossNextButton", "#RoundStartSoundPrevButton", "#RoundStartSoundNextButton", "#RoundVictorySoundPrevButton", "#RoundVictorySoundNextButton", "#RewardCategoryPrevButton", "#RewardCategoryNextButton", "#RewardItemPrevButton", "#RewardItemNextButton", "#RewardEveryRoundsLabel", "#RewardEveryRounds", "#HelpDiscordButton", "#HelpCurseForgeButton");
     }
 
     private void setVisible(UICommandBuilder commandBuilder, boolean visible, String ... elementIds) {

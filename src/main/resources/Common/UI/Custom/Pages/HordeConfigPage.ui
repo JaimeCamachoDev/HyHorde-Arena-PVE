@@ -419,9 +419,9 @@ Group {
   }
 
   Label #TitleLabel {
-    Anchor: (Left: 456, Top: 98, Width: 500, Height: 30);
+    Anchor: (Left: 456, Top: 104, Width: 500, Height: 26);
     Text: "Horda PVE Config";
-    Style: (FontSize: 22, TextColor: #f1f7ff, RenderBold: true, VerticalAlignment: Center);
+    Style: (FontSize: 18, TextColor: #f1f7ff, RenderBold: true, VerticalAlignment: Center);
   }
 
   Label #SubTitleLabel {
@@ -1142,20 +1142,8 @@ Group {
     Style: (FontSize: 18, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
-  Label #BossCreateIdLabel {
-    Anchor: (Left: 456, Top: 268, Width: 120, Height: 22);
-    Text: "Nuevo ID";
-    Visible: false;
-    Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
-  }
-
-  $C.@TextField #BossCreateId {
-    @Anchor = (Left: 580, Top: 264, Width: 220);
-    Value: "";
-  }
-
   TextButton #BossAddButton {
-    Anchor: (Left: 808, Top: 264, Width: 216, Height: 34);
+    Anchor: (Left: 456, Top: 264, Width: 568, Height: 34);
     Text: "Anadir boss";
     Visible: false;
     Style: $C.@SmallSecondaryTextButtonStyle;
@@ -1205,7 +1193,15 @@ Group {
     Label #BossTier1 { Anchor: (Left: 354, Top: 6, Width: 74, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     Label #BossAmount1 { Anchor: (Left: 434, Top: 6, Width: 42, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
     TextButton #BossOpen1 { Anchor: (Left: 478, Top: 4, Width: 54, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #BossDelete1 { Anchor: (Left: 536, Top: 4, Width: 26, Height: 26); Text: "-"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #BossDelete1 {
+      Anchor: (Left: 536, Top: 4, Width: 26, Height: 26);
+      Text: "-";
+      Style: TextButtonStyle(
+        Default: (Background: #4f1f1f, LabelStyle: (FontSize: 14, TextColor: #ffd8d8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+        Hovered: (Background: #6a2929, LabelStyle: (FontSize: 14, TextColor: #ffeaea, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+        Pressed: (Background: #873636, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+      );
+    }
   }
 
   Panel #BossRow2 {
@@ -1217,7 +1213,15 @@ Group {
     Label #BossTier2 { Anchor: (Left: 354, Top: 6, Width: 74, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     Label #BossAmount2 { Anchor: (Left: 434, Top: 6, Width: 42, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
     TextButton #BossOpen2 { Anchor: (Left: 478, Top: 4, Width: 54, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #BossDelete2 { Anchor: (Left: 536, Top: 4, Width: 26, Height: 26); Text: "-"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #BossDelete2 {
+      Anchor: (Left: 536, Top: 4, Width: 26, Height: 26);
+      Text: "-";
+      Style: TextButtonStyle(
+        Default: (Background: #4f1f1f, LabelStyle: (FontSize: 14, TextColor: #ffd8d8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+        Hovered: (Background: #6a2929, LabelStyle: (FontSize: 14, TextColor: #ffeaea, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+        Pressed: (Background: #873636, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+      );
+    }
   }
 
   Panel #BossRow3 {
@@ -1229,7 +1233,15 @@ Group {
     Label #BossTier3 { Anchor: (Left: 354, Top: 6, Width: 74, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     Label #BossAmount3 { Anchor: (Left: 434, Top: 6, Width: 42, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
     TextButton #BossOpen3 { Anchor: (Left: 478, Top: 4, Width: 54, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #BossDelete3 { Anchor: (Left: 536, Top: 4, Width: 26, Height: 26); Text: "-"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #BossDelete3 {
+      Anchor: (Left: 536, Top: 4, Width: 26, Height: 26);
+      Text: "-";
+      Style: TextButtonStyle(
+        Default: (Background: #4f1f1f, LabelStyle: (FontSize: 14, TextColor: #ffd8d8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+        Hovered: (Background: #6a2929, LabelStyle: (FontSize: 14, TextColor: #ffeaea, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+        Pressed: (Background: #873636, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+      );
+    }
   }
 
   Panel #BossRow4 {
@@ -1241,7 +1253,15 @@ Group {
     Label #BossTier4 { Anchor: (Left: 354, Top: 6, Width: 74, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     Label #BossAmount4 { Anchor: (Left: 434, Top: 6, Width: 42, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
     TextButton #BossOpen4 { Anchor: (Left: 478, Top: 4, Width: 54, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #BossDelete4 { Anchor: (Left: 536, Top: 4, Width: 26, Height: 26); Text: "-"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #BossDelete4 {
+      Anchor: (Left: 536, Top: 4, Width: 26, Height: 26);
+      Text: "-";
+      Style: TextButtonStyle(
+        Default: (Background: #4f1f1f, LabelStyle: (FontSize: 14, TextColor: #ffd8d8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+        Hovered: (Background: #6a2929, LabelStyle: (FontSize: 14, TextColor: #ffeaea, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+        Pressed: (Background: #873636, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+      );
+    }
   }
 
   TextButton #BossPagePrevButton {
@@ -1302,34 +1322,32 @@ Group {
     Background: #0f1825;
   }
 
-  Label #BossEditNameLabel { Anchor: (Left: 1048, Top: 300, Width: 170, Height: 22); Text: "Boss ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossEditName { @Anchor = (Left: 1228, Top: 296, Width: 236); Value: ""; }
-  Label #BossEditNpcIdLabel { Anchor: (Left: 1048, Top: 338, Width: 170, Height: 22); Text: "NPC ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossEditNpcId { @Anchor = (Left: 1228, Top: 334, Width: 236); Value: ""; }
-  Label #BossEditTierLabel { Anchor: (Left: 1048, Top: 376, Width: 170, Height: 22); Text: "Tier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@DropdownBox #BossEditTier { @Anchor = (Left: 1228, Top: 372, Width: 236); Value: "common"; }
-  Label #BossEditAmountLabel { Anchor: (Left: 1048, Top: 414, Width: 100, Height: 22); Text: "Cantidad"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossEditAmount { @Anchor = (Left: 1152, Top: 410, Width: 88); Value: "1"; }
-  Label #BossEditLevelOverrideLabel { Anchor: (Left: 1250, Top: 414, Width: 120, Height: 22); Text: "Nivel fijo"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossEditLevelOverride { @Anchor = (Left: 1372, Top: 410, Width: 92); Value: "0"; }
-  Label #BossEditLootRadiusLabel { Anchor: (Left: 1048, Top: 452, Width: 170, Height: 22); Text: "Radio loot"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossEditLootRadius { @Anchor = (Left: 1228, Top: 448, Width: 236); Value: "0"; }
-  Label #BossSpawnTriggerLabel { Anchor: (Left: 1048, Top: 490, Width: 170, Height: 22); Text: "Spawn trigger"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@DropdownBox #BossSpawnTrigger { @Anchor = (Left: 1228, Top: 486, Width: 236); Value: "before_boss"; }
-  Label #BossSpawnTriggerValueLabel { Anchor: (Left: 1048, Top: 528, Width: 170, Height: 22); Text: "Valor"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossSpawnTriggerValue { @Anchor = (Left: 1228, Top: 524, Width: 236); Value: "0"; }
-  Label #BossWaveRandomLocationsLabel { Anchor: (Left: 1048, Top: 566, Width: 170, Height: 22); Text: "Ubicaciones aleatorias"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@CheckBox #BossWaveRandomLocations { @Anchor = (Left: 1228, Top: 562, Width: 236); Value: false; }
-  Label #BossWaveRandomRadiusLabel { Anchor: (Left: 1048, Top: 604, Width: 170, Height: 22); Text: "Radio aleatorio"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossWaveRandomRadius { @Anchor = (Left: 1228, Top: 600, Width: 236); Value: "0"; }
-  Label #BossTimedProximityEnabledLabel { Anchor: (Left: 1048, Top: 642, Width: 170, Height: 22); Text: "Prox. temporizada"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@CheckBox #BossTimedProximityEnabled { @Anchor = (Left: 1228, Top: 638, Width: 236); Value: false; }
-  Label #BossTimedProximityArenaLabel { Anchor: (Left: 1048, Top: 680, Width: 170, Height: 22); Text: "Arena temporizada"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@DropdownBox #BossTimedProximityArena { @Anchor = (Left: 1228, Top: 676, Width: 236); Value: ""; }
-  Label #BossTimedProximityRadiusLabel { Anchor: (Left: 1048, Top: 718, Width: 170, Height: 22); Text: "Radio"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossTimedProximityRadius { @Anchor = (Left: 1228, Top: 714, Width: 96); Value: "0"; }
-  Label #BossTimedProximityCooldownLabel { Anchor: (Left: 1332, Top: 718, Width: 86, Height: 22); Text: "Cooldown"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
-  $C.@TextField #BossTimedProximityCooldown { @Anchor = (Left: 1420, Top: 714, Width: 44); Value: "0"; }
+  Label #BossEditNameLabel { Anchor: (Left: 1048, Top: 304, Width: 170, Height: 22); Text: "Boss ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #BossEditName { @Anchor = (Left: 1228, Top: 300, Width: 236); Value: ""; }
+  Label #BossEditNpcIdLabel { Anchor: (Left: 1048, Top: 346, Width: 170, Height: 22); Text: "NPC ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #BossEditNpcId { @Anchor = (Left: 1228, Top: 342, Width: 236); Value: ""; }
+  Label #BossEditTierLabel { Anchor: (Left: 1048, Top: 388, Width: 170, Height: 22); Text: "Tier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@DropdownBox #BossEditTier { @Anchor = (Left: 1228, Top: 384, Width: 236); Value: "common"; }
+  Label #BossEditAmountLabel { Anchor: (Left: 1048, Top: 430, Width: 100, Height: 22); Text: "Cantidad"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #BossEditAmount { @Anchor = (Left: 1152, Top: 426, Width: 88); Value: "1"; }
+  Label #BossEditLevelOverrideLabel { Anchor: (Left: 1250, Top: 430, Width: 120, Height: 22); Text: "Nivel fijo"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #BossEditLevelOverride { @Anchor = (Left: 1372, Top: 426, Width: 92); Value: "0"; }
+  Label #BossEditLootRadiusLabel { Anchor: (Left: 1048, Top: 472, Width: 170, Height: 22); Text: "Radio loot"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #BossEditLootRadius { @Anchor = (Left: 1228, Top: 468, Width: 236); Value: "0"; }
+  Label #BossSpawnTriggerLabel { Anchor: (Left: 1048, Top: 514, Width: 170, Height: 22); Text: "Spawn trigger"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@DropdownBox #BossSpawnTrigger { @Anchor = (Left: 1228, Top: 510, Width: 236); Value: "before_boss"; }
+  Label #BossSpawnTriggerValueLabel { Anchor: (Left: 1048, Top: 556, Width: 170, Height: 22); Text: "Valor"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #BossSpawnTriggerValue { @Anchor = (Left: 1228, Top: 552, Width: 236); Value: "0"; }
+  Label #BossWaveRandomLocationsLabel { Anchor: (Left: 1048, Top: 598, Width: 170, Height: 22); Text: "Ubicaciones aleatorias"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@CheckBox #BossWaveRandomLocations { @Anchor = (Left: 1228, Top: 594, Width: 236); Value: false; }
+  Label #BossTimedProximityEnabledLabel { Anchor: (Left: 1048, Top: 640, Width: 170, Height: 22); Text: "Prox. temporizada"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@CheckBox #BossTimedProximityEnabled { @Anchor = (Left: 1228, Top: 636, Width: 236); Value: false; }
+  Label #BossTimedProximityArenaLabel { Anchor: (Left: 1048, Top: 682, Width: 170, Height: 22); Text: "Arena temporizada"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@DropdownBox #BossTimedProximityArena { @Anchor = (Left: 1228, Top: 678, Width: 236); Value: ""; }
+  Label #BossTimedProximityRadiusLabel { Anchor: (Left: 1048, Top: 724, Width: 170, Height: 22); Text: "Radio"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #BossTimedProximityRadius { @Anchor = (Left: 1228, Top: 720, Width: 96); Value: "0"; }
+  Label #BossTimedProximityCooldownLabel { Anchor: (Left: 1332, Top: 724, Width: 86, Height: 22); Text: "Cooldown"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #BossTimedProximityCooldown { @Anchor = (Left: 1420, Top: 720, Width: 44); Value: "0"; }
 
   TextButton #BossSaveButton {
     Anchor: (Left: 1228, Top: 752, Width: 236, Height: 34);
