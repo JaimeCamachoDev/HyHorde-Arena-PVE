@@ -8,6 +8,7 @@ import com.hyhorde.arenapve.commands.HordeCommand;
 import com.hyhorde.arenapve.commands.HordeHelpCommand;
 import com.hyhorde.arenapve.commands.HordePveCommand;
 import com.hyhorde.arenapve.commands.HordeReloadCommand;
+import com.hyhorde.arenapve.horde.HordeBossDamageScalingSystem;
 import com.hyhorde.arenapve.horde.HordeDamageTrackerSystem;
 import com.hyhorde.arenapve.horde.HordeHudSystem;
 import com.hyhorde.arenapve.horde.HordeService;
@@ -24,6 +25,7 @@ extends JavaPlugin {
     protected void setup() {
         super.setup();
         this.hordeService = new HordeService((PluginBase)this);
+        this.getEntityStoreRegistry().registerSystem(new HordeBossDamageScalingSystem(this.hordeService));
         this.getEntityStoreRegistry().registerSystem(new HordeDamageTrackerSystem(this.hordeService));
         // HUD lifecycle is managed on world tick through HordeHudSystem.
         // Compatibility note:

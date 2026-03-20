@@ -153,6 +153,8 @@ public final class HordeService {
     private static final float ENEMY_LEVEL_HEALTH_STEP = 0.1f;
     private static final float ENEMY_LEVEL_HEALTH_MAX_MULTIPLIER = 6.0f;
     private static final float FINAL_BOSS_HEALTH_MULTIPLIER = 1.35f;
+    private static final float MIN_BOSS_RUNTIME_MULTIPLIER = 0.01f;
+    private static final float MAX_BOSS_RUNTIME_MULTIPLIER = 1000.0f;
     private static final double MIN_RADIUS = HordeConfigRules.MIN_RADIUS;
     private static final double MAX_RADIUS = HordeConfigRules.MAX_RADIUS;
     private static final double MIN_ARENA_JOIN_RADIUS = HordeConfigRules.MIN_ARENA_JOIN_RADIUS;
@@ -189,6 +191,7 @@ public final class HordeService {
     private boolean pluginReloadInProgress;
     private HordeConfig config;
     private HordeSession session;
+    private final Map<Ref<EntityStore>, BossRuntimeModifiers> bossRuntimeModifiersByEnemyRef;
     private long nextAutoStartPollAtMillis;
     private long nextAutoStartAtMillis;
     private long lastStartDiagnosticAtMillis;
@@ -213,6 +216,7 @@ public final class HordeService {
         this.cachedRoundVictorySoundEventId = "";
         this.cachedRoundVictorySoundSelection = "";
         this.config = HordeConfig.defaults();
+        this.bossRuntimeModifiersByEnemyRef = new HashMap<Ref<EntityStore>, BossRuntimeModifiers>();
         this.nextAutoStartPollAtMillis = 0L;
         this.nextAutoStartAtMillis = 0L;
         this.lastStartDiagnosticAtMillis = 0L;
@@ -961,6 +965,17 @@ public final class HordeService {
         return this.session.activeEnemies.contains(enemyRef);
     }
 
+    public synchronized float getTrackedBossDamageMultiplier(Ref<EntityStore> enemyRef) {
+        if (this.session == null || enemyRef == null || !this.session.activeEnemies.contains(enemyRef)) {
+            return 1.0f;
+        }
+        BossRuntimeModifiers runtime = this.bossRuntimeModifiersByEnemyRef.get(enemyRef);
+        if (runtime == null) {
+            return 1.0f;
+        }
+        return HordeService.clampRuntimeMultiplier(runtime.damageMultiplier);
+    }
+
     public synchronized void registerEnemyKill(Ref<EntityStore> enemyRef, PlayerRef attackerPlayer) {
         if (this.session == null || enemyRef == null || attackerPlayer == null) {
             return;
@@ -971,6 +986,7 @@ public final class HordeService {
         if (!this.session.accountedEnemyDeaths.add(enemyRef)) {
             return;
         }
+        this.bossRuntimeModifiersByEnemyRef.remove(enemyRef);
         if (!this.isArenaPlayer(attackerPlayer)) {
             return;
         }
@@ -1526,6 +1542,7 @@ public final class HordeService {
         }
         Vector3f startRotation = new Vector3f(startedBy.getTransform().getRotation());
         long firstRoundAtMillis = System.currentTimeMillis() + (long)START_COUNTDOWN_TOTAL_SECONDS * 1000L;
+        this.bossRuntimeModifiersByEnemyRef.clear();
         this.session = newSession = new HordeSession(world, store, selectedRole, selectedEnemyType, new ArrayList<String>(roles), playerMultiplier, forcedRole, randomizableEnemyTypes, startRotation, firstRoundAtMillis, lockedPlayers, lockedSpectators, selectedArenaSessionId, sessionArenaCenterX, sessionArenaCenterY, sessionArenaCenterZ, selectedBossSessionId, selectedBossNpcRole, selectedBossAmount);
         this.syncSessionPlayers(newSession);
         newSession.ticker = HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> this.tickSession(newSession), 0L, SESSION_TICK_INTERVAL_MILLIS, TimeUnit.MILLISECONDS);
@@ -1743,6 +1760,7 @@ public final class HordeService {
                 staleSession.ticker.cancel(false);
             }
             this.session = null;
+            this.bossRuntimeModifiersByEnemyRef.clear();
             this.plugin.getLogger().at(Level.WARNING).log("Skipping horde shutdown announcements because world is already closing: %s", (Object)ex.getMessage());
         }
         this.closeAllStatusPages();
@@ -1766,11 +1784,13 @@ public final class HordeService {
                         if (this.session != trackedSession) {
                             return;
                         }
+                        this.purgeBossRuntimeModifiers(trackedSession);
                         int removed = HordeService.removeInvalidRefs(trackedSession.activeEnemies, trackedSession.accountedEnemyDeaths);
                         if (removed > 0) {
                             trackedSession.totalKilled += removed;
                         }
                         HordeService.removeInvalidRefs(trackedSession.spawnedEnemies, null);
+                        this.purgeBossRuntimeModifiers(trackedSession);
                         this.syncSessionPlayers(trackedSession);
                         long now = System.currentTimeMillis();
                         boolean english = HordeService.isEnglishLanguage(this.config.language);
@@ -1856,6 +1876,8 @@ public final class HordeService {
         boolean finalRound = nextRound >= this.config.rounds;
         boolean spawnFinalBoss = finalRound && this.config.finalBossEnabled;
         int configuredFinalBossCount = spawnFinalBoss ? Math.max(1, sessionToAdvance.selectedBossAmount) : 0;
+        BossArenaCatalogService.BossDefinitionSnapshot configuredBossDefinition = spawnFinalBoss ? HordeService.findBossById(this.bossArenaCatalogService.getBossDefinitionsSnapshot(), sessionToAdvance.selectedBossId) : null;
+        BossRuntimeModifiers configuredBossRuntimeModifiers = this.computeBossRuntimeModifiers(configuredBossDefinition, playerMultiplier);
         int spawnGoal = targetCount + configuredFinalBossCount;
         Vector3d center = new Vector3d(this.config.spawnX, this.config.spawnY, this.config.spawnZ);
         ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -1916,6 +1938,9 @@ public final class HordeService {
                     int enemyLevel = this.rollEnemyLevel(levelMin, levelMax, bossSpawn);
                     this.applyEnemyLevelIfSupported(sessionToAdvance.store, enemyRef, enemyLevel, bossSpawn);
                 }
+                if (bossSpawn) {
+                    this.applyBossRuntimeModifiers(sessionToAdvance.store, enemyRef, configuredBossDefinition, configuredBossRuntimeModifiers, nextRound);
+                }
                 ++sessionToAdvance.totalSpawned;
                 ++spawned;
                 if (bossSpawn) {
@@ -1966,6 +1991,235 @@ public final class HordeService {
             this.sendAudienceMessage(sessionToAdvance, "Ronda " + nextRound + "/" + this.config.rounds + " iniciada: " + spawned + " enemigos (x" + playerMultiplier + " jugadores, " + levelInfo + ")." + bossSuffix);
         }
         this.broadcastRoundStartAnnouncement(sessionToAdvance, nextRound, this.config.rounds, spawned, playerMultiplier);
+    }
+
+    private void purgeBossRuntimeModifiers(HordeSession trackedSession) {
+        if (trackedSession == null || this.bossRuntimeModifiersByEnemyRef.isEmpty()) {
+            return;
+        }
+        this.bossRuntimeModifiersByEnemyRef.entrySet().removeIf(entry -> entry == null || entry.getKey() == null || !entry.getKey().isValid() || !trackedSession.activeEnemies.contains(entry.getKey()));
+    }
+
+    private BossRuntimeModifiers computeBossRuntimeModifiers(BossArenaCatalogService.BossDefinitionSnapshot definition, int playerCount) {
+        int safePlayers = Math.max(MIN_PLAYER_MULTIPLIER, Math.min(MAX_PLAYER_MULTIPLIER, playerCount));
+        int extraPlayers = Math.max(0, safePlayers - 1);
+        if (definition == null) {
+            return BossRuntimeModifiers.defaults();
+        }
+        double baseHp = definition.modifiers == null ? 1.0 : definition.modifiers.hp;
+        double baseDamage = definition.modifiers == null ? 1.0 : definition.modifiers.damage;
+        double baseSize = definition.modifiers == null ? 1.0 : definition.modifiers.size;
+        double baseAttackRate = definition.modifiers == null ? 1.0 : definition.modifiers.attackRate;
+        double perHp = definition.perPlayerIncrease == null ? 0.0 : definition.perPlayerIncrease.hp;
+        double perDamage = definition.perPlayerIncrease == null ? 0.0 : definition.perPlayerIncrease.damage;
+        double perSize = definition.perPlayerIncrease == null ? 0.0 : definition.perPlayerIncrease.size;
+        double perAttackRate = definition.perPlayerIncrease == null ? 0.0 : definition.perPlayerIncrease.attackRate;
+        float hpMultiplier = HordeService.clampRuntimeMultiplier((float)(baseHp + perHp * (double)extraPlayers));
+        float damageMultiplier = HordeService.clampRuntimeMultiplier((float)(baseDamage + perDamage * (double)extraPlayers));
+        float sizeMultiplier = HordeService.clampRuntimeMultiplier((float)(baseSize + perSize * (double)extraPlayers));
+        float attackRateMultiplier = HordeService.clampRuntimeMultiplier((float)(baseAttackRate + perAttackRate * (double)extraPlayers));
+        return new BossRuntimeModifiers(hpMultiplier, damageMultiplier, sizeMultiplier, attackRateMultiplier);
+    }
+
+    private static float clampRuntimeMultiplier(float value) {
+        if (!Float.isFinite(value)) {
+            return 1.0f;
+        }
+        if (value < MIN_BOSS_RUNTIME_MULTIPLIER) {
+            return MIN_BOSS_RUNTIME_MULTIPLIER;
+        }
+        if (value > MAX_BOSS_RUNTIME_MULTIPLIER) {
+            return MAX_BOSS_RUNTIME_MULTIPLIER;
+        }
+        return value;
+    }
+
+    private void applyBossRuntimeModifiers(Store<EntityStore> store, Ref<EntityStore> enemyRef, BossArenaCatalogService.BossDefinitionSnapshot definition, BossRuntimeModifiers runtimeModifiers, int roundNumber) {
+        if (store == null || enemyRef == null || runtimeModifiers == null) {
+            return;
+        }
+        boolean hpApplied = this.applyBossHealthMultiplier(store, enemyRef, runtimeModifiers.hpMultiplier);
+        boolean sizeApplied = this.applyBossSizeMultiplier(store, enemyRef, runtimeModifiers.sizeMultiplier);
+        boolean attackRateApplied = this.applyBossAttackRateMultiplier(store, enemyRef, runtimeModifiers.attackRateMultiplier);
+        this.bossRuntimeModifiersByEnemyRef.put(enemyRef, runtimeModifiers);
+        String bossIdText = definition == null || definition.bossId == null || definition.bossId.isBlank() ? "<legacy>" : definition.bossId;
+        this.plugin.getLogger().at(Level.INFO).log("Boss modifiers | round=%d | boss=%s | hp=%.3f | damage=%.3f | size=%.3f | attackRate=%.3f | applied(hp=%s,size=%s,attackRate=%s)", (Object)Integer.valueOf(roundNumber), (Object)bossIdText, (Object)Float.valueOf(runtimeModifiers.hpMultiplier), (Object)Float.valueOf(runtimeModifiers.damageMultiplier), (Object)Float.valueOf(runtimeModifiers.sizeMultiplier), (Object)Float.valueOf(runtimeModifiers.attackRateMultiplier), (Object)Boolean.valueOf(hpApplied), (Object)Boolean.valueOf(sizeApplied), (Object)Boolean.valueOf(attackRateApplied));
+    }
+
+    private boolean applyBossHealthMultiplier(Store<EntityStore> store, Ref<EntityStore> enemyRef, float multiplier) {
+        if (store == null || enemyRef == null || !enemyRef.isValid() || Math.abs(multiplier - 1.0f) < 0.0001f) {
+            return true;
+        }
+        try {
+            EntityStatMap statMap = (EntityStatMap)store.getComponent(enemyRef, EntityStatMap.getComponentType());
+            if (statMap == null) {
+                return false;
+            }
+            EntityStatValue health = statMap.get(DefaultEntityStatTypes.getHealth());
+            if (health == null) {
+                return false;
+            }
+            float currentHealth = Math.max(1.0f, health.get());
+            float maxHealth = this.readNumericValue(health, currentHealth, new String[]{"getMax", "getMaxValue", "getBase", "getBaseValue"}, new String[]{"max", "maxValue", "base", "baseValue"});
+            float sourceHealth = Math.max(currentHealth, maxHealth);
+            float scaledHealth = Math.max(1.0f, sourceHealth * multiplier);
+            boolean applied = this.trySetEntityStatValue(health, scaledHealth);
+            if (!applied) {
+                applied = this.trySetHealthOnStatMap(statMap, health, scaledHealth);
+            }
+            return applied;
+        }
+        catch (Exception exception) {
+            return false;
+        }
+    }
+
+    private boolean applyBossSizeMultiplier(Store<EntityStore> store, Ref<EntityStore> enemyRef, float multiplier) {
+        if (store == null || enemyRef == null || !enemyRef.isValid() || Math.abs(multiplier - 1.0f) < 0.0001f) {
+            return true;
+        }
+        try {
+            Class<?> scaleComponentClass = Class.forName("com.hypixel.hytale.server.core.modules.entity.component.EntityScaleComponent");
+            Method getComponentTypeMethod = scaleComponentClass.getMethod("getComponentType", new Class[0]);
+            Object componentType = getComponentTypeMethod.invoke(null, new Object[0]);
+            Object scaleComponent = this.invokeStoreGetComponent(store, enemyRef, componentType);
+            float baseScale = scaleComponent == null ? 1.0f : this.readNumericValue(scaleComponent, 1.0f, new String[]{"getScale", "getValue"}, new String[]{"scale", "value"});
+            float scaled = Math.max(MIN_BOSS_RUNTIME_MULTIPLIER, baseScale * multiplier);
+            if (scaleComponent != null) {
+                return this.tryInvokeNumericSetter(scaleComponent, "setScale", scaled) || this.tryInvokeNumericSetter(scaleComponent, "setValue", scaled) || this.trySetNumericField(scaleComponent, "scale", scaled) || this.trySetNumericField(scaleComponent, "value", scaled);
+            }
+            Object newScaleComponent = scaleComponentClass.getDeclaredConstructor(new Class[0]).newInstance(new Object[0]);
+            boolean configured = this.tryInvokeNumericSetter(newScaleComponent, "setScale", scaled) || this.tryInvokeNumericSetter(newScaleComponent, "setValue", scaled) || this.trySetNumericField(newScaleComponent, "scale", scaled) || this.trySetNumericField(newScaleComponent, "value", scaled);
+            if (!configured) {
+                return false;
+            }
+            return this.invokeStoreAddComponent(store, enemyRef, componentType, newScaleComponent);
+        }
+        catch (Exception exception) {
+            return false;
+        }
+    }
+
+    private boolean applyBossAttackRateMultiplier(Store<EntityStore> store, Ref<EntityStore> enemyRef, float multiplier) {
+        if (store == null || enemyRef == null || !enemyRef.isValid() || Math.abs(multiplier - 1.0f) < 0.0001f) {
+            return true;
+        }
+        try {
+            EntityStatMap statMap = (EntityStatMap)store.getComponent(enemyRef, EntityStatMap.getComponentType());
+            if (statMap == null) {
+                return false;
+            }
+            String[] candidateStatAccessors = new String[]{"getAttackRate", "getAttackSpeed", "getMeleeAttackRate", "getAttackCooldown"};
+            for (String accessor : candidateStatAccessors) {
+                try {
+                    Method method = DefaultEntityStatTypes.class.getMethod(accessor, new Class[0]);
+                    Object statType = method.invoke(null, new Object[0]);
+                    if (!(statType instanceof Number)) {
+                        continue;
+                    }
+                    int typeIndex = ((Number)statType).intValue();
+                    if (this.tryApplyStatMultiplierByType(statMap, typeIndex, multiplier)) {
+                        return true;
+                    }
+                }
+                catch (Exception ignored) {
+                    // try next stat accessor
+                }
+            }
+        }
+        catch (Exception exception) {
+            return false;
+        }
+        return false;
+    }
+
+    private boolean tryApplyStatMultiplierByType(EntityStatMap statMap, int statType, float multiplier) {
+        if (statMap == null || statType < 0) {
+            return false;
+        }
+        try {
+            EntityStatValue statValue = statMap.get(statType);
+            if (statValue == null) {
+                return false;
+            }
+            float current = Math.max(0.0f, statValue.get());
+            float scaled = Math.max(0.0f, current * multiplier);
+            return this.trySetEntityStatValue(statValue, scaled);
+        }
+        catch (Exception exception) {
+            return false;
+        }
+    }
+
+    private boolean invokeStoreAddComponent(Store<EntityStore> store, Ref<EntityStore> enemyRef, Object componentType, Object component) {
+        if (store == null || enemyRef == null || componentType == null || component == null) {
+            return false;
+        }
+        for (Method method : store.getClass().getMethods()) {
+            if (!"addComponent".equals(method.getName()) || method.getParameterCount() != 3) {
+                continue;
+            }
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            if (!parameterTypes[0].isAssignableFrom(enemyRef.getClass()) || !parameterTypes[1].isAssignableFrom(componentType.getClass()) || !parameterTypes[2].isAssignableFrom(component.getClass())) {
+                continue;
+            }
+            try {
+                method.invoke(store, enemyRef, componentType, component);
+                return true;
+            }
+            catch (Exception exception) {
+                // try next overload
+            }
+        }
+        return false;
+    }
+
+    private float readNumericValue(Object target, float fallback, String[] getterNames, String[] fieldNames) {
+        if (target == null) {
+            return fallback;
+        }
+        if (getterNames != null) {
+            for (String getterName : getterNames) {
+                if (getterName == null || getterName.isBlank()) {
+                    continue;
+                }
+                try {
+                    Method getter = target.getClass().getMethod(getterName, new Class[0]);
+                    Object value = getter.invoke(target, new Object[0]);
+                    if (value instanceof Number) {
+                        float numeric = ((Number)value).floatValue();
+                        if (Float.isFinite(numeric)) {
+                            return numeric;
+                        }
+                    }
+                }
+                catch (Exception ignored) {
+                    // try next getter
+                }
+            }
+        }
+        if (fieldNames != null) {
+            for (String fieldName : fieldNames) {
+                if (fieldName == null || fieldName.isBlank()) {
+                    continue;
+                }
+                try {
+                    Field field = target.getClass().getDeclaredField(fieldName);
+                    field.setAccessible(true);
+                    Object value = field.get(target);
+                    if (value instanceof Number) {
+                        float numeric = ((Number)value).floatValue();
+                        if (Float.isFinite(numeric)) {
+                            return numeric;
+                        }
+                    }
+                }
+                catch (Exception ignored) {
+                    // try next field
+                }
+            }
+        }
+        return fallback;
     }
 
     private void grantRoundRewards(HordeSession trackedSession, int completedRound) {
@@ -2681,6 +2935,7 @@ public final class HordeService {
         int aliveAtEnd = HordeService.countAlive(trackedSession.activeEnemies);
         trackedSession.activeEnemies.clear();
         trackedSession.spawnedEnemies.clear();
+        this.bossRuntimeModifiersByEnemyRef.clear();
         this.session = null;
         String cleanInfo = cleanupAliveEnemies ? (english ? " | cleaned: " + cleanedEnemies : " | limpiados: " + cleanedEnemies) : "";
         String aliveLabel = english ? "alive remaining: " : "vivos restantes: ";
@@ -2708,6 +2963,7 @@ public final class HordeService {
             if (enemyRef == null || !enemyRef.isValid()) {
                 continue;
             }
+            this.bossRuntimeModifiersByEnemyRef.remove(enemyRef);
             try {
                 trackedSession.store.removeEntity(enemyRef, RemoveReason.REMOVE);
                 ++cleaned;
@@ -2727,6 +2983,7 @@ public final class HordeService {
         trackedSession.activeEnemies.clear();
         trackedSession.spawnedEnemies.clear();
         trackedSession.accountedEnemyDeaths.clear();
+        this.bossRuntimeModifiersByEnemyRef.clear();
         return cleaned;
     }
 
@@ -5794,6 +6051,24 @@ public final class HordeService {
             this.username = username == null || username.isBlank() ? "Jugador" : username;
             this.kills = 0;
             this.deaths = 0;
+        }
+    }
+
+    private static final class BossRuntimeModifiers {
+        private final float hpMultiplier;
+        private final float damageMultiplier;
+        private final float sizeMultiplier;
+        private final float attackRateMultiplier;
+
+        private BossRuntimeModifiers(float hpMultiplier, float damageMultiplier, float sizeMultiplier, float attackRateMultiplier) {
+            this.hpMultiplier = HordeService.clampRuntimeMultiplier(hpMultiplier);
+            this.damageMultiplier = HordeService.clampRuntimeMultiplier(damageMultiplier);
+            this.sizeMultiplier = HordeService.clampRuntimeMultiplier(sizeMultiplier);
+            this.attackRateMultiplier = HordeService.clampRuntimeMultiplier(attackRateMultiplier);
+        }
+
+        private static BossRuntimeModifiers defaults() {
+            return new BossRuntimeModifiers(1.0f, 1.0f, 1.0f, 1.0f);
         }
     }
 

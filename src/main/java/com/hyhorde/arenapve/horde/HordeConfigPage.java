@@ -94,6 +94,10 @@ extends CustomUIPage {
             new UiFieldBinding("bossEditNpcId", "BossEditNpcId", "#BossEditNpcId.Value"),
             new UiFieldBinding("bossEditTier", "BossEditTier", "#BossEditTier.Value"),
             new UiFieldBinding("bossEditAmount", "BossEditAmount", "#BossEditAmount.Value"),
+            new UiFieldBinding("bossEditHp", "BossEditHp", "#BossEditHp.Value"),
+            new UiFieldBinding("bossEditDamage", "BossEditDamage", "#BossEditDamage.Value"),
+            new UiFieldBinding("bossEditSize", "BossEditSize", "#BossEditSize.Value"),
+            new UiFieldBinding("bossEditAttackRate", "BossEditAttackRate", "#BossEditAttackRate.Value"),
             new UiFieldBinding("arenaSelected", "ArenaSelected", "#ArenaSelected.Value"),
             new UiFieldBinding("arenaEditId", "ArenaEditId", "#ArenaEditId.Value"),
             new UiFieldBinding("arenaEditX", "ArenaEditX", "#ArenaEditX.Value"),
@@ -316,6 +320,10 @@ extends CustomUIPage {
                 .set("#BossEditTier.Value", bossTierValue)
                 .set("#BossEditTier.Entries", bossTierEntries)
                 .set("#BossEditAmount.Value", this.getDraftValue("bossEditAmount", "1"))
+                .set("#BossEditHp.Value", this.getDraftValue("bossEditHp", "1"))
+                .set("#BossEditDamage.Value", this.getDraftValue("bossEditDamage", "1"))
+                .set("#BossEditSize.Value", this.getDraftValue("bossEditSize", "1"))
+                .set("#BossEditAttackRate.Value", this.getDraftValue("bossEditAttackRate", "1"))
                 .set("#BossStatusLabel.Text", this.bossStatusText == null ? "" : this.bossStatusText)
                 .set("#ArenaSelected.Value", arenaSelectedValue)
                 .set("#ArenaEditId.Value", this.getDraftValue("arenaEditId", arenaSelectedValue))
@@ -1302,9 +1310,17 @@ extends CustomUIPage {
             this.putDraftIfMissing("bossEditNpcId", selectedBoss.npcId);
             this.putDraftIfMissing("bossEditTier", selectedBoss.tier);
             this.putDraftIfMissing("bossEditAmount", Integer.toString(selectedBoss.amount));
+            this.putDraftIfMissing("bossEditHp", HordeConfigPage.formatDouble(selectedBoss.modifiers == null ? 1.0 : selectedBoss.modifiers.hp));
+            this.putDraftIfMissing("bossEditDamage", HordeConfigPage.formatDouble(selectedBoss.modifiers == null ? 1.0 : selectedBoss.modifiers.damage));
+            this.putDraftIfMissing("bossEditSize", HordeConfigPage.formatDouble(selectedBoss.modifiers == null ? 1.0 : selectedBoss.modifiers.size));
+            this.putDraftIfMissing("bossEditAttackRate", HordeConfigPage.formatDouble(selectedBoss.modifiers == null ? 1.0 : selectedBoss.modifiers.attackRate));
         }
         this.putDraftIfMissing("bossEditTier", "common");
         this.putDraftIfMissing("bossEditAmount", "1");
+        this.putDraftIfMissing("bossEditHp", "1");
+        this.putDraftIfMissing("bossEditDamage", "1");
+        this.putDraftIfMissing("bossEditSize", "1");
+        this.putDraftIfMissing("bossEditAttackRate", "1");
     }
 
     private void ensureArenaDraftDefaults(List<BossArenaCatalogService.ArenaDefinitionSnapshot> arenaRows) {
@@ -1413,6 +1429,10 @@ extends CustomUIPage {
             this.draftValues.remove("bossEditNpcId");
             this.draftValues.remove("bossEditTier");
             this.draftValues.remove("bossEditAmount");
+            this.draftValues.remove("bossEditHp");
+            this.draftValues.remove("bossEditDamage");
+            this.draftValues.remove("bossEditSize");
+            this.draftValues.remove("bossEditAttackRate");
             return;
         }
         this.applyBossDraftFromSnapshot(selected);
@@ -1460,6 +1480,10 @@ extends CustomUIPage {
         this.draftValues.put("bossEditNpcId", snapshot.npcId == null ? "" : snapshot.npcId);
         this.draftValues.put("bossEditTier", snapshot.tier == null ? "common" : snapshot.tier);
         this.draftValues.put("bossEditAmount", Integer.toString(snapshot.amount));
+        this.draftValues.put("bossEditHp", HordeConfigPage.formatDouble(snapshot.modifiers == null ? 1.0 : snapshot.modifiers.hp));
+        this.draftValues.put("bossEditDamage", HordeConfigPage.formatDouble(snapshot.modifiers == null ? 1.0 : snapshot.modifiers.damage));
+        this.draftValues.put("bossEditSize", HordeConfigPage.formatDouble(snapshot.modifiers == null ? 1.0 : snapshot.modifiers.size));
+        this.draftValues.put("bossEditAttackRate", HordeConfigPage.formatDouble(snapshot.modifiers == null ? 1.0 : snapshot.modifiers.attackRate));
     }
 
     private void applyEnemyCategoryDraftFromSnapshot(HordeService.EnemyCategorySnapshot snapshot) {
@@ -1535,6 +1559,10 @@ extends CustomUIPage {
         HordeConfigPage.putIfNotBlank(values, "bossEditNpcId", this.getDraftValue("bossEditNpcId", ""));
         HordeConfigPage.putIfNotBlank(values, "bossEditTier", this.getDraftValue("bossEditTier", "common"));
         HordeConfigPage.putIfNotBlank(values, "bossEditAmount", this.getDraftValue("bossEditAmount", "1"));
+        HordeConfigPage.putIfNotBlank(values, "bossEditHp", this.getDraftValue("bossEditHp", "1"));
+        HordeConfigPage.putIfNotBlank(values, "bossEditDamage", this.getDraftValue("bossEditDamage", "1"));
+        HordeConfigPage.putIfNotBlank(values, "bossEditSize", this.getDraftValue("bossEditSize", "1"));
+        HordeConfigPage.putIfNotBlank(values, "bossEditAttackRate", this.getDraftValue("bossEditAttackRate", "1"));
         values.put("bossEditLevelOverride", "0");
         // Boss advanced trigger/reward fields were removed from UI.
         // Persist deterministic defaults so older rows don't keep stale values.
@@ -1952,7 +1980,11 @@ extends CustomUIPage {
                         || "bossEditName".equals(field.configKey)
                         || "bossEditNpcId".equals(field.configKey)
                         || "bossEditTier".equals(field.configKey)
-                        || "bossEditAmount".equals(field.configKey);
+                        || "bossEditAmount".equals(field.configKey)
+                        || "bossEditHp".equals(field.configKey)
+                        || "bossEditDamage".equals(field.configKey)
+                        || "bossEditSize".equals(field.configKey)
+                        || "bossEditAttackRate".equals(field.configKey);
             case TAB_ARENAS:
                 return "arenaSelected".equals(field.configKey)
                         || "arenaEditId".equals(field.configKey)
@@ -2326,6 +2358,10 @@ extends CustomUIPage {
                 .set("#BossEditNpcIdLabel.Text", HordeConfigPage.t(language, english, "Enemy ID", "Enemy ID"))
                 .set("#BossEditTierLabel.Text", HordeConfigPage.t(language, english, "Tier", "Tier"))
                 .set("#BossEditAmountLabel.Text", HordeConfigPage.t(language, english, "Amount", "Cantidad"))
+                .set("#BossEditHpLabel.Text", HordeConfigPage.t(language, english, "HP multiplier", "Multiplicador HP"))
+                .set("#BossEditDamageLabel.Text", HordeConfigPage.t(language, english, "Damage multiplier", "Multiplicador dano"))
+                .set("#BossEditSizeLabel.Text", HordeConfigPage.t(language, english, "Size multiplier", "Multiplicador tamano"))
+                .set("#BossEditAttackRateLabel.Text", HordeConfigPage.t(language, english, "Attack rate x", "Velocidad ataque x"))
                 .set("#BossPagePrevButton.Text", "<")
                 .set("#BossPageNextButton.Text", ">")
                 .set("#BossSaveButton.Text", HordeConfigPage.t(language, english, "Save boss", "Guardar boss"))
@@ -2387,7 +2423,7 @@ extends CustomUIPage {
         this.setVisible(commandBuilder, playersTab, "#PlayersTitleLabel", "#PlayersAddButton", "#PlayersHeaderName", "#PlayersHeaderMode", "#PlayersHeaderActions", "#PlayersPagePrevButton", "#PlayersPageNextButton", "#PlayersPageLabel", "#PlayersEmptyLabel", "#PlayersOverflowLabel", "#PlayersEditorTitleLabel", "#PlayerSelected", "#PlayerEditModeLabel", "#PlayerEditMode", "#PlayersSaveButton", "#ArenaJoinRadiusLabel", "#ArenaJoinRadius", "#PlayerRow1", "#PlayerRow2", "#PlayerRow3", "#PlayerRow4", "#PlayerRow5", "#PlayerRow6", "#PlayerRow7", "#PlayerRow8", "#PlayerRow9", "#PlayerRow10", "#PlayerRow11");
         this.setVisible(commandBuilder, soundsTab, "#RoundStartSoundLabel", "#RoundStartSoundId", "#RoundStartVolumeLabel", "#RoundStartVolume", "#RoundVictorySoundLabel", "#RoundVictorySoundId", "#RoundVictoryVolumeLabel", "#RoundVictoryVolume");
         this.setVisible(commandBuilder, rewardsTab, "#RewardCatTitleLabel", "#RewardCatAddButton", "#RewardCatHeaderName", "#RewardCatHeaderPreview", "#RewardCatHeaderActions", "#RewardCatPagePrevButton", "#RewardCatPageNextButton", "#RewardCatPageLabel", "#RewardCatEmptyLabel", "#RewardCatOverflowLabel", "#RewardCatEditorTitleLabel", "#RewardCatEditIdLabel", "#RewardCatEditId", "#RewardCatItemPickerLabel", "#RewardCatItemPicker", "#RewardCatItemAddButton", "#RewardCatEditItemsLabel", "#RewardCatItemsPagePrevButton", "#RewardCatItemsPageNextButton", "#RewardCatItemsPageLabel", "#RewardCatSaveButton", "#RewardCatRow1", "#RewardCatRow2", "#RewardCatRow3", "#RewardCatRow4", "#RewardCatRow5", "#RewardCatRow6", "#RewardCatRow7", "#RewardCatRow8", "#RewardCatRow9", "#RewardCatRow10", "#RewardCatRow11", "#RewardCatItemRow1", "#RewardCatItemRow2", "#RewardCatItemRow3", "#RewardCatItemRow4", "#RewardCatItemRow5", "#RewardCatItemRow6", "#RewardCatItemRow7", "#RewardCatItemRow8", "#RewardCatItemRow9", "#RewardCatItemRow10");
-        this.setVisible(commandBuilder, bossesTab, "#BossesTitleLabel", "#BossAddButton", "#BossHeaderName", "#BossHeaderNpc", "#BossHeaderTier", "#BossHeaderAmount", "#BossHeaderActions", "#BossPagePrevButton", "#BossPageNextButton", "#BossPageLabel", "#BossEmptyLabel", "#BossOverflowLabel", "#BossEditorTitleLabel", "#BossEditNameLabel", "#BossEditName", "#BossEditNpcIdLabel", "#BossEditNpcId", "#BossEditTierLabel", "#BossEditTier", "#BossEditAmountLabel", "#BossEditAmount", "#BossSaveButton", "#BossRow1", "#BossRow2", "#BossRow3", "#BossRow4", "#BossRow5", "#BossRow6", "#BossRow7", "#BossRow8", "#BossRow9", "#BossRow10", "#BossRow11");
+        this.setVisible(commandBuilder, bossesTab, "#BossesTitleLabel", "#BossAddButton", "#BossHeaderName", "#BossHeaderNpc", "#BossHeaderTier", "#BossHeaderAmount", "#BossHeaderActions", "#BossPagePrevButton", "#BossPageNextButton", "#BossPageLabel", "#BossEmptyLabel", "#BossOverflowLabel", "#BossEditorTitleLabel", "#BossEditNameLabel", "#BossEditName", "#BossEditNpcIdLabel", "#BossEditNpcId", "#BossEditTierLabel", "#BossEditTier", "#BossEditAmountLabel", "#BossEditAmount", "#BossEditHpLabel", "#BossEditHp", "#BossEditDamageLabel", "#BossEditDamage", "#BossEditSizeLabel", "#BossEditSize", "#BossEditAttackRateLabel", "#BossEditAttackRate", "#BossSaveButton", "#BossRow1", "#BossRow2", "#BossRow3", "#BossRow4", "#BossRow5", "#BossRow6", "#BossRow7", "#BossRow8", "#BossRow9", "#BossRow10", "#BossRow11");
         this.setVisible(commandBuilder, arenasTab, "#ArenasTitleLabel", "#ArenaAddButton", "#ArenaHeaderName", "#ArenaHeaderCoords", "#ArenaHeaderActions", "#ArenaPagePrevButton", "#ArenaPageNextButton", "#ArenaPageLabel", "#ArenaEmptyLabel", "#ArenaOverflowLabel", "#ArenaEditorTitleLabel", "#ArenaEditIdLabel", "#ArenaEditId", "#ArenaEditXLabel", "#ArenaEditX", "#ArenaEditYLabel", "#ArenaEditY", "#ArenaEditZLabel", "#ArenaEditZ", "#ArenaUseCurrentPositionButton", "#ArenaSaveButton", "#ArenaRow1", "#ArenaRow2", "#ArenaRow3", "#ArenaRow4", "#ArenaRow5", "#ArenaRow6", "#ArenaRow7", "#ArenaRow8", "#ArenaRow9", "#ArenaRow10", "#ArenaRow11");
         this.setVisible(commandBuilder, helpTab, "#HelpIntroLabel", "#HelpCommandsLabel", "#HelpCommandsLine1", "#HelpCommandsLine2", "#HelpCommandsLine3", "#HelpConfigLabel", "#HelpConfigLine1", "#HelpConfigLine2", "#HelpConfigLine3", "#HelpExternalLabel", "#HelpExternalLine1", "#HelpExternalLine2", "#HelpExternalLine3", "#HelpReloadLabel", "#HelpReloadLine1", "#HelpReloadLine2");
         this.setVisible(commandBuilder, generalTab, "#TabGeneralActiveTop", "#TabGeneralActiveNotch");

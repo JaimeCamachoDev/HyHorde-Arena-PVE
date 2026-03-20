@@ -1875,13 +1875,21 @@ Group {
   }
 
   Label #BossEditNameLabel { Anchor: (Left: 980, Top: 306, Width: 484, Height: 16); Text: "Boss ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditName { @Anchor = (Left: 980, Top: 328, Width: 484); Value: ""; }
-  Label #BossEditAmountLabel { Anchor: (Left: 980, Top: 370, Width: 484, Height: 16); Text: "Cantidad"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditAmount { @Anchor = (Left: 980, Top: 392, Width: 484); Value: "1"; }
-  Label #BossEditNpcIdLabel { Anchor: (Left: 980, Top: 434, Width: 484, Height: 16); Text: "Enemy ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@DropdownBox #BossEditNpcId { @Anchor = (Left: 980, Top: 456, Width: 484, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
-  Label #BossEditTierLabel { Anchor: (Left: 980, Top: 498, Width: 484, Height: 16); Text: "Tier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@DropdownBox #BossEditTier { @Anchor = (Left: 980, Top: 520, Width: 484, Height: 34); Value: "common"; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
+  $C.@TextField #BossEditName { @Anchor = (Left: 980, Top: 326, Width: 484); Value: ""; }
+  Label #BossEditAmountLabel { Anchor: (Left: 980, Top: 356, Width: 484, Height: 16); Text: "Cantidad"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditAmount { @Anchor = (Left: 980, Top: 376, Width: 484); Value: "1"; }
+  Label #BossEditNpcIdLabel { Anchor: (Left: 980, Top: 406, Width: 484, Height: 16); Text: "Enemy ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@DropdownBox #BossEditNpcId { @Anchor = (Left: 980, Top: 426, Width: 484, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
+  Label #BossEditTierLabel { Anchor: (Left: 980, Top: 456, Width: 484, Height: 16); Text: "Tier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@DropdownBox #BossEditTier { @Anchor = (Left: 980, Top: 476, Width: 484, Height: 34); Value: "common"; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
+  Label #BossEditHpLabel { Anchor: (Left: 980, Top: 506, Width: 484, Height: 16); Text: "HP multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditHp { @Anchor = (Left: 980, Top: 526, Width: 484); Value: "1"; }
+  Label #BossEditDamageLabel { Anchor: (Left: 980, Top: 556, Width: 484, Height: 16); Text: "Damage multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditDamage { @Anchor = (Left: 980, Top: 576, Width: 484); Value: "1"; }
+  Label #BossEditSizeLabel { Anchor: (Left: 980, Top: 606, Width: 484, Height: 16); Text: "Size multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditSize { @Anchor = (Left: 980, Top: 626, Width: 484); Value: "1"; }
+  Label #BossEditAttackRateLabel { Anchor: (Left: 980, Top: 656, Width: 484, Height: 16); Text: "Attack rate x"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditAttackRate { @Anchor = (Left: 980, Top: 676, Width: 484); Value: "1"; }
 
   TextButton #BossSaveButton {
     Anchor: (Left: 980, Top: 264, Width: 484, Height: 34);
@@ -1891,7 +1899,7 @@ Group {
   }
 
   Label #BossStatusLabel {
-    Anchor: (Left: 980, Top: 578, Width: 484, Height: 72);
+    Anchor: (Left: 980, Top: 722, Width: 484, Height: 56);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center);
