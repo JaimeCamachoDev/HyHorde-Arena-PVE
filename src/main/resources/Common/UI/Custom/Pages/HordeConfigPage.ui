@@ -937,8 +937,68 @@ Group {
     );
   }
 
+  Label #SoundsTitleLabel {
+    Anchor: (Left: 456, Top: 232, Width: 500, Height: 28);
+    Text: "Configuracion de sonidos";
+    Visible: false;
+    Style: (FontSize: 18, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  Label #SoundsHeaderEvent {
+    Anchor: (Left: 466, Top: 308, Width: 120, Height: 22);
+    Text: "Evento";
+    Visible: false;
+    Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  Label #SoundsHeaderSound {
+    Anchor: (Left: 592, Top: 308, Width: 256, Height: 22);
+    Text: "Sound ID";
+    Visible: false;
+    Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  Label #SoundsHeaderVolume {
+    Anchor: (Left: 854, Top: 308, Width: 98, Height: 22);
+    Text: "Volumen";
+    Visible: false;
+    Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  Panel #SoundRowStart {
+    Anchor: (Left: 456, Top: 336, Width: 500, Height: 34);
+    Background: #16283f;
+    Visible: false;
+    Label #SoundRowStartEvent { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: "Inicio ronda"; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #SoundRowStartId { Anchor: (Left: 136, Top: 6, Width: 256, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #SoundRowStartVolume { Anchor: (Left: 398, Top: 6, Width: 92, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #e8f1ff, RenderBold: true, VerticalAlignment: Center); }
+  }
+
+  Panel #SoundRowVictory {
+    Anchor: (Left: 456, Top: 374, Width: 500, Height: 34);
+    Background: #16283f;
+    Visible: false;
+    Label #SoundRowVictoryEvent { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: "Victoria ronda"; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #SoundRowVictoryId { Anchor: (Left: 136, Top: 6, Width: 256, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #SoundRowVictoryVolume { Anchor: (Left: 398, Top: 6, Width: 92, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #e8f1ff, RenderBold: true, VerticalAlignment: Center); }
+  }
+
+  Label #SoundsEditorTitleLabel {
+    Anchor: (Left: 980, Top: 232, Width: 484, Height: 24);
+    Text: "Editor de sonidos";
+    Visible: false;
+    Style: (FontSize: 16, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  TextButton #SoundsSaveButton {
+    Anchor: (Left: 980, Top: 264, Width: 484, Height: 34);
+    Text: "Guardar sonidos";
+    Visible: false;
+    Style: $C.@SecondaryTextButtonStyle;
+  }
+
   Label #RoundStartSoundLabel {
-    Anchor: (Left: 980, Top: 312, Width: 484, Height: 16);
+    Anchor: (Left: 980, Top: 306, Width: 484, Height: 16);
     Text: "Sonido inicio ronda";
     Style: (FontSize: 14, TextColor: #dde8f8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
@@ -954,7 +1014,7 @@ Group {
   }
 
   $C.@DropdownBox #RoundStartSoundId {
-    @Anchor = (Left: 980, Top: 336, Width: 484);
+    @Anchor = (Left: 980, Top: 328, Width: 484);
     Value: "auto";
     Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484);
   }
@@ -970,13 +1030,13 @@ Group {
   }
 
   Label #RoundStartVolumeLabel {
-    Anchor: (Left: 980, Top: 380, Width: 484, Height: 16);
+    Anchor: (Left: 980, Top: 370, Width: 484, Height: 16);
     Text: "Volumen inicio (%)";
     Style: (FontSize: 13, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
 
   $C.@SliderNumberField #RoundStartVolume {
-    @Anchor = (Left: 980, Top: 404, Width: 484);
+    @Anchor = (Left: 980, Top: 392, Width: 484);
     Value: 100;
     Min: 0.0;
     Max: 100.0;
@@ -985,7 +1045,7 @@ Group {
   }
 
   Label #RoundVictorySoundLabel {
-    Anchor: (Left: 980, Top: 458, Width: 484, Height: 16);
+    Anchor: (Left: 980, Top: 444, Width: 484, Height: 16);
     Text: "Sonido victoria ronda";
     Style: (FontSize: 14, TextColor: #dde8f8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
@@ -1001,7 +1061,7 @@ Group {
   }
 
   $C.@DropdownBox #RoundVictorySoundId {
-    @Anchor = (Left: 980, Top: 482, Width: 484);
+    @Anchor = (Left: 980, Top: 466, Width: 484);
     Value: "auto";
     Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484);
   }
@@ -1017,13 +1077,13 @@ Group {
   }
 
   Label #RoundVictoryVolumeLabel {
-    Anchor: (Left: 980, Top: 526, Width: 484, Height: 16);
+    Anchor: (Left: 980, Top: 508, Width: 484, Height: 16);
     Text: "Volumen victoria (%)";
     Style: (FontSize: 13, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
 
   $C.@SliderNumberField #RoundVictoryVolume {
-    @Anchor = (Left: 980, Top: 550, Width: 484);
+    @Anchor = (Left: 980, Top: 530, Width: 484);
     Value: 100;
     Min: 0.0;
     Max: 100.0;
@@ -1032,7 +1092,7 @@ Group {
   }
 
   Label #RoundSoundHelpLabel {
-    Anchor: (Left: 980, Top: 596, Width: 484, Height: 24);
+    Anchor: (Left: 980, Top: 574, Width: 484, Height: 24);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center);
@@ -1875,21 +1935,21 @@ Group {
   }
 
   Label #BossEditNameLabel { Anchor: (Left: 980, Top: 306, Width: 484, Height: 16); Text: "Boss ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditName { @Anchor = (Left: 980, Top: 326, Width: 484); Value: ""; }
-  Label #BossEditAmountLabel { Anchor: (Left: 980, Top: 356, Width: 484, Height: 16); Text: "Cantidad"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditAmount { @Anchor = (Left: 980, Top: 376, Width: 484); Value: "1"; }
-  Label #BossEditNpcIdLabel { Anchor: (Left: 980, Top: 406, Width: 484, Height: 16); Text: "Enemy ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@DropdownBox #BossEditNpcId { @Anchor = (Left: 980, Top: 426, Width: 484, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
-  Label #BossEditTierLabel { Anchor: (Left: 980, Top: 456, Width: 484, Height: 16); Text: "Tier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@DropdownBox #BossEditTier { @Anchor = (Left: 980, Top: 476, Width: 484, Height: 34); Value: "common"; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
-  Label #BossEditHpLabel { Anchor: (Left: 980, Top: 506, Width: 484, Height: 16); Text: "HP multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditHp { @Anchor = (Left: 980, Top: 526, Width: 484); Value: "1"; }
-  Label #BossEditDamageLabel { Anchor: (Left: 980, Top: 556, Width: 484, Height: 16); Text: "Damage multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditDamage { @Anchor = (Left: 980, Top: 576, Width: 484); Value: "1"; }
-  Label #BossEditSizeLabel { Anchor: (Left: 980, Top: 606, Width: 484, Height: 16); Text: "Size multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditSize { @Anchor = (Left: 980, Top: 626, Width: 484); Value: "1"; }
-  Label #BossEditAttackRateLabel { Anchor: (Left: 980, Top: 656, Width: 484, Height: 16); Text: "Attack rate x"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditAttackRate { @Anchor = (Left: 980, Top: 676, Width: 484); Value: "1"; }
+  $C.@TextField #BossEditName { @Anchor = (Left: 980, Top: 328, Width: 484); Value: ""; }
+  Label #BossEditAmountLabel { Anchor: (Left: 980, Top: 366, Width: 484, Height: 16); Text: "Cantidad"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditAmount { @Anchor = (Left: 980, Top: 388, Width: 484); Value: "1"; }
+  Label #BossEditNpcIdLabel { Anchor: (Left: 980, Top: 426, Width: 484, Height: 16); Text: "Enemy ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@DropdownBox #BossEditNpcId { @Anchor = (Left: 980, Top: 448, Width: 484, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
+  Label #BossEditTierLabel { Anchor: (Left: 980, Top: 486, Width: 484, Height: 16); Text: "Tier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@DropdownBox #BossEditTier { @Anchor = (Left: 980, Top: 508, Width: 484, Height: 34); Value: "common"; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
+  Label #BossEditHpLabel { Anchor: (Left: 980, Top: 546, Width: 484, Height: 16); Text: "HP multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditHp { @Anchor = (Left: 980, Top: 568, Width: 484); Value: "1"; }
+  Label #BossEditDamageLabel { Anchor: (Left: 980, Top: 606, Width: 484, Height: 16); Text: "Damage multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditDamage { @Anchor = (Left: 980, Top: 628, Width: 484); Value: "1"; }
+  Label #BossEditSizeLabel { Anchor: (Left: 980, Top: 666, Width: 484, Height: 16); Text: "Size multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditSize { @Anchor = (Left: 980, Top: 688, Width: 484); Value: "1"; }
+  Label #BossEditAttackRateLabel { Anchor: (Left: 980, Top: 726, Width: 484, Height: 16); Text: "Attack rate x"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditAttackRate { @Anchor = (Left: 980, Top: 748, Width: 484); Value: "1"; }
 
   TextButton #BossSaveButton {
     Anchor: (Left: 980, Top: 264, Width: 484, Height: 34);
