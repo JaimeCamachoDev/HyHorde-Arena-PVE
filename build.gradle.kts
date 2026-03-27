@@ -7,7 +7,7 @@ plugins {
 }
 
 group = (findProperty("maven_group") as String? ?: "com.hyhorde.arenapve")
-version = (findProperty("version") as String? ?: "1.3.0")
+version = (findProperty("version") as String? ?: "1.4.0")
 
 val javaVersion = (findProperty("java_version") as String? ?: "25").toInt()
 val patchline = (findProperty("patchline") as String? ?: "release")
@@ -20,6 +20,7 @@ val modDescription = (findProperty("mod_description") as String? ?: "Sistema de 
 val modAuthor = (findProperty("mod_author") as String? ?: "Jaime")
 val modWebsite = (findProperty("mod_website") as String? ?: "https://github.com/Jaime/HyHorde-Arena-PVE")
 val modMainClass = (findProperty("mod_main_class") as String? ?: "com.hyhorde.arenapve.HyHordeArenaPvePlugin")
+val modServerVersion = (findProperty("mod_server_version") as String? ?: "*")
 
 val configuredHytaleHome = findProperty("hytale_home") as String?
 val configuredServerJarPath = findProperty("hytale_server_jar") as String?
@@ -88,7 +89,8 @@ tasks.processResources {
         "modDescription" to modDescription,
         "modAuthor" to modAuthor,
         "modWebsite" to modWebsite,
-        "modMainClass" to modMainClass
+        "modMainClass" to modMainClass,
+        "modServerVersion" to modServerVersion
     )
 
     resourceProps.forEach { (key, value) -> inputs.property(key, value) }

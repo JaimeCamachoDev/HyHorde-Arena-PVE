@@ -1,7 +1,7 @@
 {
     "Group": "HyHorde",
     "Name": "ArenaPVE",
-    "Version": "1.3.0",
+    "Version": "1.4.0",
     "Description": "Sistema de hordas PVE para Hytale.",
     "Authors": [
         {
@@ -9,7 +9,7 @@
         }
     ],
     "Website": "https://github.com/Jaime/HyHorde-Arena-PVE",
-    "ServerVersion": "*",
+    "ServerVersion": "2026.03.26-89796e57b",
     "Dependencies": {
     },
     "OptionalDependencies": {

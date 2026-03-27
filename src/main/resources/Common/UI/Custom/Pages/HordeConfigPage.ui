@@ -19,6 +19,33 @@ $C = "../Common.ui";
   PanelAlign: Bottom
 );
 
+@OfficialTabLabelDefaultStyle = (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #8ea1bb, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@OfficialTabLabelHoverStyle = (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #d9e5f5, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@OfficialTabLabelPressedStyle = (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@OfficialTextTopTabAnchor = Anchor(Width: 74, Height: 50, Right: 4, Bottom: -10);
+@OfficialTextTopTabStyle = TabStyleState(
+  Background: (TexturePath: "../Common/Tab.png", Border: 3, Color: #8ea1bb(0.42)),
+  Overlay: "../Common/TabOverlay.png",
+  LabelStyle: @OfficialTabLabelDefaultStyle,
+  Padding: (Left: 10, Right: 10, Top: 12),
+  Anchor: @OfficialTextTopTabAnchor
+);
+@OfficialTextTopTabsStyle = TabNavigationStyle(
+  TabStyle: (
+    Default: @OfficialTextTopTabStyle,
+    Hovered: (...@OfficialTextTopTabStyle, Anchor: (...@OfficialTextTopTabAnchor, Bottom: -4), LabelStyle: @OfficialTabLabelHoverStyle),
+    Pressed: (...@OfficialTextTopTabStyle, Anchor: (...@OfficialTextTopTabAnchor, Bottom: -7), LabelStyle: @OfficialTabLabelPressedStyle)
+  ),
+  SelectedTabStyle: (
+    Default: (
+      ...@OfficialTextTopTabStyle,
+      Anchor: (...@OfficialTextTopTabAnchor, Bottom: 0),
+      Overlay: "../Common/TabSelectedOverlay.png",
+      LabelStyle: @OfficialTabLabelPressedStyle
+    )
+  )
+);
+
 Group {
   Anchor: (Full: 0);
 
@@ -320,7 +347,7 @@ Group {
 
   Panel #TabGeneralActiveBack {
     Anchor: (Left: 766, Top: 22, Width: 76, Height: 46);
-    Background: #2a3c53;
+    Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #ffffff(0.9));
     Visible: false;
   }
 
@@ -338,7 +365,7 @@ Group {
 
   Panel #TabArenasActiveBack {
     Anchor: (Left: 846, Top: 22, Width: 76, Height: 46);
-    Background: #2a3c53;
+    Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #ffffff(0.9));
     Visible: false;
   }
 
@@ -356,7 +383,7 @@ Group {
 
   Panel #TabEnemiesActiveBack {
     Anchor: (Left: 926, Top: 22, Width: 76, Height: 46);
-    Background: #2a3c53;
+    Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #ffffff(0.9));
     Visible: false;
   }
 
@@ -374,7 +401,7 @@ Group {
 
   Panel #TabHordeActiveBack {
     Anchor: (Left: 1006, Top: 22, Width: 76, Height: 46);
-    Background: #2a3c53;
+    Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #ffffff(0.9));
     Visible: false;
   }
 
@@ -392,7 +419,7 @@ Group {
 
   Panel #TabBossesActiveBack {
     Anchor: (Left: 1086, Top: 22, Width: 76, Height: 46);
-    Background: #2a3c53;
+    Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #ffffff(0.9));
     Visible: false;
   }
 
@@ -410,7 +437,7 @@ Group {
 
   Panel #TabPlayersActiveBack {
     Anchor: (Left: 1166, Top: 22, Width: 76, Height: 46);
-    Background: #2a3c53;
+    Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #ffffff(0.9));
     Visible: false;
   }
 
@@ -428,7 +455,7 @@ Group {
 
   Panel #TabSoundsActiveBack {
     Anchor: (Left: 1326, Top: 22, Width: 76, Height: 46);
-    Background: #2a3c53;
+    Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #ffffff(0.9));
     Visible: false;
   }
 
@@ -446,7 +473,7 @@ Group {
 
   Panel #TabRewardsActiveBack {
     Anchor: (Left: 1246, Top: 22, Width: 76, Height: 46);
-    Background: #2a3c53;
+    Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #ffffff(0.9));
     Visible: false;
   }
 
@@ -464,7 +491,7 @@ Group {
 
   Panel #TabHelpActiveBack {
     Anchor: (Left: 1406, Top: 22, Width: 76, Height: 46);
-    Background: #2a3c53;
+    Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #ffffff(0.9));
     Visible: false;
   }
 
@@ -511,103 +538,55 @@ Group {
     Visible: false;
   }
 
-  TextButton #TabGeneralButton {
-    Anchor: (Left: 767, Top: 24, Width: 74, Height: 40);
-    Text: "General";
-    Style: TextButtonStyle(
-      Default: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-    );
-    Padding: (Horizontal: 8);
-  }
+  TabNavigation #CategoryTabs {
+    Anchor: (Left: 763, Top: 14, Width: 724, Height: 64);
+    Style: @OfficialTextTopTabsStyle;
+    SelectedTab: "general";
 
-  TextButton #TabArenasButton {
-    Anchor: (Left: 847, Top: 24, Width: 74, Height: 40);
-    Text: "Arenas";
-    Style: TextButtonStyle(
-      Default: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-    );
-    Padding: (Horizontal: 6);
-  }
+    TabButton #TabGeneralButton {
+      Id: "general";
+      Text: "General";
+    }
 
-  TextButton #TabEnemiesButton {
-    Anchor: (Left: 927, Top: 24, Width: 74, Height: 40);
-    Text: "Enemigos";
-    Style: TextButtonStyle(
-      Default: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-    );
-    Padding: (Horizontal: 8);
-  }
+    TabButton #TabArenasButton {
+      Id: "arenas";
+      Text: "Arenas";
+    }
 
-  TextButton #TabHordeButton {
-    Anchor: (Left: 1007, Top: 24, Width: 74, Height: 40);
-    Text: "Horda";
-    Style: TextButtonStyle(
-      Default: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-    );
-    Padding: (Horizontal: 8);
-  }
+    TabButton #TabEnemiesButton {
+      Id: "enemies";
+      Text: "Enemigos";
+    }
 
-  TextButton #TabBossesButton {
-    Anchor: (Left: 1087, Top: 24, Width: 74, Height: 40);
-    Text: "Bosses";
-    Style: TextButtonStyle(
-      Default: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-    );
-    Padding: (Horizontal: 6);
-  }
+    TabButton #TabHordeButton {
+      Id: "horde";
+      Text: "Horda";
+    }
 
-  TextButton #TabPlayersButton {
-    Anchor: (Left: 1167, Top: 24, Width: 74, Height: 40);
-    Text: "Jugadores";
-    Style: TextButtonStyle(
-      Default: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-    );
-    Padding: (Horizontal: 8);
-  }
+    TabButton #TabBossesButton {
+      Id: "bosses";
+      Text: "Bosses";
+    }
 
-  TextButton #TabSoundsButton {
-    Anchor: (Left: 1327, Top: 24, Width: 74, Height: 40);
-    Text: "Sonidos";
-    Style: TextButtonStyle(
-      Default: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-    );
-    Padding: (Horizontal: 8);
-  }
+    TabButton #TabPlayersButton {
+      Id: "players";
+      Text: "Jugadores";
+    }
 
-  TextButton #TabRewardsButton {
-    Anchor: (Left: 1247, Top: 24, Width: 74, Height: 40);
-    Text: "Recompensas";
-    Style: TextButtonStyle(
-      Default: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-    );
-    Padding: (Horizontal: 8);
-  }
+    TabButton #TabRewardsButton {
+      Id: "rewards";
+      Text: "Recomp.";
+    }
 
-  TextButton #TabHelpButton {
-    Anchor: (Left: 1407, Top: 24, Width: 74, Height: 40);
-    Text: "Ayuda";
-    Style: TextButtonStyle(
-      Default: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #9eb1c8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Hovered: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #e6f0ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-      Pressed: (Background: #000000(0), LabelStyle: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-    );
-    Padding: (Horizontal: 6);
+    TabButton #TabSoundsButton {
+      Id: "sounds";
+      Text: "Sonidos";
+    }
+
+    TabButton #TabHelpButton {
+      Id: "help";
+      Text: "Ayuda";
+    }
   }
 
   Label #TabHintLabel {
