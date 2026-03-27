@@ -1701,7 +1701,6 @@ extends CustomUIPage {
         int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_PLAYER_ROWS));
         this.playerPage = HordeConfigPage.clamp(this.playerPage, 0, pageCount - 1);
         int start = this.playerPage * MAX_PLAYER_ROWS;
-        String selectedPlayerId = this.getDraftValue("playerSelected", "");
         for (int slot = 0; slot < MAX_PLAYER_ROWS; ++slot) {
             int index = start + slot;
             int rowNumber = slot + 1;
@@ -1712,8 +1711,7 @@ extends CustomUIPage {
                 String mode = HordeConfigPage.normalizeAudienceMode(row == null ? "" : row.mode);
                 commandBuilder.set(rowSelector + ".Visible", true)
                         .set("#PlayerName" + rowNumber + ".Text", row == null ? "" : HordeConfigPage.compactName(row.username, 22))
-                        .set("#PlayerMode" + rowNumber + ".Text", HordeConfigPage.audienceModeDisplay(mode, language))
-                        .set(rowSelector + ".Background", selectedPlayerId.equalsIgnoreCase(rowPlayerId) ? "#2b4a70" : "#16283f");
+                        .set("#PlayerMode" + rowNumber + ".Text", HordeConfigPage.audienceModeDisplay(mode, language));
                 eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#PlayerOpen" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildPlayerDefinitionAction("open", rowPlayerId)))
                         .addEventBinding(CustomUIEventBindingType.Activating, "#PlayerDelete" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildPlayerDefinitionAction("delete", rowPlayerId)));
             } else {
@@ -1739,7 +1737,6 @@ extends CustomUIPage {
         int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_ENEMY_CATEGORY_ROWS));
         this.enemyCategoryPage = HordeConfigPage.clamp(this.enemyCategoryPage, 0, pageCount - 1);
         int start = this.enemyCategoryPage * MAX_ENEMY_CATEGORY_ROWS;
-        String selectedCategoryId = this.getDraftValue("enemyCategorySelected", "");
         for (int slot = 0; slot < MAX_ENEMY_CATEGORY_ROWS; ++slot) {
             int index = start + slot;
             int rowNumber = slot + 1;
@@ -1748,8 +1745,7 @@ extends CustomUIPage {
                 HordeService.EnemyCategorySnapshot row = rows.get(index);
                 commandBuilder.set(rowSelector + ".Visible", true)
                         .set("#EnemyCatName" + rowNumber + ".Text", row.categoryId)
-                        .set("#EnemyCatPreview" + rowNumber + ".Text", row.rolesPreview == null ? "" : HordeConfigPage.compactName(row.rolesPreview, 26))
-                        .set(rowSelector + ".Background", selectedCategoryId.equalsIgnoreCase(row.categoryId) ? "#2b4a70" : "#16283f");
+                        .set("#EnemyCatPreview" + rowNumber + ".Text", row.rolesPreview == null ? "" : HordeConfigPage.compactName(row.rolesPreview, 26));
                 eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#EnemyCatOpen" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildEnemyCategoryAction("open", row.categoryId)))
                         .addEventBinding(CustomUIEventBindingType.Activating, "#EnemyCatDelete" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildEnemyCategoryAction("delete", row.categoryId)));
             } else {
@@ -1803,7 +1799,6 @@ extends CustomUIPage {
         int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_REWARD_CATEGORY_ROWS));
         this.rewardCategoryPage = HordeConfigPage.clamp(this.rewardCategoryPage, 0, pageCount - 1);
         int start = this.rewardCategoryPage * MAX_REWARD_CATEGORY_ROWS;
-        String selectedCategoryId = this.getDraftValue("rewardCatSelected", "");
         for (int slot = 0; slot < MAX_REWARD_CATEGORY_ROWS; ++slot) {
             int index = start + slot;
             int rowNumber = slot + 1;
@@ -1812,8 +1807,7 @@ extends CustomUIPage {
                 HordeService.RewardCategorySnapshot row = rows.get(index);
                 commandBuilder.set(rowSelector + ".Visible", true)
                         .set("#RewardCatName" + rowNumber + ".Text", row.categoryId)
-                        .set("#RewardCatPreview" + rowNumber + ".Text", row.itemsPreview == null ? "" : HordeConfigPage.compactName(row.itemsPreview, 26))
-                        .set(rowSelector + ".Background", selectedCategoryId.equalsIgnoreCase(row.categoryId) ? "#2b4a70" : "#16283f");
+                        .set("#RewardCatPreview" + rowNumber + ".Text", row.itemsPreview == null ? "" : HordeConfigPage.compactName(row.itemsPreview, 26));
                 eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#RewardCatOpen" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildRewardCategoryAction("open", row.categoryId)))
                         .addEventBinding(CustomUIEventBindingType.Activating, "#RewardCatDelete" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildRewardCategoryAction("delete", row.categoryId)));
             } else {
@@ -1867,7 +1861,6 @@ extends CustomUIPage {
         int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_HORDE_ROWS));
         this.hordePage = HordeConfigPage.clamp(this.hordePage, 0, pageCount - 1);
         int start = this.hordePage * MAX_HORDE_ROWS;
-        String selectedHordeId = this.getDraftValue("hordeSelected", "");
         for (int slot = 0; slot < MAX_HORDE_ROWS; ++slot) {
             int index = start + slot;
             int rowNumber = slot + 1;
@@ -1877,8 +1870,7 @@ extends CustomUIPage {
                 commandBuilder.set(rowSelector + ".Visible", true)
                         .set("#HordeName" + rowNumber + ".Text", row.hordeId)
                         .set("#HordeType" + rowNumber + ".Text", row.enemyType == null ? "" : HordeConfigPage.compactName(row.enemyType, 14))
-                        .set("#HordeRounds" + rowNumber + ".Text", Integer.toString(row.rounds))
-                        .set(rowSelector + ".Background", selectedHordeId.equalsIgnoreCase(row.hordeId) ? "#2b4a70" : "#16283f");
+                        .set("#HordeRounds" + rowNumber + ".Text", Integer.toString(row.rounds));
                 eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#HordeOpen" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildHordeDefinitionAction("open", row.hordeId)))
                         .addEventBinding(CustomUIEventBindingType.Activating, "#HordeDelete" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildHordeDefinitionAction("delete", row.hordeId)));
             } else {
@@ -1904,7 +1896,6 @@ extends CustomUIPage {
         int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_BOSS_ROWS));
         this.bossPage = HordeConfigPage.clamp(this.bossPage, 0, pageCount - 1);
         int start = this.bossPage * MAX_BOSS_ROWS;
-        String selectedBossId = this.getDraftValue("bossSelected", "");
         for (int slot = 0; slot < MAX_BOSS_ROWS; ++slot) {
             int index = start + slot;
             int rowNumber = slot + 1;
@@ -1916,8 +1907,7 @@ extends CustomUIPage {
                         .set("#BossName" + rowNumber + ".Text", row.bossId)
                         .set("#BossNpc" + rowNumber + ".Text", row.npcId == null ? "" : HordeConfigPage.compactName(row.npcId, 18))
                         .set("#BossTier" + rowNumber + ".Text", tierText)
-                        .set("#BossAmount" + rowNumber + ".Text", Integer.toString(row.amount))
-                        .set(rowSelector + ".Background", selectedBossId.equalsIgnoreCase(row.bossId) ? "#2b4a70" : "#16283f");
+                        .set("#BossAmount" + rowNumber + ".Text", Integer.toString(row.amount));
                 eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#BossOpen" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildBossAction("open", row.bossId)))
                         .addEventBinding(CustomUIEventBindingType.Activating, "#BossDelete" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildBossAction("delete", row.bossId)));
             } else {
@@ -1944,7 +1934,6 @@ extends CustomUIPage {
         int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_ARENA_ROWS));
         this.arenaPage = HordeConfigPage.clamp(this.arenaPage, 0, pageCount - 1);
         int start = this.arenaPage * MAX_ARENA_ROWS;
-        String selectedArenaId = this.getDraftValue("arenaSelected", "");
         for (int slot = 0; slot < MAX_ARENA_ROWS; ++slot) {
             int index = start + slot;
             int rowNumber = slot + 1;
@@ -1954,8 +1943,7 @@ extends CustomUIPage {
                 String coords = String.format(Locale.ROOT, "%.1f %.1f %.1f", row.x, row.y, row.z);
                 commandBuilder.set(rowSelector + ".Visible", true)
                         .set("#ArenaName" + rowNumber + ".Text", row.arenaId)
-                        .set("#ArenaCoords" + rowNumber + ".Text", coords)
-                        .set(rowSelector + ".Background", selectedArenaId.equalsIgnoreCase(row.arenaId) ? "#2b4a70" : "#16283f");
+                        .set("#ArenaCoords" + rowNumber + ".Text", coords);
                 eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#ArenaOpen" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildArenaAction("open", row.arenaId)))
                         .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaDelete" + rowNumber, this.buildConfigSnapshotEvent(HordeConfigPage.buildArenaAction("delete", row.arenaId)));
             } else {
