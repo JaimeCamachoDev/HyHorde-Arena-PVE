@@ -45,6 +45,12 @@ $C = "../Common.ui";
   )
 );
 
+@ListRowHitboxButtonStyle = TextButtonStyle(
+  Default: (Background: #6f95c0(0.14), LabelStyle: (FontSize: 1, TextColor: #000000(0))),
+  Hovered: (Background: #6f95c0(0.34), LabelStyle: (FontSize: 1, TextColor: #000000(0))),
+  Pressed: (Background: #6f95c0(0.48), LabelStyle: (FontSize: 1, TextColor: #000000(0)))
+);
+
 Group {
   Anchor: (Full: 0);
 
@@ -733,66 +739,11 @@ Group {
     NumberFieldStyle: $C.@DefaultInputFieldStyle;
   }
 
-  Label #MaxRadiusLabel {
-    Anchor: (Left: 980, Top: 434, Width: 484, Height: 16);
-    Text: "Radio maximo";
-    Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-  }
-
-  $C.@TextField #MaxRadius { @Anchor = (Left: 980, Top: 456, Width: 484); Value: "12.0"; }
-
-  Label #ArenaJoinRadiusLabel {
-    Anchor: (Left: 980, Top: 370, Width: 484, Height: 16);
-    Text: "Radio de jugadores de arena";
-    Style: (FontSize: 13, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-  }
-
-  $C.@SliderNumberField #ArenaJoinRadius {
-    @Anchor = (Left: 980, Top: 392, Width: 484);
-    Value: 32.0;
-    Min: 4.0;
-    Max: 512.0;
-    Step: 1.0;
-    NumberFieldStyle: $C.@DefaultInputFieldStyle;
-  }
-
   TextButton #ReloadModButton {
     Anchor: (Left: 660, Top: 936, Width: 192, Height: 46);
     Text: "Recargar config";
     Style: $C.@TertiaryTextButtonStyle;
   }
-
-  Label #RoundLabel {
-    Anchor: (Left: 980, Top: 498, Width: 484, Height: 16);
-    Text: "Cantidad de rondas";
-    Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-  }
-
-  $C.@TextField #Rounds { @Anchor = (Left: 980, Top: 520, Width: 484); Value: "5"; }
-
-  Label #BaseEnemiesLabel {
-    Anchor: (Left: 980, Top: 562, Width: 484, Height: 16);
-    Text: "Cantidad base de enemigos por ronda";
-    Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-  }
-
-  $C.@TextField #BaseEnemies { @Anchor = (Left: 980, Top: 584, Width: 484); Value: "8"; }
-
-  Label #EnemiesPerRoundLabel {
-    Anchor: (Left: 980, Top: 626, Width: 484, Height: 16);
-    Text: "Incremento de enemigos por ronda";
-    Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-  }
-
-  $C.@TextField #EnemiesPerRound { @Anchor = (Left: 980, Top: 648, Width: 484); Value: "2"; }
-
-  Label #WaveDelayLabel {
-    Anchor: (Left: 980, Top: 690, Width: 484, Height: 16);
-    Text: "Tiempo de espera entre rondas (s)";
-    Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-  }
-
-  $C.@TextField #WaveDelay { @Anchor = (Left: 980, Top: 712, Width: 484); Value: "8"; }
 
   Label #PlayerMultiplierLabel {
     Anchor: (Left: 1096, Top: 232, Width: 170, Height: 24);
@@ -808,24 +759,6 @@ Group {
     Background: #0f1825;
   }
 
-  Label #RoleLabel {
-    Anchor: (Left: 980, Top: 370, Width: 484, Height: 16);
-    Text: "Categoria de horda";
-    Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-  }
-
-  $C.@DropdownBox #EnemyType {
-    @Anchor = (Left: 980, Top: 392, Width: 484, Height: 34);
-    Value: "undead";
-    Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484);
-  }
-
-  Label #RoleHelpLabel {
-    Anchor: (Left: 642, Top: 418, Width: 822, Height: 24);
-    Text: "";
-    Visible: false;
-    Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center);
-  }
 
   Label #LanguageLabel {
     Anchor: (Left: 980, Top: 234, Width: 160, Height: 24);
@@ -916,7 +849,7 @@ Group {
   }
 
   Label #SoundsTitleLabel {
-    Anchor: (Left: 456, Top: 232, Width: 500, Height: 28);
+    Anchor: (Left: 456, Top: 232, Width: 1008, Height: 28);
     Text: "Configuracion de sonidos";
     Visible: false;
     Style: (FontSize: 18, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
@@ -944,39 +877,59 @@ Group {
   }
 
   Panel #SoundRowStart {
-    Anchor: (Left: 456, Top: 336, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 336, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
+    TextButton #SoundRowStartOpen { Anchor: (Left: 0, Top: 0, Width: 1008, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     Label #SoundRowStartEvent { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: "Inicio ronda"; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
     Label #SoundRowStartId { Anchor: (Left: 136, Top: 6, Width: 256, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
     Label #SoundRowStartVolume { Anchor: (Left: 398, Top: 6, Width: 92, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #e8f1ff, RenderBold: true, VerticalAlignment: Center); }
   }
 
   Panel #SoundRowVictory {
-    Anchor: (Left: 456, Top: 374, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 374, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
+    TextButton #SoundRowVictoryOpen { Anchor: (Left: 0, Top: 0, Width: 1008, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     Label #SoundRowVictoryEvent { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: "Victoria ronda"; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
     Label #SoundRowVictoryId { Anchor: (Left: 136, Top: 6, Width: 256, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
     Label #SoundRowVictoryVolume { Anchor: (Left: 398, Top: 6, Width: 92, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #e8f1ff, RenderBold: true, VerticalAlignment: Center); }
   }
 
+  Panel #SoundsEditorModalShade {
+    Anchor: (Full: 0);
+    Background: #02060f(0.48);
+    Visible: false;
+  }
+
+  $C.@DecoratedContainer #SoundsEditorModalFrame {
+    Anchor: (Left: 456, Top: 224, Width: 1008, Height: 572);
+    Visible: false;
+  }
+
+  TextButton #SoundsEditorCloseButton {
+    Anchor: (Left: 1422, Top: 232, Width: 34, Height: 28);
+    Text: "X";
+    Visible: false;
+    Style: $C.@CancelTextButtonStyle;
+  }
+
   Label #SoundsEditorTitleLabel {
-    Anchor: (Left: 980, Top: 232, Width: 484, Height: 24);
+    Anchor: (Left: 480, Top: 232, Width: 936, Height: 24);
     Text: "Editor de sonidos";
     Visible: false;
     Style: (FontSize: 16, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #SoundsSaveButton {
-    Anchor: (Left: 980, Top: 264, Width: 484, Height: 34);
+    Anchor: (Left: 480, Top: 264, Width: 960, Height: 34);
     Text: "Guardar sonidos";
     Visible: false;
     Style: $C.@SecondaryTextButtonStyle;
   }
 
   Label #RoundStartSoundLabel {
-    Anchor: (Left: 980, Top: 306, Width: 484, Height: 16);
+    Anchor: (Left: 480, Top: 306, Width: 960, Height: 16);
     Text: "Sonido inicio ronda";
     Style: (FontSize: 14, TextColor: #dde8f8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
@@ -992,9 +945,9 @@ Group {
   }
 
   $C.@DropdownBox #RoundStartSoundId {
-    @Anchor = (Left: 980, Top: 328, Width: 484);
+    @Anchor = (Left: 480, Top: 328, Width: 960);
     Value: "auto";
-    Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484);
+    Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 960);
   }
 
   TextButton #RoundStartSoundNextButton {
@@ -1008,13 +961,13 @@ Group {
   }
 
   Label #RoundStartVolumeLabel {
-    Anchor: (Left: 980, Top: 370, Width: 484, Height: 16);
+    Anchor: (Left: 480, Top: 370, Width: 960, Height: 16);
     Text: "Volumen inicio (%)";
     Style: (FontSize: 13, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
 
   $C.@SliderNumberField #RoundStartVolume {
-    @Anchor = (Left: 980, Top: 392, Width: 484);
+    @Anchor = (Left: 480, Top: 392, Width: 960);
     Value: 100;
     Min: 0.0;
     Max: 100.0;
@@ -1023,7 +976,7 @@ Group {
   }
 
   Label #RoundVictorySoundLabel {
-    Anchor: (Left: 980, Top: 444, Width: 484, Height: 16);
+    Anchor: (Left: 480, Top: 444, Width: 960, Height: 16);
     Text: "Sonido victoria ronda";
     Style: (FontSize: 14, TextColor: #dde8f8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
@@ -1039,9 +992,9 @@ Group {
   }
 
   $C.@DropdownBox #RoundVictorySoundId {
-    @Anchor = (Left: 980, Top: 466, Width: 484);
+    @Anchor = (Left: 480, Top: 466, Width: 960);
     Value: "auto";
-    Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484);
+    Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 960);
   }
 
   TextButton #RoundVictorySoundNextButton {
@@ -1055,13 +1008,13 @@ Group {
   }
 
   Label #RoundVictoryVolumeLabel {
-    Anchor: (Left: 980, Top: 508, Width: 484, Height: 16);
+    Anchor: (Left: 480, Top: 508, Width: 960, Height: 16);
     Text: "Volumen victoria (%)";
     Style: (FontSize: 13, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
 
   $C.@SliderNumberField #RoundVictoryVolume {
-    @Anchor = (Left: 980, Top: 530, Width: 484);
+    @Anchor = (Left: 480, Top: 530, Width: 960);
     Value: 100;
     Min: 0.0;
     Max: 100.0;
@@ -1070,7 +1023,7 @@ Group {
   }
 
   Label #RoundSoundHelpLabel {
-    Anchor: (Left: 980, Top: 574, Width: 484, Height: 24);
+    Anchor: (Left: 480, Top: 574, Width: 960, Height: 24);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center);
@@ -1111,57 +1064,132 @@ Group {
   }
 
   Label #PlayersTitleLabel {
-    Anchor: (Left: 456, Top: 232, Width: 500, Height: 28);
+    Anchor: (Left: 456, Top: 232, Width: 1008, Height: 28);
     Text: "Definiciones de audiencia de jugadores";
     Visible: false;
     Style: (FontSize: 18, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #PlayersAddButton {
-    Anchor: (Left: 456, Top: 264, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 264, Width: 1008, Height: 34);
     Text: "Actualizar jugadores";
     Visible: false;
     Style: $C.@SmallSecondaryTextButtonStyle;
   }
 
-  Label #PlayersHeaderName { Anchor: (Left: 466, Top: 308, Width: 188, Height: 22); Text: "Jugador"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #PlayersHeaderMode { Anchor: (Left: 660, Top: 308, Width: 122, Height: 22); Text: "Modo"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #PlayersHeaderActions { Anchor: (Left: 788, Top: 308, Width: 158, Height: 22); Text: "Acciones"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #PlayersHeaderName { Anchor: (Left: 466, Top: 308, Width: 300, Height: 22); Text: "Jugador"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #PlayersHeaderMode { Anchor: (Left: 786, Top: 308, Width: 220, Height: 22); Text: "Modo"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #PlayersHeaderActions { Anchor: (Left: 1426, Top: 308, Width: 34, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
 
-  Panel #PlayerRow1 { Anchor: (Left: 456, Top: 336, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName1 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode1 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen1 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete1 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #PlayerRow2 { Anchor: (Left: 456, Top: 374, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName2 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode2 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen2 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete2 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #PlayerRow3 { Anchor: (Left: 456, Top: 412, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName3 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode3 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen3 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete3 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #PlayerRow4 { Anchor: (Left: 456, Top: 450, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName4 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode4 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen4 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete4 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #PlayerRow5 { Anchor: (Left: 456, Top: 488, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName5 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode5 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen5 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete5 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #PlayerRow6 { Anchor: (Left: 456, Top: 526, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName6 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode6 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen6 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete6 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #PlayerRow7 { Anchor: (Left: 456, Top: 564, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName7 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode7 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen7 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete7 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #PlayerRow8 { Anchor: (Left: 456, Top: 602, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName8 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode8 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen8 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete8 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #PlayerRow9 { Anchor: (Left: 456, Top: 640, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName9 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode9 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen9 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete9 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #PlayerRow10 { Anchor: (Left: 456, Top: 678, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName10 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode10 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen10 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete10 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #PlayerRow11 { Anchor: (Left: 456, Top: 716, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #PlayerName11 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode11 { Anchor: (Left: 204, Top: 6, Width: 122, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen11 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #PlayerDelete11 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #PlayerRow1 {
+    Anchor: (Left: 456, Top: 336, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #PlayerName1 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode1 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen1 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #PlayerDelete1 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #PlayerRow2 {
+    Anchor: (Left: 456, Top: 374, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #PlayerName2 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode2 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen2 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #PlayerDelete2 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #PlayerRow3 {
+    Anchor: (Left: 456, Top: 412, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #PlayerName3 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode3 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen3 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #PlayerDelete3 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #PlayerRow4 {
+    Anchor: (Left: 456, Top: 450, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #PlayerName4 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode4 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen4 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #PlayerDelete4 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #PlayerRow5 {
+    Anchor: (Left: 456, Top: 488, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #PlayerName5 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode5 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen5 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #PlayerDelete5 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #PlayerRow6 {
+    Anchor: (Left: 456, Top: 526, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #PlayerName6 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode6 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen6 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #PlayerDelete6 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #PlayerRow7 {
+    Anchor: (Left: 456, Top: 564, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #PlayerName7 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode7 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen7 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #PlayerDelete7 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #PlayerRow8 {
+    Anchor: (Left: 456, Top: 602, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #PlayerName8 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode8 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen8 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #PlayerDelete8 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #PlayerRow9 {
+    Anchor: (Left: 456, Top: 640, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #PlayerName9 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode9 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen9 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #PlayerDelete9 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #PlayerRow10 {
+    Anchor: (Left: 456, Top: 678, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #PlayerName10 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode10 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen10 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #PlayerDelete10 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #PlayerRow11 {
+    Anchor: (Left: 456, Top: 716, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #PlayerName11 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #PlayerMode11 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #PlayerOpen11 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #PlayerDelete11 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
 
-  TextButton #PlayersPagePrevButton { Anchor: (Left: 622, Top: 760, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #PlayersPageLabel { Anchor: (Left: 658, Top: 762, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  TextButton #PlayersPageNextButton { Anchor: (Left: 758, Top: 760, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #PlayersEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-  Label #PlayersOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
+  TextButton #PlayersPagePrevButton { Anchor: (Left: 872, Top: 760, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #PlayersPageLabel { Anchor: (Left: 908, Top: 762, Width: 104, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  TextButton #PlayersPageNextButton { Anchor: (Left: 1016, Top: 760, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #PlayersEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+  Label #PlayersOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
+
+  Panel #PlayersEditorModalShade {
+    Anchor: (Full: 0);
+    Background: #02060f(0.48);
+    Visible: false;
+  }
+
+  $C.@DecoratedContainer #PlayersEditorModalFrame {
+    Anchor: (Left: 456, Top: 224, Width: 1008, Height: 572);
+    Visible: false;
+  }
+
+  TextButton #PlayersEditorCloseButton {
+    Anchor: (Left: 1422, Top: 232, Width: 34, Height: 28);
+    Text: "X";
+    Visible: false;
+    Style: $C.@CancelTextButtonStyle;
+  }
 
   Label #PlayersEditorTitleLabel {
-    Anchor: (Left: 980, Top: 232, Width: 484, Height: 24);
+    Anchor: (Left: 480, Top: 232, Width: 936, Height: 24);
     Text: "Editor de jugador";
     Visible: false;
     Style: (FontSize: 16, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
-  TextButton #PlayersSaveButton { Anchor: (Left: 980, Top: 264, Width: 484, Height: 34); Text: "Guardar modo jugador"; Visible: false; Style: $C.@SecondaryTextButtonStyle; }
+  TextButton #PlayersSaveButton { Anchor: (Left: 480, Top: 264, Width: 960, Height: 34); Text: "Guardar modo jugador"; Visible: false; Style: $C.@SecondaryTextButtonStyle; }
   TextField #PlayerSelected { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Value: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
-  Label #PlayersCountLabel { Anchor: (Left: 980, Top: 458, Width: 220, Height: 22); Text: "Detectados"; Visible: false; Style: (FontSize: 13, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #PlayersCountValue { Anchor: (Left: 1208, Top: 458, Width: 120, Height: 22); Text: "0"; Visible: false; Style: (FontSize: 13, TextColor: #f1f7ff, RenderBold: true, VerticalAlignment: Center); }
-  Label #PlayerEditModeLabel { Anchor: (Left: 980, Top: 306, Width: 484, Height: 16); Text: "Modo de audiencia"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@DropdownBox #PlayerEditMode { @Anchor = (Left: 980, Top: 328, Width: 484, Height: 34); Value: "player"; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
-  Label #AudienceInfoLabel { Anchor: (Left: 980, Top: 486, Width: 484, Height: 20); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #b5c7df, VerticalAlignment: Center); }
-  Label #PlayerStatusLabel { Anchor: (Left: 980, Top: 456, Width: 484, Height: 56); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-  Label #AudienceHelpLabel { Anchor: (Left: 980, Top: 584, Width: 484, Height: 36); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center); }
+  Label #PlayersCountLabel { Anchor: (Left: 480, Top: 458, Width: 220, Height: 22); Text: "Detectados"; Visible: false; Style: (FontSize: 13, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #PlayersCountValue { Anchor: (Left: 708, Top: 458, Width: 732, Height: 22); Text: "0"; Visible: false; Style: (FontSize: 13, TextColor: #f1f7ff, RenderBold: true, VerticalAlignment: Center); }
+  Label #PlayerEditModeLabel { Anchor: (Left: 480, Top: 306, Width: 960, Height: 16); Text: "Modo de audiencia"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@DropdownBox #PlayerEditMode { @Anchor = (Left: 480, Top: 328, Width: 960, Height: 34); Value: "player"; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 960); }
+  Label #ArenaJoinRadiusLabel { Anchor: (Left: 480, Top: 370, Width: 960, Height: 16); Text: "Radio de jugadores de arena"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@SliderNumberField #ArenaJoinRadius { @Anchor = (Left: 480, Top: 392, Width: 960); Value: 32.0; Visible: false; Min: 4.0; Max: 512.0; Step: 1.0; NumberFieldStyle: $C.@DefaultInputFieldStyle; }
+  Label #AudienceInfoLabel { Anchor: (Left: 480, Top: 486, Width: 960, Height: 20); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #b5c7df, VerticalAlignment: Center); }
+  Label #PlayerStatusLabel { Anchor: (Left: 480, Top: 636, Width: 960, Height: 56); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+  Label #AudienceHelpLabel { Anchor: (Left: 480, Top: 584, Width: 960, Height: 36); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center); }
 
   Label #PlayersListTitle { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Text: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
   Label #PlayersListHint { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Text: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
@@ -1170,73 +1198,146 @@ Group {
   Label #AudiencePlayersEmptyLabel { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Text: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
 
   Label #RewardCatTitleLabel {
-    Anchor: (Left: 456, Top: 232, Width: 500, Height: 28);
+    Anchor: (Left: 456, Top: 232, Width: 1008, Height: 28);
     Text: "Definiciones de categorias de recompensa";
     Visible: false;
     Style: (FontSize: 18, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #RewardCatAddButton {
-    Anchor: (Left: 456, Top: 264, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 264, Width: 1008, Height: 34);
     Text: "Anadir categoria";
     Visible: false;
     Style: $C.@SmallSecondaryTextButtonStyle;
   }
 
-  Label #RewardCatHeaderName { Anchor: (Left: 466, Top: 308, Width: 148, Height: 22); Text: "Categoria ID"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #RewardCatHeaderPreview { Anchor: (Left: 620, Top: 308, Width: 196, Height: 22); Text: "Items"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #RewardCatHeaderActions { Anchor: (Left: 820, Top: 308, Width: 132, Height: 22); Text: "Acciones"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #RewardCatHeaderName { Anchor: (Left: 466, Top: 308, Width: 300, Height: 22); Text: "Categoria ID"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #RewardCatHeaderPreview { Anchor: (Left: 786, Top: 308, Width: 620, Height: 22); Text: "Items"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #RewardCatHeaderActions { Anchor: (Left: 1426, Top: 308, Width: 34, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
 
-  Panel #RewardCatRow1 { Anchor: (Left: 456, Top: 336, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName1 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview1 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen1 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete1 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatRow2 { Anchor: (Left: 456, Top: 374, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName2 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview2 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen2 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete2 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatRow3 { Anchor: (Left: 456, Top: 412, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName3 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview3 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen3 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete3 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatRow4 { Anchor: (Left: 456, Top: 450, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName4 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview4 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen4 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete4 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatRow5 { Anchor: (Left: 456, Top: 488, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName5 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview5 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen5 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete5 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatRow6 { Anchor: (Left: 456, Top: 526, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName6 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview6 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen6 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete6 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatRow7 { Anchor: (Left: 456, Top: 564, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName7 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview7 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen7 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete7 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatRow8 { Anchor: (Left: 456, Top: 602, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName8 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview8 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen8 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete8 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatRow9 { Anchor: (Left: 456, Top: 640, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName9 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview9 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen9 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete9 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatRow10 { Anchor: (Left: 456, Top: 678, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName10 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview10 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen10 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete10 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatRow11 { Anchor: (Left: 456, Top: 716, Width: 500, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName11 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview11 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen11 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; } TextButton #RewardCatDelete11 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #RewardCatRow1 {
+    Anchor: (Left: 456, Top: 336, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName1 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview1 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen1 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #RewardCatDelete1 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #RewardCatRow2 {
+    Anchor: (Left: 456, Top: 374, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName2 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview2 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen2 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #RewardCatDelete2 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #RewardCatRow3 {
+    Anchor: (Left: 456, Top: 412, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName3 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview3 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen3 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #RewardCatDelete3 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #RewardCatRow4 {
+    Anchor: (Left: 456, Top: 450, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName4 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview4 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen4 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #RewardCatDelete4 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #RewardCatRow5 {
+    Anchor: (Left: 456, Top: 488, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName5 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview5 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen5 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #RewardCatDelete5 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #RewardCatRow6 {
+    Anchor: (Left: 456, Top: 526, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName6 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview6 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen6 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #RewardCatDelete6 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #RewardCatRow7 {
+    Anchor: (Left: 456, Top: 564, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName7 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview7 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen7 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #RewardCatDelete7 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #RewardCatRow8 {
+    Anchor: (Left: 456, Top: 602, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName8 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview8 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen8 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #RewardCatDelete8 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #RewardCatRow9 {
+    Anchor: (Left: 456, Top: 640, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName9 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview9 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen9 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #RewardCatDelete9 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #RewardCatRow10 {
+    Anchor: (Left: 456, Top: 678, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName10 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview10 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen10 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #RewardCatDelete10 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
+  Panel #RewardCatRow11 {
+    Anchor: (Left: 456, Top: 716, Width: 1008, Height: 34); Background: #16283f; Visible: false; Label #RewardCatName11 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } Label #RewardCatPreview11 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); } TextButton #RewardCatOpen11 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; } TextButton #RewardCatDelete11 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    } }
 
-  TextButton #RewardCatPagePrevButton { Anchor: (Left: 622, Top: 760, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #RewardCatPageLabel { Anchor: (Left: 658, Top: 762, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  TextButton #RewardCatPageNextButton { Anchor: (Left: 758, Top: 760, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #RewardCatEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-  Label #RewardCatOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
+  TextButton #RewardCatPagePrevButton { Anchor: (Left: 872, Top: 760, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #RewardCatPageLabel { Anchor: (Left: 908, Top: 762, Width: 104, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  TextButton #RewardCatPageNextButton { Anchor: (Left: 1016, Top: 760, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #RewardCatEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+  Label #RewardCatOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
+
+  Panel #RewardCatEditorModalShade {
+    Anchor: (Full: 0);
+    Background: #02060f(0.48);
+    Visible: false;
+  }
+
+  $C.@DecoratedContainer #RewardCatEditorModalFrame {
+    Anchor: (Left: 456, Top: 224, Width: 1008, Height: 572);
+    Visible: false;
+  }
+
+  TextButton #RewardCatEditorCloseButton {
+    Anchor: (Left: 1422, Top: 232, Width: 34, Height: 28);
+    Text: "X";
+    Visible: false;
+    Style: $C.@CancelTextButtonStyle;
+  }
 
   Label #RewardCatEditorTitleLabel {
-    Anchor: (Left: 980, Top: 232, Width: 484, Height: 24);
+    Anchor: (Left: 480, Top: 232, Width: 936, Height: 24);
     Text: "Editor de categoria de recompensa";
     Visible: false;
     Style: (FontSize: 16, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
-  TextButton #RewardCatSaveButton { Anchor: (Left: 980, Top: 264, Width: 484, Height: 34); Text: "Guardar categoria"; Visible: false; Style: $C.@SecondaryTextButtonStyle; }
+  TextButton #RewardCatSaveButton { Anchor: (Left: 480, Top: 264, Width: 960, Height: 34); Text: "Guardar categoria"; Visible: false; Style: $C.@SecondaryTextButtonStyle; }
   TextField #RewardCatSelected { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Value: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
-  Label #RewardCatEditIdLabel { Anchor: (Left: 980, Top: 306, Width: 484, Height: 16); Text: "Categoria ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #RewardCatEditId { @Anchor = (Left: 980, Top: 328, Width: 484); Value: ""; }
-  Label #RewardCatItemPickerLabel { Anchor: (Left: 980, Top: 370, Width: 484, Height: 16); Text: "Reward item ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@DropdownBox #RewardCatItemPicker { @Anchor = (Left: 980, Top: 392, Width: 484, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
-  TextButton #RewardCatItemAddButton { Anchor: (Left: 980, Top: 434, Width: 484, Height: 34); Text: "Anadir"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #RewardCatEditItemsLabel { Anchor: (Left: 980, Top: 476, Width: 484, Height: 16); Text: "Items en categoria"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  Label #RewardCatEditIdLabel { Anchor: (Left: 480, Top: 306, Width: 960, Height: 16); Text: "Categoria ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #RewardCatEditId { @Anchor = (Left: 480, Top: 328, Width: 960); Value: ""; }
+  Label #RewardCatItemPickerLabel { Anchor: (Left: 480, Top: 370, Width: 960, Height: 16); Text: "Reward item ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@DropdownBox #RewardCatItemPicker { @Anchor = (Left: 480, Top: 392, Width: 960, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 960); }
+  TextButton #RewardCatItemAddButton { Anchor: (Left: 480, Top: 434, Width: 960, Height: 34); Text: "Anadir"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #RewardCatEditItemsLabel { Anchor: (Left: 480, Top: 476, Width: 960, Height: 16); Text: "Items en categoria"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
   $C.@TextField #RewardCatEditItems { @Anchor = (Left: 0, Top: 0, Width: 1, Height: 1); Value: ""; Visible: false; }
-  Panel #RewardCatItemRow1 { Anchor: (Left: 980, Top: 498, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName1 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete1 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatItemRow2 { Anchor: (Left: 980, Top: 526, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName2 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete2 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatItemRow3 { Anchor: (Left: 980, Top: 554, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName3 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete3 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatItemRow4 { Anchor: (Left: 980, Top: 582, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName4 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete4 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatItemRow5 { Anchor: (Left: 980, Top: 610, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName5 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete5 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatItemRow6 { Anchor: (Left: 980, Top: 638, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName6 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete6 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatItemRow7 { Anchor: (Left: 980, Top: 666, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName7 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete7 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatItemRow8 { Anchor: (Left: 980, Top: 694, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName8 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete8 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatItemRow9 { Anchor: (Left: 980, Top: 722, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName9 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete9 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #RewardCatItemRow10 { Anchor: (Left: 980, Top: 750, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName10 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete10 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  TextButton #RewardCatItemsPagePrevButton { Anchor: (Left: 1138, Top: 780, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #RewardCatItemsPageLabel { Anchor: (Left: 1174, Top: 782, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  TextButton #RewardCatItemsPageNextButton { Anchor: (Left: 1274, Top: 780, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Panel #RewardCatItemRow1 { Anchor: (Left: 480, Top: 498, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName1 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete1 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #RewardCatItemRow2 { Anchor: (Left: 480, Top: 526, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName2 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete2 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #RewardCatItemRow3 { Anchor: (Left: 480, Top: 554, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName3 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete3 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #RewardCatItemRow4 { Anchor: (Left: 480, Top: 582, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName4 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete4 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #RewardCatItemRow5 { Anchor: (Left: 480, Top: 610, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName5 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete5 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #RewardCatItemRow6 { Anchor: (Left: 480, Top: 638, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName6 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete6 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #RewardCatItemRow7 { Anchor: (Left: 480, Top: 666, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName7 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete7 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #RewardCatItemRow8 { Anchor: (Left: 480, Top: 694, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName8 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete8 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #RewardCatItemRow9 { Anchor: (Left: 480, Top: 722, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName9 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete9 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #RewardCatItemRow10 { Anchor: (Left: 480, Top: 750, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #RewardCatItemName10 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #RewardCatItemDelete10 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  TextButton #RewardCatItemsPagePrevButton { Anchor: (Left: 888, Top: 780, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #RewardCatItemsPageLabel { Anchor: (Left: 924, Top: 782, Width: 104, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  TextButton #RewardCatItemsPageNextButton { Anchor: (Left: 1032, Top: 780, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
   Label #RewardCatItemsOverflowLabel { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Text: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
-  Label #RewardCatEditItemsHelpLabel { Anchor: (Left: 980, Top: 732, Width: 484, Height: 28); Text: "Usa desplegable para anadir item IDs"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center); }
-  Label #RewardCatStatusLabel { Anchor: (Left: 980, Top: 770, Width: 484, Height: 40); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+  Label #RewardCatEditItemsHelpLabel { Anchor: (Left: 480, Top: 732, Width: 960, Height: 28); Text: "Usa desplegable para anadir item IDs"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center); }
+  Label #RewardCatStatusLabel { Anchor: (Left: 480, Top: 770, Width: 960, Height: 40); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
 
   Label #RewardEveryRoundsLabel { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Text: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
   $C.@NumberField #RewardEveryRounds { @Anchor = (Left: 0, Top: 0, Width: 1); Value: 2; Visible: false; }
@@ -1260,141 +1361,203 @@ Group {
   }
 
   Label #EnemyCatTitleLabel {
-    Anchor: (Left: 456, Top: 232, Width: 500, Height: 28);
+    Anchor: (Left: 456, Top: 232, Width: 1008, Height: 28);
     Text: "Definiciones de categorias de enemigos";
     Visible: false;
     Style: (FontSize: 18, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #EnemyCatAddButton {
-    Anchor: (Left: 456, Top: 264, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 264, Width: 1008, Height: 34);
     Text: "Anadir categoria";
     Visible: false;
     Style: $C.@SmallSecondaryTextButtonStyle;
   }
 
-  Label #EnemyCatHeaderName { Anchor: (Left: 466, Top: 308, Width: 148, Height: 22); Text: "Categoria ID"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #EnemyCatHeaderPreview { Anchor: (Left: 620, Top: 308, Width: 196, Height: 22); Text: "Enemy IDs"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #EnemyCatHeaderActions { Anchor: (Left: 820, Top: 308, Width: 132, Height: 22); Text: "Acciones"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #EnemyCatHeaderName { Anchor: (Left: 466, Top: 308, Width: 300, Height: 22); Text: "Categoria ID"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #EnemyCatHeaderPreview { Anchor: (Left: 786, Top: 308, Width: 620, Height: 22); Text: "Enemy IDs"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #EnemyCatHeaderActions { Anchor: (Left: 1426, Top: 308, Width: 34, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
 
   Panel #EnemyCatRow1 {
-    Anchor: (Left: 456, Top: 336, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 336, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #EnemyCatName1 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #EnemyCatPreview1 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #EnemyCatOpen1 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #EnemyCatDelete1 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #EnemyCatName1 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #EnemyCatPreview1 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    TextButton #EnemyCatOpen1 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #EnemyCatDelete1 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #EnemyCatRow2 {
-    Anchor: (Left: 456, Top: 374, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 374, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #EnemyCatName2 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #EnemyCatPreview2 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #EnemyCatOpen2 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #EnemyCatDelete2 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #EnemyCatName2 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #EnemyCatPreview2 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    TextButton #EnemyCatOpen2 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #EnemyCatDelete2 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #EnemyCatRow3 {
-    Anchor: (Left: 456, Top: 412, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 412, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #EnemyCatName3 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #EnemyCatPreview3 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #EnemyCatOpen3 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #EnemyCatDelete3 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #EnemyCatName3 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #EnemyCatPreview3 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    TextButton #EnemyCatOpen3 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #EnemyCatDelete3 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #EnemyCatRow4 {
-    Anchor: (Left: 456, Top: 450, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 450, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #EnemyCatName4 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #EnemyCatPreview4 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #EnemyCatOpen4 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #EnemyCatDelete4 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #EnemyCatName4 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #EnemyCatPreview4 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    TextButton #EnemyCatOpen4 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #EnemyCatDelete4 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #EnemyCatRow5 {
-    Anchor: (Left: 456, Top: 488, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 488, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #EnemyCatName5 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #EnemyCatPreview5 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #EnemyCatOpen5 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #EnemyCatDelete5 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #EnemyCatName5 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #EnemyCatPreview5 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    TextButton #EnemyCatOpen5 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #EnemyCatDelete5 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #EnemyCatRow6 {
-    Anchor: (Left: 456, Top: 526, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 526, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #EnemyCatName6 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #EnemyCatPreview6 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #EnemyCatOpen6 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #EnemyCatDelete6 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #EnemyCatName6 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #EnemyCatPreview6 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    TextButton #EnemyCatOpen6 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #EnemyCatDelete6 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #EnemyCatRow7 {
-    Anchor: (Left: 456, Top: 564, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 564, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #EnemyCatName7 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #EnemyCatPreview7 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #EnemyCatOpen7 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #EnemyCatDelete7 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #EnemyCatName7 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #EnemyCatPreview7 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    TextButton #EnemyCatOpen7 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #EnemyCatDelete7 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #EnemyCatRow8 {
-    Anchor: (Left: 456, Top: 602, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 602, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #EnemyCatName8 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #EnemyCatPreview8 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #EnemyCatOpen8 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #EnemyCatDelete8 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #EnemyCatName8 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #EnemyCatPreview8 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    TextButton #EnemyCatOpen8 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #EnemyCatDelete8 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #EnemyCatRow9 {
-    Anchor: (Left: 456, Top: 640, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 640, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #EnemyCatName9 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #EnemyCatPreview9 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #EnemyCatOpen9 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #EnemyCatDelete9 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #EnemyCatName9 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #EnemyCatPreview9 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    TextButton #EnemyCatOpen9 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #EnemyCatDelete9 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #EnemyCatRow10 {
-    Anchor: (Left: 456, Top: 678, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 678, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #EnemyCatName10 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #EnemyCatPreview10 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #EnemyCatOpen10 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #EnemyCatDelete10 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #EnemyCatName10 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #EnemyCatPreview10 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    TextButton #EnemyCatOpen10 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #EnemyCatDelete10 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #EnemyCatRow11 {
-    Anchor: (Left: 456, Top: 716, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 716, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #EnemyCatName11 { Anchor: (Left: 10, Top: 6, Width: 148, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #EnemyCatPreview11 { Anchor: (Left: 164, Top: 6, Width: 196, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #EnemyCatOpen11 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #EnemyCatDelete11 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #EnemyCatName11 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #EnemyCatPreview11 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    TextButton #EnemyCatOpen11 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #EnemyCatDelete11 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
-  TextButton #EnemyCatPagePrevButton { Anchor: (Left: 622, Top: 760, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #EnemyCatPageLabel { Anchor: (Left: 658, Top: 762, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  TextButton #EnemyCatPageNextButton { Anchor: (Left: 758, Top: 760, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #EnemyCatEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-  Label #EnemyCatOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
+  TextButton #EnemyCatPagePrevButton { Anchor: (Left: 872, Top: 760, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #EnemyCatPageLabel { Anchor: (Left: 908, Top: 762, Width: 104, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  TextButton #EnemyCatPageNextButton { Anchor: (Left: 1016, Top: 760, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #EnemyCatEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+  Label #EnemyCatOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
+
+  Panel #EnemyCatEditorModalShade {
+    Anchor: (Full: 0);
+    Background: #02060f(0.48);
+    Visible: false;
+  }
+
+  $C.@DecoratedContainer #EnemyCatEditorModalFrame {
+    Anchor: (Left: 456, Top: 224, Width: 1008, Height: 572);
+    Visible: false;
+  }
+
+  TextButton #EnemyCatEditorCloseButton {
+    Anchor: (Left: 1422, Top: 232, Width: 34, Height: 28);
+    Text: "X";
+    Visible: false;
+    Style: $C.@CancelTextButtonStyle;
+  }
 
   Label #EnemyCatEditorTitleLabel {
-    Anchor: (Left: 980, Top: 232, Width: 484, Height: 24);
+    Anchor: (Left: 480, Top: 232, Width: 936, Height: 24);
     Text: "Editor de categoria de enemigos";
     Visible: false;
     Style: (FontSize: 16, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
@@ -1416,495 +1579,589 @@ Group {
     Background: #0f1825;
   }
 
-  Label #EnemyCatEditIdLabel { Anchor: (Left: 980, Top: 306, Width: 484, Height: 16); Text: "Categoria ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #EnemyCatEditId { @Anchor = (Left: 980, Top: 328, Width: 484); Value: ""; }
-  Label #EnemyCatRolePickerLabel { Anchor: (Left: 980, Top: 370, Width: 484, Height: 16); Text: "Enemy ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@DropdownBox #EnemyCatRolePicker { @Anchor = (Left: 980, Top: 392, Width: 484, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
-  TextButton #EnemyCatRoleAddButton { Anchor: (Left: 980, Top: 434, Width: 484, Height: 34); Text: "Anadir"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #EnemyCatEditRolesLabel { Anchor: (Left: 980, Top: 476, Width: 484, Height: 16); Text: "Enemy IDs en categoria"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  Label #EnemyCatEditIdLabel { Anchor: (Left: 480, Top: 306, Width: 960, Height: 16); Text: "Categoria ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #EnemyCatEditId { @Anchor = (Left: 480, Top: 328, Width: 960); Value: ""; }
+  Label #EnemyCatRolePickerLabel { Anchor: (Left: 480, Top: 370, Width: 960, Height: 16); Text: "Enemy ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@DropdownBox #EnemyCatRolePicker { @Anchor = (Left: 480, Top: 392, Width: 960, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 960); }
+  TextButton #EnemyCatRoleAddButton { Anchor: (Left: 480, Top: 434, Width: 960, Height: 34); Text: "Anadir"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #EnemyCatEditRolesLabel { Anchor: (Left: 480, Top: 476, Width: 960, Height: 16); Text: "Enemy IDs en categoria"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
   $C.@TextField #EnemyCatEditRoles { @Anchor = (Left: 0, Top: 0, Width: 1, Height: 1); Value: ""; Visible: false; }
-  Panel #EnemyCatRoleRow1 { Anchor: (Left: 980, Top: 498, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName1 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete1 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #EnemyCatRoleRow2 { Anchor: (Left: 980, Top: 526, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName2 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete2 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #EnemyCatRoleRow3 { Anchor: (Left: 980, Top: 554, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName3 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete3 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #EnemyCatRoleRow4 { Anchor: (Left: 980, Top: 582, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName4 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete4 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #EnemyCatRoleRow5 { Anchor: (Left: 980, Top: 610, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName5 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete5 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #EnemyCatRoleRow6 { Anchor: (Left: 980, Top: 638, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName6 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete6 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #EnemyCatRoleRow7 { Anchor: (Left: 980, Top: 666, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName7 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete7 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #EnemyCatRoleRow8 { Anchor: (Left: 980, Top: 694, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName8 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete8 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #EnemyCatRoleRow9 { Anchor: (Left: 980, Top: 722, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName9 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete9 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  Panel #EnemyCatRoleRow10 { Anchor: (Left: 980, Top: 750, Width: 484, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName10 { Anchor: (Left: 8, Top: 3, Width: 438, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete10 { Anchor: (Left: 448, Top: 1, Width: 30, Height: 24); Text: "-"; Style: $C.@CancelTextButtonStyle; } }
-  TextButton #EnemyCatRolesPagePrevButton { Anchor: (Left: 1138, Top: 780, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #EnemyCatRolesPageLabel { Anchor: (Left: 1174, Top: 782, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  TextButton #EnemyCatRolesPageNextButton { Anchor: (Left: 1274, Top: 780, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Panel #EnemyCatRoleRow1 { Anchor: (Left: 480, Top: 498, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName1 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete1 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #EnemyCatRoleRow2 { Anchor: (Left: 480, Top: 526, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName2 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete2 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #EnemyCatRoleRow3 { Anchor: (Left: 480, Top: 554, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName3 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete3 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #EnemyCatRoleRow4 { Anchor: (Left: 480, Top: 582, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName4 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete4 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #EnemyCatRoleRow5 { Anchor: (Left: 480, Top: 610, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName5 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete5 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #EnemyCatRoleRow6 { Anchor: (Left: 480, Top: 638, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName6 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete6 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #EnemyCatRoleRow7 { Anchor: (Left: 480, Top: 666, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName7 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete7 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #EnemyCatRoleRow8 { Anchor: (Left: 480, Top: 694, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName8 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete8 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #EnemyCatRoleRow9 { Anchor: (Left: 480, Top: 722, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName9 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete9 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  Panel #EnemyCatRoleRow10 { Anchor: (Left: 480, Top: 750, Width: 960, Height: 26); Background: #16283f; Visible: false; Label #EnemyCatRoleName10 { Anchor: (Left: 8, Top: 3, Width: 914, Height: 20); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); } TextButton #EnemyCatRoleDelete10 { Anchor: (Left: 928, Top: 1, Width: 30, Height: 24); Text: "X"; Style: $C.@CancelTextButtonStyle; } }
+  TextButton #EnemyCatRolesPagePrevButton { Anchor: (Left: 888, Top: 780, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #EnemyCatRolesPageLabel { Anchor: (Left: 924, Top: 782, Width: 104, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  TextButton #EnemyCatRolesPageNextButton { Anchor: (Left: 1032, Top: 780, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
   Label #EnemyCatRolesOverflowLabel { Anchor: (Left: 0, Top: 0, Width: 1, Height: 1); Text: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
 
   Label #EnemyCatEditRolesHelpLabel {
-    Anchor: (Left: 980, Top: 732, Width: 484, Height: 28);
+    Anchor: (Left: 480, Top: 732, Width: 960, Height: 28);
     Text: "Usa desplegable para anadir Enemy IDs";
     Visible: false;
     Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center);
   }
 
   TextButton #EnemyCatSaveButton {
-    Anchor: (Left: 980, Top: 264, Width: 484, Height: 34);
+    Anchor: (Left: 480, Top: 264, Width: 960, Height: 34);
     Text: "Guardar categoria";
     Visible: false;
     Style: $C.@SecondaryTextButtonStyle;
   }
 
   Label #EnemyCatStatusLabel {
-    Anchor: (Left: 980, Top: 770, Width: 484, Height: 40);
+    Anchor: (Left: 480, Top: 770, Width: 960, Height: 40);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center);
   }
 
   Label #HordesTitleLabel {
-    Anchor: (Left: 456, Top: 232, Width: 500, Height: 28);
+    Anchor: (Left: 456, Top: 232, Width: 1008, Height: 28);
     Text: "Definiciones de hordas";
     Visible: false;
     Style: (FontSize: 18, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #HordeAddButton {
-    Anchor: (Left: 456, Top: 264, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 264, Width: 1008, Height: 34);
     Text: "Anadir horda";
     Visible: false;
     Style: $C.@SmallSecondaryTextButtonStyle;
   }
 
-  Label #HordeHeaderId { Anchor: (Left: 466, Top: 308, Width: 180, Height: 22); Text: "Horde ID"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #HordeHeaderType { Anchor: (Left: 652, Top: 308, Width: 120, Height: 22); Text: "Tipo"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #HordeHeaderRounds { Anchor: (Left: 778, Top: 308, Width: 70, Height: 22); Text: "Rondas"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #HordeHeaderActions { Anchor: (Left: 854, Top: 308, Width: 98, Height: 22); Text: "Acciones"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #HordeHeaderId { Anchor: (Left: 466, Top: 308, Width: 300, Height: 22); Text: "Horde ID"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #HordeHeaderType { Anchor: (Left: 786, Top: 308, Width: 220, Height: 22); Text: "Tipo"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #HordeHeaderRounds { Anchor: (Left: 1016, Top: 308, Width: 90, Height: 22); Text: "Rondas"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #HordeHeaderActions { Anchor: (Left: 1426, Top: 308, Width: 34, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
 
   Panel #HordeRow1 {
-    Anchor: (Left: 456, Top: 336, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 336, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #HordeName1 { Anchor: (Left: 10, Top: 6, Width: 180, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeType1 { Anchor: (Left: 196, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeRounds1 { Anchor: (Left: 322, Top: 6, Width: 36, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #HordeOpen1 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #HordeDelete1 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #HordeName1 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeType1 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeRounds1 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #HordeOpen1 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #HordeDelete1 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #HordeRow2 {
-    Anchor: (Left: 456, Top: 374, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 374, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #HordeName2 { Anchor: (Left: 10, Top: 6, Width: 180, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeType2 { Anchor: (Left: 196, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeRounds2 { Anchor: (Left: 322, Top: 6, Width: 36, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #HordeOpen2 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #HordeDelete2 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #HordeName2 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeType2 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeRounds2 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #HordeOpen2 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #HordeDelete2 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #HordeRow3 {
-    Anchor: (Left: 456, Top: 412, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 412, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #HordeName3 { Anchor: (Left: 10, Top: 6, Width: 180, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeType3 { Anchor: (Left: 196, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeRounds3 { Anchor: (Left: 322, Top: 6, Width: 36, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #HordeOpen3 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #HordeDelete3 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #HordeName3 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeType3 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeRounds3 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #HordeOpen3 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #HordeDelete3 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #HordeRow4 {
-    Anchor: (Left: 456, Top: 450, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 450, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #HordeName4 { Anchor: (Left: 10, Top: 6, Width: 180, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeType4 { Anchor: (Left: 196, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeRounds4 { Anchor: (Left: 322, Top: 6, Width: 36, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #HordeOpen4 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #HordeDelete4 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #HordeName4 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeType4 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeRounds4 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #HordeOpen4 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #HordeDelete4 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #HordeRow5 {
-    Anchor: (Left: 456, Top: 488, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 488, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #HordeName5 { Anchor: (Left: 10, Top: 6, Width: 180, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeType5 { Anchor: (Left: 196, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeRounds5 { Anchor: (Left: 322, Top: 6, Width: 36, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #HordeOpen5 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #HordeDelete5 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #HordeName5 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeType5 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeRounds5 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #HordeOpen5 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #HordeDelete5 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #HordeRow6 {
-    Anchor: (Left: 456, Top: 526, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 526, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #HordeName6 { Anchor: (Left: 10, Top: 6, Width: 180, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeType6 { Anchor: (Left: 196, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeRounds6 { Anchor: (Left: 322, Top: 6, Width: 36, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #HordeOpen6 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #HordeDelete6 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #HordeName6 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeType6 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeRounds6 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #HordeOpen6 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #HordeDelete6 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #HordeRow7 {
-    Anchor: (Left: 456, Top: 564, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 564, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #HordeName7 { Anchor: (Left: 10, Top: 6, Width: 180, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeType7 { Anchor: (Left: 196, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeRounds7 { Anchor: (Left: 322, Top: 6, Width: 36, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #HordeOpen7 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #HordeDelete7 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #HordeName7 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeType7 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeRounds7 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #HordeOpen7 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #HordeDelete7 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #HordeRow8 {
-    Anchor: (Left: 456, Top: 602, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 602, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #HordeName8 { Anchor: (Left: 10, Top: 6, Width: 180, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeType8 { Anchor: (Left: 196, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeRounds8 { Anchor: (Left: 322, Top: 6, Width: 36, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #HordeOpen8 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #HordeDelete8 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #HordeName8 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeType8 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeRounds8 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #HordeOpen8 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #HordeDelete8 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #HordeRow9 {
-    Anchor: (Left: 456, Top: 640, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 640, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #HordeName9 { Anchor: (Left: 10, Top: 6, Width: 180, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeType9 { Anchor: (Left: 196, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeRounds9 { Anchor: (Left: 322, Top: 6, Width: 36, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #HordeOpen9 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #HordeDelete9 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #HordeName9 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeType9 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeRounds9 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #HordeOpen9 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #HordeDelete9 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #HordeRow10 {
-    Anchor: (Left: 456, Top: 678, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 678, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #HordeName10 { Anchor: (Left: 10, Top: 6, Width: 180, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeType10 { Anchor: (Left: 196, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeRounds10 { Anchor: (Left: 322, Top: 6, Width: 36, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #HordeOpen10 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #HordeDelete10 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #HordeName10 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeType10 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeRounds10 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #HordeOpen10 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #HordeDelete10 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
   Panel #HordeRow11 {
-    Anchor: (Left: 456, Top: 716, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 716, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #HordeName11 { Anchor: (Left: 10, Top: 6, Width: 180, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeType11 { Anchor: (Left: 196, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #HordeRounds11 { Anchor: (Left: 322, Top: 6, Width: 36, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #HordeOpen11 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
-    TextButton #HordeDelete11 { Anchor: (Left: 458, Top: 4, Width: 32, Height: 26); Text: "-"; Style: $C.@CancelTextButtonStyle; }
+    Label #HordeName11 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeType11 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #HordeRounds11 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #HordeOpen11 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    TextButton #HordeDelete11 {
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
+      Style: $C.@CancelTextButtonStyle;
+    }
   }
 
-  TextButton #HordePagePrevButton { Anchor: (Left: 622, Top: 760, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #HordePageLabel { Anchor: (Left: 658, Top: 762, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  TextButton #HordePageNextButton { Anchor: (Left: 758, Top: 760, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #HordeEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-  Label #HordeOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
+  TextButton #HordePagePrevButton { Anchor: (Left: 872, Top: 760, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #HordePageLabel { Anchor: (Left: 908, Top: 762, Width: 104, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  TextButton #HordePageNextButton { Anchor: (Left: 1016, Top: 760, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #HordeEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+  Label #HordeOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
+
+  Panel #HordeEditorModalShade {
+    Anchor: (Full: 0);
+    Background: #02060f(0.48);
+    Visible: false;
+  }
+
+  $C.@DecoratedContainer #HordeEditorModalFrame {
+    Anchor: (Left: 456, Top: 224, Width: 1008, Height: 572);
+    Visible: false;
+  }
+
+  TextButton #HordeEditorCloseButton {
+    Anchor: (Left: 1422, Top: 232, Width: 34, Height: 28);
+    Text: "X";
+    Visible: false;
+    Style: $C.@CancelTextButtonStyle;
+  }
 
   Label #HordeEditorTitleLabel {
-    Anchor: (Left: 980, Top: 232, Width: 484, Height: 24);
+    Anchor: (Left: 480, Top: 232, Width: 936, Height: 24);
     Text: "Editor de horda";
     Visible: false;
     Style: (FontSize: 16, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
-  Label #HordeEditIdLabel { Anchor: (Left: 980, Top: 306, Width: 484, Height: 16); Text: "Horde ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #HordeEditId { @Anchor = (Left: 980, Top: 328, Width: 484); Value: ""; }
-
   TextButton #HordeSaveButton {
-    Anchor: (Left: 980, Top: 264, Width: 484, Height: 34);
+    Anchor: (Left: 480, Top: 264, Width: 960, Height: 34);
     Text: "Guardar horda";
     Visible: false;
     Style: $C.@SecondaryTextButtonStyle;
   }
 
+  Label #HordeEditIdLabel { Anchor: (Left: 480, Top: 306, Width: 960, Height: 16); Text: "Horde ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #HordeEditId { @Anchor = (Left: 480, Top: 328, Width: 960); Value: ""; }
+
+  Label #RoleLabel { Anchor: (Left: 480, Top: 370, Width: 960, Height: 16); Text: "Categoria de horda"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@DropdownBox #EnemyType { @Anchor = (Left: 480, Top: 392, Width: 960, Height: 34); Value: "undead"; Visible: false; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 960); }
+  Label #RoleHelpLabel { Anchor: (Left: 480, Top: 430, Width: 960, Height: 20); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, VerticalAlignment: Center); }
+  Label #MaxRadiusLabel { Anchor: (Left: 480, Top: 454, Width: 960, Height: 16); Text: "Radio maximo"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #MaxRadius { @Anchor = (Left: 480, Top: 476, Width: 960); Value: "12.0"; Visible: false; }
+  Label #RoundLabel { Anchor: (Left: 480, Top: 518, Width: 960, Height: 16); Text: "Cantidad de rondas"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #Rounds { @Anchor = (Left: 480, Top: 540, Width: 960); Value: "5"; Visible: false; }
+  Label #BaseEnemiesLabel { Anchor: (Left: 480, Top: 582, Width: 960, Height: 16); Text: "Cantidad base de enemigos por ronda"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BaseEnemies { @Anchor = (Left: 480, Top: 604, Width: 960); Value: "8"; Visible: false; }
+  Label #EnemiesPerRoundLabel { Anchor: (Left: 480, Top: 646, Width: 960, Height: 16); Text: "Incremento de enemigos por ronda"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #EnemiesPerRound { @Anchor = (Left: 480, Top: 668, Width: 960); Value: "2"; Visible: false; }
+  Label #WaveDelayLabel { Anchor: (Left: 480, Top: 710, Width: 960, Height: 16); Text: "Tiempo de espera entre rondas (s)"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #WaveDelay { @Anchor = (Left: 480, Top: 732, Width: 960); Value: "8"; Visible: false; }
+
   Label #HordeStatusLabel {
-    Anchor: (Left: 980, Top: 712, Width: 484, Height: 72);
+    Anchor: (Left: 480, Top: 756, Width: 960, Height: 40);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center);
   }
 
   Label #BossesTitleLabel {
-    Anchor: (Left: 456, Top: 232, Width: 500, Height: 28);
+    Anchor: (Left: 456, Top: 232, Width: 1008, Height: 28);
     Text: "Definiciones de bosses";
     Visible: false;
     Style: (FontSize: 18, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #BossAddButton {
-    Anchor: (Left: 456, Top: 264, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 264, Width: 1008, Height: 34);
     Text: "Anadir boss";
     Visible: false;
     Style: $C.@SmallSecondaryTextButtonStyle;
   }
 
   Label #BossHeaderName {
-    Anchor: (Left: 466, Top: 308, Width: 120, Height: 22);
+    Anchor: (Left: 466, Top: 308, Width: 300, Height: 22);
     Text: "Boss ID";
     Visible: false;
     Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   Label #BossHeaderNpc {
-    Anchor: (Left: 592, Top: 308, Width: 120, Height: 22);
+    Anchor: (Left: 786, Top: 308, Width: 220, Height: 22);
     Text: "Enemy ID";
     Visible: false;
     Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   Label #BossHeaderTier {
-    Anchor: (Left: 718, Top: 308, Width: 50, Height: 22);
+    Anchor: (Left: 1016, Top: 308, Width: 90, Height: 22);
     Text: "Tier";
     Visible: false;
     Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   Label #BossHeaderAmount {
-    Anchor: (Left: 774, Top: 308, Width: 40, Height: 22);
+    Anchor: (Left: 1116, Top: 308, Width: 60, Height: 22);
     Text: "Cant";
     Visible: false;
     Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
   }
 
   Label #BossHeaderActions {
-    Anchor: (Left: 820, Top: 308, Width: 132, Height: 22);
-    Text: "Acciones";
+    Anchor: (Left: 1426, Top: 308, Width: 34, Height: 22);
+    Text: "";
     Visible: false;
-    Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center);
+    Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
 
   Panel #BossRow1 {
-    Anchor: (Left: 456, Top: 336, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 336, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #BossName1 { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossNpc1 { Anchor: (Left: 136, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossTier1 { Anchor: (Left: 262, Top: 6, Width: 50, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    Label #BossAmount1 { Anchor: (Left: 318, Top: 6, Width: 40, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #BossOpen1 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    Label #BossName1 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossNpc1 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossTier1 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    Label #BossAmount1 { Anchor: (Left: 660, Top: 6, Width: 60, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #BossOpen1 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     TextButton #BossDelete1 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #BossRow2 {
-    Anchor: (Left: 456, Top: 374, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 374, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #BossName2 { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossNpc2 { Anchor: (Left: 136, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossTier2 { Anchor: (Left: 262, Top: 6, Width: 50, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    Label #BossAmount2 { Anchor: (Left: 318, Top: 6, Width: 40, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #BossOpen2 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    Label #BossName2 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossNpc2 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossTier2 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    Label #BossAmount2 { Anchor: (Left: 660, Top: 6, Width: 60, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #BossOpen2 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     TextButton #BossDelete2 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #BossRow3 {
-    Anchor: (Left: 456, Top: 412, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 412, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #BossName3 { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossNpc3 { Anchor: (Left: 136, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossTier3 { Anchor: (Left: 262, Top: 6, Width: 50, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    Label #BossAmount3 { Anchor: (Left: 318, Top: 6, Width: 40, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #BossOpen3 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    Label #BossName3 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossNpc3 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossTier3 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    Label #BossAmount3 { Anchor: (Left: 660, Top: 6, Width: 60, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #BossOpen3 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     TextButton #BossDelete3 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #BossRow4 {
-    Anchor: (Left: 456, Top: 450, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 450, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #BossName4 { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossNpc4 { Anchor: (Left: 136, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossTier4 { Anchor: (Left: 262, Top: 6, Width: 50, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    Label #BossAmount4 { Anchor: (Left: 318, Top: 6, Width: 40, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #BossOpen4 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    Label #BossName4 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossNpc4 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossTier4 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    Label #BossAmount4 { Anchor: (Left: 660, Top: 6, Width: 60, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #BossOpen4 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     TextButton #BossDelete4 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #BossRow5 {
-    Anchor: (Left: 456, Top: 488, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 488, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #BossName5 { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossNpc5 { Anchor: (Left: 136, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossTier5 { Anchor: (Left: 262, Top: 6, Width: 50, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    Label #BossAmount5 { Anchor: (Left: 318, Top: 6, Width: 40, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #BossOpen5 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    Label #BossName5 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossNpc5 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossTier5 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    Label #BossAmount5 { Anchor: (Left: 660, Top: 6, Width: 60, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #BossOpen5 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     TextButton #BossDelete5 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #BossRow6 {
-    Anchor: (Left: 456, Top: 526, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 526, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #BossName6 { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossNpc6 { Anchor: (Left: 136, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossTier6 { Anchor: (Left: 262, Top: 6, Width: 50, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    Label #BossAmount6 { Anchor: (Left: 318, Top: 6, Width: 40, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #BossOpen6 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    Label #BossName6 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossNpc6 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossTier6 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    Label #BossAmount6 { Anchor: (Left: 660, Top: 6, Width: 60, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #BossOpen6 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     TextButton #BossDelete6 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #BossRow7 {
-    Anchor: (Left: 456, Top: 564, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 564, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #BossName7 { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossNpc7 { Anchor: (Left: 136, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossTier7 { Anchor: (Left: 262, Top: 6, Width: 50, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    Label #BossAmount7 { Anchor: (Left: 318, Top: 6, Width: 40, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #BossOpen7 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    Label #BossName7 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossNpc7 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossTier7 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    Label #BossAmount7 { Anchor: (Left: 660, Top: 6, Width: 60, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #BossOpen7 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     TextButton #BossDelete7 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #BossRow8 {
-    Anchor: (Left: 456, Top: 602, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 602, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #BossName8 { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossNpc8 { Anchor: (Left: 136, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossTier8 { Anchor: (Left: 262, Top: 6, Width: 50, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    Label #BossAmount8 { Anchor: (Left: 318, Top: 6, Width: 40, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #BossOpen8 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    Label #BossName8 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossNpc8 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossTier8 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    Label #BossAmount8 { Anchor: (Left: 660, Top: 6, Width: 60, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #BossOpen8 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     TextButton #BossDelete8 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #BossRow9 {
-    Anchor: (Left: 456, Top: 640, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 640, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #BossName9 { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossNpc9 { Anchor: (Left: 136, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossTier9 { Anchor: (Left: 262, Top: 6, Width: 50, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    Label #BossAmount9 { Anchor: (Left: 318, Top: 6, Width: 40, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #BossOpen9 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    Label #BossName9 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossNpc9 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossTier9 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    Label #BossAmount9 { Anchor: (Left: 660, Top: 6, Width: 60, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #BossOpen9 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     TextButton #BossDelete9 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #BossRow10 {
-    Anchor: (Left: 456, Top: 678, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 678, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #BossName10 { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossNpc10 { Anchor: (Left: 136, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossTier10 { Anchor: (Left: 262, Top: 6, Width: 50, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    Label #BossAmount10 { Anchor: (Left: 318, Top: 6, Width: 40, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #BossOpen10 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    Label #BossName10 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossNpc10 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossTier10 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    Label #BossAmount10 { Anchor: (Left: 660, Top: 6, Width: 60, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #BossOpen10 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     TextButton #BossDelete10 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #BossRow11 {
-    Anchor: (Left: 456, Top: 716, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 716, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #BossName11 { Anchor: (Left: 10, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossNpc11 { Anchor: (Left: 136, Top: 6, Width: 120, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #BossTier11 { Anchor: (Left: 262, Top: 6, Width: 50, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    Label #BossAmount11 { Anchor: (Left: 318, Top: 6, Width: 40, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
-    TextButton #BossOpen11 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    Label #BossName11 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossNpc11 { Anchor: (Left: 330, Top: 6, Width: 220, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #BossTier11 { Anchor: (Left: 560, Top: 6, Width: 90, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+    Label #BossAmount11 { Anchor: (Left: 660, Top: 6, Width: 60, Height: 22); Text: "0"; Style: (FontSize: 12, TextColor: #e8f1ff, VerticalAlignment: Center); }
+    TextButton #BossOpen11 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
     TextButton #BossDelete11 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   TextButton #BossPagePrevButton {
-    Anchor: (Left: 622, Top: 760, Width: 32, Height: 28);
+    Anchor: (Left: 872, Top: 760, Width: 32, Height: 28);
     Text: "<";
     Visible: false;
     Style: $C.@SmallSecondaryTextButtonStyle;
   }
 
   Label #BossPageLabel {
-    Anchor: (Left: 658, Top: 762, Width: 96, Height: 24);
+    Anchor: (Left: 908, Top: 762, Width: 104, Height: 24);
     Text: "0/0";
     Visible: false;
     Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
 
   TextButton #BossPageNextButton {
-    Anchor: (Left: 758, Top: 760, Width: 32, Height: 28);
+    Anchor: (Left: 1016, Top: 760, Width: 32, Height: 28);
     Text: ">";
     Visible: false;
     Style: $C.@SmallSecondaryTextButtonStyle;
   }
 
   Label #BossEmptyLabel {
-    Anchor: (Left: 456, Top: 754, Width: 500, Height: 22);
+    Anchor: (Left: 456, Top: 754, Width: 1008, Height: 22);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center);
   }
 
   Label #BossOverflowLabel {
-    Anchor: (Left: 456, Top: 778, Width: 500, Height: 22);
+    Anchor: (Left: 456, Top: 778, Width: 1008, Height: 22);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center);
   }
 
+  Panel #BossEditorModalShade {
+    Anchor: (Full: 0);
+    Background: #02060f(0.48);
+    Visible: false;
+  }
+
+  $C.@DecoratedContainer #BossEditorModalFrame {
+    Anchor: (Left: 456, Top: 224, Width: 1008, Height: 572);
+    Visible: false;
+  }
+
+  TextButton #BossEditorCloseButton {
+    Anchor: (Left: 1422, Top: 232, Width: 34, Height: 28);
+    Text: "X";
+    Visible: false;
+    Style: $C.@CancelTextButtonStyle;
+  }
+
   Label #BossEditorTitleLabel {
-    Anchor: (Left: 980, Top: 232, Width: 484, Height: 24);
+    Anchor: (Left: 480, Top: 232, Width: 936, Height: 24);
     Text: "Editor de boss";
     Visible: false;
     Style: (FontSize: 16, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
   Label #BossSelectedLabel {
-    Anchor: (Left: 980, Top: 266, Width: 160, Height: 22);
+    Anchor: (Left: 480, Top: 266, Width: 180, Height: 22);
     Text: "Boss seleccionado";
     Visible: false;
     Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextField #BossSelected {
-    Anchor: (Left: 1148, Top: 262, Width: 300, Height: 30);
+    Anchor: (Left: 668, Top: 262, Width: 772, Height: 30);
     Value: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #9cb4d1);
@@ -1912,32 +2169,32 @@ Group {
     Background: #0f1825;
   }
 
-  Label #BossEditNameLabel { Anchor: (Left: 980, Top: 306, Width: 484, Height: 16); Text: "Boss ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditName { @Anchor = (Left: 980, Top: 328, Width: 484); Value: ""; }
-  Label #BossEditAmountLabel { Anchor: (Left: 980, Top: 366, Width: 484, Height: 16); Text: "Cantidad"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditAmount { @Anchor = (Left: 980, Top: 388, Width: 484); Value: "1"; }
-  Label #BossEditNpcIdLabel { Anchor: (Left: 980, Top: 426, Width: 484, Height: 16); Text: "Enemy ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@DropdownBox #BossEditNpcId { @Anchor = (Left: 980, Top: 448, Width: 484, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
-  Label #BossEditTierLabel { Anchor: (Left: 980, Top: 486, Width: 484, Height: 16); Text: "Tier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@DropdownBox #BossEditTier { @Anchor = (Left: 980, Top: 508, Width: 484, Height: 34); Value: "common"; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 484); }
-  Label #BossEditHpLabel { Anchor: (Left: 980, Top: 546, Width: 484, Height: 16); Text: "HP multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditHp { @Anchor = (Left: 980, Top: 568, Width: 484); Value: "1"; }
-  Label #BossEditDamageLabel { Anchor: (Left: 980, Top: 606, Width: 484, Height: 16); Text: "Damage multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditDamage { @Anchor = (Left: 980, Top: 628, Width: 484); Value: "1"; }
-  Label #BossEditSizeLabel { Anchor: (Left: 980, Top: 666, Width: 484, Height: 16); Text: "Size multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditSize { @Anchor = (Left: 980, Top: 688, Width: 484); Value: "1"; }
-  Label #BossEditAttackRateLabel { Anchor: (Left: 980, Top: 726, Width: 484, Height: 16); Text: "Attack rate x"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #BossEditAttackRate { @Anchor = (Left: 980, Top: 748, Width: 484); Value: "1"; }
+  Label #BossEditNameLabel { Anchor: (Left: 480, Top: 306, Width: 960, Height: 16); Text: "Boss ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditName { @Anchor = (Left: 480, Top: 328, Width: 960); Value: ""; }
+  Label #BossEditAmountLabel { Anchor: (Left: 480, Top: 366, Width: 960, Height: 16); Text: "Cantidad"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditAmount { @Anchor = (Left: 480, Top: 388, Width: 960); Value: "1"; }
+  Label #BossEditNpcIdLabel { Anchor: (Left: 480, Top: 426, Width: 960, Height: 16); Text: "Enemy ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@DropdownBox #BossEditNpcId { @Anchor = (Left: 480, Top: 448, Width: 960, Height: 34); Value: ""; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 960); }
+  Label #BossEditTierLabel { Anchor: (Left: 480, Top: 486, Width: 960, Height: 16); Text: "Tier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@DropdownBox #BossEditTier { @Anchor = (Left: 480, Top: 508, Width: 960, Height: 34); Value: "common"; Style: DropdownBoxStyle(...@OfficialDropdownBoxStyle, PanelWidth: 960); }
+  Label #BossEditHpLabel { Anchor: (Left: 480, Top: 546, Width: 960, Height: 16); Text: "HP multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditHp { @Anchor = (Left: 480, Top: 568, Width: 960); Value: "1"; }
+  Label #BossEditDamageLabel { Anchor: (Left: 480, Top: 606, Width: 960, Height: 16); Text: "Damage multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditDamage { @Anchor = (Left: 480, Top: 628, Width: 960); Value: "1"; }
+  Label #BossEditSizeLabel { Anchor: (Left: 480, Top: 666, Width: 960, Height: 16); Text: "Size multiplier"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditSize { @Anchor = (Left: 480, Top: 688, Width: 960); Value: "1"; }
+  Label #BossEditAttackRateLabel { Anchor: (Left: 480, Top: 726, Width: 960, Height: 16); Text: "Attack rate x"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #BossEditAttackRate { @Anchor = (Left: 480, Top: 748, Width: 960); Value: "1"; }
 
   TextButton #BossSaveButton {
-    Anchor: (Left: 980, Top: 264, Width: 484, Height: 34);
+    Anchor: (Left: 480, Top: 264, Width: 960, Height: 34);
     Text: "Guardar boss";
     Visible: false;
     Style: $C.@SecondaryTextButtonStyle;
   }
 
   Label #BossStatusLabel {
-    Anchor: (Left: 980, Top: 722, Width: 484, Height: 56);
+    Anchor: (Left: 480, Top: 722, Width: 960, Height: 56);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center);
@@ -1951,192 +2208,210 @@ Group {
   }
 
   TextButton #ArenaAddButton {
-    Anchor: (Left: 456, Top: 264, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 264, Width: 1008, Height: 34);
     Text: "Anadir arena";
     Visible: false;
     Style: $C.@SmallSecondaryTextButtonStyle;
   }
 
-  Label #ArenaHeaderName { Anchor: (Left: 466, Top: 308, Width: 188, Height: 22); Text: "Arena ID"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #ArenaHeaderCoords { Anchor: (Left: 660, Top: 308, Width: 154, Height: 22); Text: "Coordenadas"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #ArenaHeaderActions { Anchor: (Left: 820, Top: 308, Width: 132, Height: 22); Text: "Acciones"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #ArenaHeaderName { Anchor: (Left: 466, Top: 308, Width: 300, Height: 22); Text: "Arena ID"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #ArenaHeaderCoords { Anchor: (Left: 786, Top: 308, Width: 620, Height: 22); Text: "Coordenadas"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
+  Label #ArenaHeaderActions { Anchor: (Left: 1426, Top: 308, Width: 34, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
 
   Panel #ArenaRow1 {
-    Anchor: (Left: 456, Top: 336, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 336, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #ArenaName1 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords1 { Anchor: (Left: 204, Top: 6, Width: 154, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaOpen1 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #ArenaOpen1 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    Label #ArenaName1 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #ArenaCoords1 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     TextButton #ArenaDelete1 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #ArenaRow2 {
-    Anchor: (Left: 456, Top: 374, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 374, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #ArenaName2 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords2 { Anchor: (Left: 204, Top: 6, Width: 154, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaOpen2 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #ArenaOpen2 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    Label #ArenaName2 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #ArenaCoords2 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     TextButton #ArenaDelete2 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #ArenaRow3 {
-    Anchor: (Left: 456, Top: 412, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 412, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #ArenaName3 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords3 { Anchor: (Left: 204, Top: 6, Width: 154, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaOpen3 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #ArenaOpen3 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    Label #ArenaName3 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #ArenaCoords3 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     TextButton #ArenaDelete3 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #ArenaRow4 {
-    Anchor: (Left: 456, Top: 450, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 450, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #ArenaName4 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords4 { Anchor: (Left: 204, Top: 6, Width: 154, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaOpen4 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #ArenaOpen4 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    Label #ArenaName4 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #ArenaCoords4 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     TextButton #ArenaDelete4 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #ArenaRow5 {
-    Anchor: (Left: 456, Top: 488, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 488, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #ArenaName5 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords5 { Anchor: (Left: 204, Top: 6, Width: 154, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaOpen5 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #ArenaOpen5 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    Label #ArenaName5 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #ArenaCoords5 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     TextButton #ArenaDelete5 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #ArenaRow6 {
-    Anchor: (Left: 456, Top: 526, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 526, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #ArenaName6 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords6 { Anchor: (Left: 204, Top: 6, Width: 154, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaOpen6 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #ArenaOpen6 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    Label #ArenaName6 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #ArenaCoords6 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     TextButton #ArenaDelete6 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #ArenaRow7 {
-    Anchor: (Left: 456, Top: 564, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 564, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #ArenaName7 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords7 { Anchor: (Left: 204, Top: 6, Width: 154, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaOpen7 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #ArenaOpen7 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    Label #ArenaName7 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #ArenaCoords7 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     TextButton #ArenaDelete7 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #ArenaRow8 {
-    Anchor: (Left: 456, Top: 602, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 602, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #ArenaName8 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords8 { Anchor: (Left: 204, Top: 6, Width: 154, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaOpen8 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #ArenaOpen8 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    Label #ArenaName8 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #ArenaCoords8 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     TextButton #ArenaDelete8 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #ArenaRow9 {
-    Anchor: (Left: 456, Top: 640, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 640, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #ArenaName9 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords9 { Anchor: (Left: 204, Top: 6, Width: 154, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaOpen9 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #ArenaOpen9 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    Label #ArenaName9 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #ArenaCoords9 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     TextButton #ArenaDelete9 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #ArenaRow10 {
-    Anchor: (Left: 456, Top: 678, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 678, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #ArenaName10 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords10 { Anchor: (Left: 204, Top: 6, Width: 154, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaOpen10 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #ArenaOpen10 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    Label #ArenaName10 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #ArenaCoords10 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     TextButton #ArenaDelete10 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
   Panel #ArenaRow11 {
-    Anchor: (Left: 456, Top: 716, Width: 500, Height: 34);
+    Anchor: (Left: 456, Top: 716, Width: 1008, Height: 34);
     Background: #16283f;
     Visible: false;
-    Label #ArenaName11 { Anchor: (Left: 10, Top: 6, Width: 188, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords11 { Anchor: (Left: 204, Top: 6, Width: 154, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaOpen11 { Anchor: (Left: 364, Top: 4, Width: 88, Height: 26); Text: "Edit"; Style: $C.@SmallSecondaryTextButtonStyle; }
+    TextButton #ArenaOpen11 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
+    Label #ArenaName11 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
+    Label #ArenaCoords11 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
     TextButton #ArenaDelete11 {
-      Anchor: (Left: 458, Top: 4, Width: 32, Height: 26);
-      Text: "-";
+      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
+      Text: "X";
       Style: $C.@CancelTextButtonStyle;
     }
   }
 
-  TextButton #ArenaPagePrevButton { Anchor: (Left: 622, Top: 760, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #ArenaPageLabel { Anchor: (Left: 658, Top: 762, Width: 96, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  TextButton #ArenaPageNextButton { Anchor: (Left: 758, Top: 760, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #ArenaEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-  Label #ArenaOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 500, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
+  TextButton #ArenaPagePrevButton { Anchor: (Left: 872, Top: 760, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #ArenaPageLabel { Anchor: (Left: 908, Top: 762, Width: 104, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  TextButton #ArenaPageNextButton { Anchor: (Left: 1016, Top: 760, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
+  Label #ArenaEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+  Label #ArenaOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
+
+  Panel #ArenaEditorModalShade {
+    Anchor: (Full: 0);
+    Background: #02060f(0.48);
+    Visible: false;
+  }
+
+  $C.@DecoratedContainer #ArenaEditorModalFrame {
+    Anchor: (Left: 456, Top: 224, Width: 1008, Height: 572);
+    Visible: false;
+  }
+
+  TextButton #ArenaEditorCloseButton {
+    Anchor: (Left: 1422, Top: 232, Width: 34, Height: 28);
+    Text: "X";
+    Visible: false;
+    Style: $C.@CancelTextButtonStyle;
+  }
 
   Label #ArenaEditorTitleLabel {
-    Anchor: (Left: 980, Top: 232, Width: 484, Height: 24);
+    Anchor: (Left: 480, Top: 232, Width: 936, Height: 24);
     Text: "Editor de arena";
     Visible: false;
     Style: (FontSize: 16, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
   Label #ArenaSelectedLabel {
-    Anchor: (Left: 980, Top: 266, Width: 160, Height: 22);
+    Anchor: (Left: 480, Top: 266, Width: 180, Height: 22);
     Text: "Arena seleccionada";
     Visible: false;
     Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextField #ArenaSelected {
-    Anchor: (Left: 1148, Top: 262, Width: 300, Height: 30);
+    Anchor: (Left: 668, Top: 262, Width: 772, Height: 30);
     Value: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #9cb4d1);
@@ -2144,31 +2419,31 @@ Group {
     Background: #0f1825;
   }
 
-  Label #ArenaEditIdLabel { Anchor: (Left: 980, Top: 306, Width: 484, Height: 16); Text: "Arena ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #ArenaEditId { @Anchor = (Left: 980, Top: 328, Width: 484); Value: ""; }
-  Label #ArenaEditXLabel { Anchor: (Left: 980, Top: 370, Width: 484, Height: 16); Text: "X"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #ArenaEditX { @Anchor = (Left: 980, Top: 392, Width: 484); Value: "0"; }
-  Label #ArenaEditYLabel { Anchor: (Left: 980, Top: 434, Width: 484, Height: 16); Text: "Y"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #ArenaEditY { @Anchor = (Left: 980, Top: 456, Width: 484); Value: "64"; }
-  Label #ArenaEditZLabel { Anchor: (Left: 980, Top: 498, Width: 484, Height: 16); Text: "Z"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #ArenaEditZ { @Anchor = (Left: 980, Top: 520, Width: 484); Value: "0"; }
+  Label #ArenaEditIdLabel { Anchor: (Left: 480, Top: 306, Width: 960, Height: 16); Text: "Arena ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #ArenaEditId { @Anchor = (Left: 480, Top: 328, Width: 960); Value: ""; }
+  Label #ArenaEditXLabel { Anchor: (Left: 480, Top: 370, Width: 960, Height: 16); Text: "X"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #ArenaEditX { @Anchor = (Left: 480, Top: 392, Width: 960); Value: "0"; }
+  Label #ArenaEditYLabel { Anchor: (Left: 480, Top: 434, Width: 960, Height: 16); Text: "Y"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #ArenaEditY { @Anchor = (Left: 480, Top: 456, Width: 960); Value: "64"; }
+  Label #ArenaEditZLabel { Anchor: (Left: 480, Top: 498, Width: 960, Height: 16); Text: "Z"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+  $C.@TextField #ArenaEditZ { @Anchor = (Left: 480, Top: 520, Width: 960); Value: "0"; }
 
   TextButton #ArenaUseCurrentPositionButton {
-    Anchor: (Left: 980, Top: 562, Width: 484, Height: 34);
+    Anchor: (Left: 480, Top: 564, Width: 960, Height: 34);
     Text: "Usar mi posicion actual";
     Visible: false;
     Style: $C.@SecondaryTextButtonStyle;
   }
 
   TextButton #ArenaSaveButton {
-    Anchor: (Left: 980, Top: 264, Width: 484, Height: 34);
+    Anchor: (Left: 480, Top: 264, Width: 960, Height: 34);
     Text: "Guardar arena";
     Visible: false;
     Style: $C.@SecondaryTextButtonStyle;
   }
 
   Label #ArenaStatusLabel {
-    Anchor: (Left: 980, Top: 604, Width: 484, Height: 64);
+    Anchor: (Left: 480, Top: 636, Width: 960, Height: 56);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center);
@@ -2347,8 +2622,9 @@ Group {
   }
 
   TextButton #HordeCloseButton {
-    Anchor: (Left: 1272, Top: 936, Width: 192, Height: 46);
-    Text: "Cerrar";
+    Anchor: (Left: 1450, Top: 88, Width: 34, Height: 28);
+    Text: "X";
     Style: $C.@CancelTextButtonStyle;
   }
 }
+

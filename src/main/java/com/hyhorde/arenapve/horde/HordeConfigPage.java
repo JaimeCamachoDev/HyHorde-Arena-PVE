@@ -125,6 +125,13 @@ extends CustomUIPage {
     private String rewardCategoryStatusText;
     private String bossStatusText;
     private String arenaStatusText;
+    private boolean playerEditorModalVisible;
+    private boolean enemyCategoryEditorModalVisible;
+    private boolean rewardCategoryEditorModalVisible;
+    private boolean hordeEditorModalVisible;
+    private boolean bossEditorModalVisible;
+    private boolean soundsEditorModalVisible;
+    private boolean arenaEditorModalVisible;
 
     private HordeConfigPage(PlayerRef playerRef, HordeService hordeService) {
         super(playerRef, CustomPageLifetime.CanDismiss);
@@ -145,6 +152,13 @@ extends CustomUIPage {
         this.rewardCategoryStatusText = "";
         this.bossStatusText = "";
         this.arenaStatusText = "";
+        this.playerEditorModalVisible = false;
+        this.enemyCategoryEditorModalVisible = false;
+        this.rewardCategoryEditorModalVisible = false;
+        this.hordeEditorModalVisible = false;
+        this.bossEditorModalVisible = false;
+        this.soundsEditorModalVisible = false;
+        this.arenaEditorModalVisible = false;
     }
 
     public static void open(Ref<EntityStore> playerEntityRef, Store<EntityStore> store, Player player, PlayerRef playerRef, HordeService hordeService) {
@@ -405,6 +419,15 @@ extends CustomUIPage {
                 .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaAddButton", this.buildConfigSnapshotEvent("arena_add_from_player"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaSaveButton", this.buildConfigSnapshotEvent("arena_save"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaUseCurrentPositionButton", this.buildConfigSnapshotEvent("arena_use_current_position"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaEditorCloseButton", this.buildConfigSnapshotEvent("arena_close_editor"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#PlayersEditorCloseButton", this.buildConfigSnapshotEvent("playerdef_close_editor"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#EnemyCatEditorCloseButton", this.buildConfigSnapshotEvent("enemycat_close_editor"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#RewardCatEditorCloseButton", this.buildConfigSnapshotEvent("rewardcat_close_editor"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#HordeEditorCloseButton", this.buildConfigSnapshotEvent("hordedef_close_editor"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#BossEditorCloseButton", this.buildConfigSnapshotEvent("boss_close_editor"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#SoundsEditorCloseButton", this.buildConfigSnapshotEvent("sounds_close_editor"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#SoundRowStartOpen", this.buildConfigSnapshotEvent("sounds_open_start"))
+                .addEventBinding(CustomUIEventBindingType.Activating, "#SoundRowVictoryOpen", this.buildConfigSnapshotEvent("sounds_open_victory"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaPagePrevButton", this.buildConfigSnapshotEvent("arena_page_prev"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#ArenaPageNextButton", this.buildConfigSnapshotEvent("arena_page_next"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#ReloadModButton", this.buildLanguageEvent("reload_config"))
@@ -415,6 +438,16 @@ extends CustomUIPage {
                 .addEventBinding(CustomUIEventBindingType.Activating, "#StartButton", this.buildConfigSnapshotEvent("start"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#StopButton", this.buildActionEventWithLanguage("stop"))
                 .addEventBinding(CustomUIEventBindingType.Activating, "#SkipRoundButton", this.buildActionEventWithLanguage("skip_round"));
+    }
+
+    private void closeAllEditorModals() {
+        this.playerEditorModalVisible = false;
+        this.enemyCategoryEditorModalVisible = false;
+        this.rewardCategoryEditorModalVisible = false;
+        this.hordeEditorModalVisible = false;
+        this.bossEditorModalVisible = false;
+        this.soundsEditorModalVisible = false;
+        this.arenaEditorModalVisible = false;
     }
 
     public void handleDataEvent(Ref<EntityStore> playerEntityRef, Store<EntityStore> store, String payloadText) {
@@ -455,47 +488,65 @@ extends CustomUIPage {
                 }
                 case "tab_general": {
                     this.activeTab = TAB_GENERAL;
+                    this.closeAllEditorModals();
                     tabSwitched = true;
                     break;
                 }
                 case "tab_horde": {
                     this.activeTab = TAB_HORDE;
+                    this.closeAllEditorModals();
                     tabSwitched = true;
                     break;
                 }
                 case "tab_enemies": {
                     this.activeTab = TAB_ENEMIES;
+                    this.closeAllEditorModals();
                     tabSwitched = true;
                     break;
                 }
                 case "tab_players": {
                     this.activeTab = TAB_PLAYERS;
+                    this.closeAllEditorModals();
                     tabSwitched = true;
                     break;
                 }
                 case "tab_sounds": {
                     this.activeTab = TAB_SOUNDS;
+                    this.closeAllEditorModals();
                     tabSwitched = true;
                     break;
                 }
                 case "tab_rewards": {
                     this.activeTab = TAB_REWARDS;
+                    this.closeAllEditorModals();
                     tabSwitched = true;
                     break;
                 }
                 case "tab_bosses": {
                     this.activeTab = TAB_BOSSES;
+                    this.closeAllEditorModals();
                     tabSwitched = true;
                     break;
                 }
                 case "tab_arenas": {
                     this.activeTab = TAB_ARENAS;
+                    this.closeAllEditorModals();
                     tabSwitched = true;
                     break;
                 }
                 case "tab_help": {
                     this.activeTab = TAB_HELP;
+                    this.closeAllEditorModals();
                     tabSwitched = true;
+                    break;
+                }
+                case "sounds_open_start":
+                case "sounds_open_victory": {
+                    this.soundsEditorModalVisible = true;
+                    break;
+                }
+                case "sounds_close_editor": {
+                    this.soundsEditorModalVisible = false;
                     break;
                 }
                 case "set_spawn_here": {
@@ -652,6 +703,10 @@ extends CustomUIPage {
             this.playerPage = this.playerPage + 1;
             return null;
         }
+        if ("playerdef_close_editor".equals(action)) {
+            this.playerEditorModalVisible = false;
+            return null;
+        }
         List<HordeService.AudiencePlayerSnapshot> rows = world == null ? List.of() : this.hordeService.getArenaAudiencePlayers(world);
         if ("playerdef_add".equals(action)) {
             this.selectAudiencePlayerForEditing(rows, "");
@@ -678,6 +733,7 @@ extends CustomUIPage {
         if (action.startsWith("playerdef_open:")) {
             String playerId = HordeConfigPage.extractActionArgument(action);
             this.selectAudiencePlayerForEditing(rows, playerId);
+            this.playerEditorModalVisible = true;
             return null;
         }
         if (action.startsWith("playerdef_delete:")) {
@@ -710,6 +766,10 @@ extends CustomUIPage {
             this.enemyCategoryPage = this.enemyCategoryPage + 1;
             return null;
         }
+        if ("enemycat_close_editor".equals(action)) {
+            this.enemyCategoryEditorModalVisible = false;
+            return null;
+        }
         if ("enemycat_roles_page_prev".equals(action)) {
             this.enemyCategoryRolePage = Math.max(0, this.enemyCategoryRolePage - 1);
             return null;
@@ -722,6 +782,7 @@ extends CustomUIPage {
             HordeService.OperationResult result = this.hordeService.createEnemyCategoryDraft("");
             if (result != null && result.isSuccess()) {
                 this.selectEnemyCategoryForEditing("");
+                this.enemyCategoryEditorModalVisible = true;
             }
             this.enemyCategoryStatusText = result == null ? "" : result.getMessage();
             return result;
@@ -770,6 +831,7 @@ extends CustomUIPage {
         if (action.startsWith("enemycat_open:")) {
             String categoryId = HordeConfigPage.extractActionArgument(action);
             this.selectEnemyCategoryForEditing(categoryId);
+            this.enemyCategoryEditorModalVisible = true;
             return null;
         }
         if (action.startsWith("enemycat_delete:")) {
@@ -796,6 +858,10 @@ extends CustomUIPage {
             this.rewardCategoryPage = this.rewardCategoryPage + 1;
             return null;
         }
+        if ("rewardcat_close_editor".equals(action)) {
+            this.rewardCategoryEditorModalVisible = false;
+            return null;
+        }
         if ("rewardcat_items_page_prev".equals(action)) {
             this.rewardCategoryItemPage = Math.max(0, this.rewardCategoryItemPage - 1);
             return null;
@@ -808,6 +874,7 @@ extends CustomUIPage {
             HordeService.OperationResult result = this.hordeService.createRewardCategoryDraft("");
             if (result != null && result.isSuccess()) {
                 this.selectRewardCategoryForEditing("");
+                this.rewardCategoryEditorModalVisible = true;
             }
             this.rewardCategoryStatusText = result == null ? "" : result.getMessage();
             return result;
@@ -856,6 +923,7 @@ extends CustomUIPage {
         if (action.startsWith("rewardcat_open:")) {
             String categoryId = HordeConfigPage.extractActionArgument(action);
             this.selectRewardCategoryForEditing(categoryId);
+            this.rewardCategoryEditorModalVisible = true;
             return null;
         }
         if (action.startsWith("rewardcat_delete:")) {
@@ -882,10 +950,15 @@ extends CustomUIPage {
             this.hordePage = this.hordePage + 1;
             return null;
         }
+        if ("hordedef_close_editor".equals(action)) {
+            this.hordeEditorModalVisible = false;
+            return null;
+        }
         if ("hordedef_add".equals(action)) {
             HordeService.OperationResult result = this.hordeService.createHordeDefinitionDraft("");
             if (result != null && result.isSuccess()) {
                 this.selectHordeForEditing("");
+                this.hordeEditorModalVisible = true;
             }
             this.hordeStatusText = result == null ? "" : result.getMessage();
             return result;
@@ -901,6 +974,7 @@ extends CustomUIPage {
         if (action.startsWith("hordedef_open:")) {
             String hordeId = HordeConfigPage.extractActionArgument(action);
             this.selectHordeForEditing(hordeId);
+            this.hordeEditorModalVisible = true;
             return null;
         }
         if (action.startsWith("hordedef_delete:")) {
@@ -927,10 +1001,15 @@ extends CustomUIPage {
             this.bossPage = this.bossPage + 1;
             return null;
         }
+        if ("boss_close_editor".equals(action)) {
+            this.bossEditorModalVisible = false;
+            return null;
+        }
         if ("boss_add".equals(action)) {
             HordeService.OperationResult result = this.hordeService.createBossDraft("");
             if (result != null && result.isSuccess()) {
                 this.selectBossForEditing("");
+                this.bossEditorModalVisible = true;
             }
             this.bossStatusText = result == null ? "" : result.getMessage();
             return result;
@@ -946,6 +1025,7 @@ extends CustomUIPage {
         if (action.startsWith("boss_open:")) {
             String bossId = HordeConfigPage.extractActionArgument(action);
             this.selectBossForEditing(bossId);
+            this.bossEditorModalVisible = true;
             return null;
         }
         if (action.startsWith("boss_delete:")) {
@@ -972,6 +1052,10 @@ extends CustomUIPage {
             this.arenaPage = this.arenaPage + 1;
             return null;
         }
+        if ("arena_close_editor".equals(action)) {
+            this.arenaEditorModalVisible = false;
+            return null;
+        }
         if ("arena_add_from_player".equals(action)) {
             if (world == null) {
                 HordeService.OperationResult result = HordeService.OperationResult.fail(english ? "Could not resolve active world for arena creation." : "No se pudo resolver el mundo activo para crear arena.");
@@ -981,6 +1065,7 @@ extends CustomUIPage {
             HordeService.OperationResult result = this.hordeService.createArenaFromPlayerDraft(this.playerRef, world, "");
             if (result != null && result.isSuccess()) {
                 this.selectArenaForEditing("");
+                this.arenaEditorModalVisible = true;
             }
             this.arenaStatusText = result == null ? "" : result.getMessage();
             return result;
@@ -1021,6 +1106,7 @@ extends CustomUIPage {
         if (action.startsWith("arena_open:")) {
             String arenaId = HordeConfigPage.extractActionArgument(action);
             this.selectArenaForEditing(arenaId);
+            this.arenaEditorModalVisible = true;
             return null;
         }
         if (action.startsWith("arena_delete:")) {
@@ -1681,10 +1767,10 @@ extends CustomUIPage {
                 .set("#EnemyCatEmptyLabel.Text", total == 0 ? HordeConfigPage.t(language, english, "No enemy categories yet. Press Add category to create one.", "Aun no hay categorias de enemigos. Pulsa Anadir categoria para crear una.") : "")
                 .set("#EnemyCatOverflowLabel.Visible", false)
                 .set("#EnemyCatOverflowLabel.Text", "");
-        this.populateEnemyCategoryEditorRoles(commandBuilder, eventBuilder, HordeConfigPage.parseEnemyCategoryRolesCsv(this.getDraftValue("enemyCategoryEditRoles", "")), language, english);
+        this.populateEnemyCategoryEditorRoles(commandBuilder, eventBuilder, HordeConfigPage.parseEnemyCategoryRolesCsv(this.getDraftValue("enemyCategoryEditRoles", "")), language, english, this.enemyCategoryEditorModalVisible);
     }
 
-    private void populateEnemyCategoryEditorRoles(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<String> roles, String language, boolean english) {
+    private void populateEnemyCategoryEditorRoles(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<String> roles, String language, boolean english, boolean editorVisible) {
         int total = roles == null ? 0 : roles.size();
         int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_ENEMY_CATEGORY_EDITOR_ROLE_ROWS));
         this.enemyCategoryRolePage = HordeConfigPage.clamp(this.enemyCategoryRolePage, 0, pageCount - 1);
@@ -1693,7 +1779,7 @@ extends CustomUIPage {
             int index = start + slot;
             int rowNumber = slot + 1;
             String rowSelector = "#EnemyCatRoleRow" + rowNumber;
-            if (index < total) {
+            if (editorVisible && index < total) {
                 String roleId = roles.get(index);
                 commandBuilder.set(rowSelector + ".Visible", true)
                         .set("#EnemyCatRoleName" + rowNumber + ".Text", roleId == null ? "" : HordeConfigPage.compactName(roleId, 28));
@@ -1705,9 +1791,9 @@ extends CustomUIPage {
         }
         String pageText = total <= 0 ? "0/0" : (this.enemyCategoryRolePage + 1) + "/" + pageCount;
         commandBuilder.set("#EnemyCatRolesPageLabel.Text", pageText)
-                .set("#EnemyCatRolesPageLabel.Visible", pageCount > 1)
-                .set("#EnemyCatRolesPagePrevButton.Visible", pageCount > 1)
-                .set("#EnemyCatRolesPageNextButton.Visible", pageCount > 1)
+                .set("#EnemyCatRolesPageLabel.Visible", editorVisible && pageCount > 1)
+                .set("#EnemyCatRolesPagePrevButton.Visible", editorVisible && pageCount > 1)
+                .set("#EnemyCatRolesPageNextButton.Visible", editorVisible && pageCount > 1)
                 .set("#EnemyCatRolesOverflowLabel.Visible", false)
                 .set("#EnemyCatRolesOverflowLabel.Text", "");
     }
@@ -1745,10 +1831,10 @@ extends CustomUIPage {
                 .set("#RewardCatEmptyLabel.Text", total == 0 ? HordeConfigPage.t(language, english, "No reward categories yet. Press Add category to create one.", "Aun no hay categorias de recompensa. Pulsa Anadir categoria para crear una.") : "")
                 .set("#RewardCatOverflowLabel.Visible", false)
                 .set("#RewardCatOverflowLabel.Text", "");
-        this.populateRewardCategoryEditorItems(commandBuilder, eventBuilder, HordeConfigPage.parseEnemyCategoryRolesCsv(this.getDraftValue("rewardCatEditItems", "")), language, english);
+        this.populateRewardCategoryEditorItems(commandBuilder, eventBuilder, HordeConfigPage.parseEnemyCategoryRolesCsv(this.getDraftValue("rewardCatEditItems", "")), language, english, this.rewardCategoryEditorModalVisible);
     }
 
-    private void populateRewardCategoryEditorItems(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<String> items, String language, boolean english) {
+    private void populateRewardCategoryEditorItems(UICommandBuilder commandBuilder, UIEventBuilder eventBuilder, List<String> items, String language, boolean english, boolean editorVisible) {
         int total = items == null ? 0 : items.size();
         int pageCount = Math.max(1, (int)Math.ceil(total / (double)MAX_REWARD_CATEGORY_EDITOR_ITEM_ROWS));
         this.rewardCategoryItemPage = HordeConfigPage.clamp(this.rewardCategoryItemPage, 0, pageCount - 1);
@@ -1757,7 +1843,7 @@ extends CustomUIPage {
             int index = start + slot;
             int rowNumber = slot + 1;
             String rowSelector = "#RewardCatItemRow" + rowNumber;
-            if (index < total) {
+            if (editorVisible && index < total) {
                 String itemId = items.get(index);
                 commandBuilder.set(rowSelector + ".Visible", true)
                         .set("#RewardCatItemName" + rowNumber + ".Text", itemId == null ? "" : HordeConfigPage.compactName(itemId, 28));
@@ -1769,9 +1855,9 @@ extends CustomUIPage {
         }
         String pageText = total <= 0 ? "0/0" : (this.rewardCategoryItemPage + 1) + "/" + pageCount;
         commandBuilder.set("#RewardCatItemsPageLabel.Text", pageText)
-                .set("#RewardCatItemsPageLabel.Visible", pageCount > 1)
-                .set("#RewardCatItemsPagePrevButton.Visible", pageCount > 1)
-                .set("#RewardCatItemsPageNextButton.Visible", pageCount > 1)
+                .set("#RewardCatItemsPageLabel.Visible", editorVisible && pageCount > 1)
+                .set("#RewardCatItemsPagePrevButton.Visible", editorVisible && pageCount > 1)
+                .set("#RewardCatItemsPageNextButton.Visible", editorVisible && pageCount > 1)
                 .set("#RewardCatItemsOverflowLabel.Visible", false)
                 .set("#RewardCatItemsOverflowLabel.Text", "");
     }
@@ -2272,7 +2358,7 @@ extends CustomUIPage {
                 .set("#PlayersCountLabel.Text", HordeConfigPage.t(language, english, "Detected", "Detectados"))
                 .set("#PlayersHeaderName.Text", HordeConfigPage.t(language, english, "Player", "Jugador"))
                 .set("#PlayersHeaderMode.Text", HordeConfigPage.t(language, english, "Mode", "Modo"))
-                .set("#PlayersHeaderActions.Text", HordeConfigPage.t(language, english, "Actions", "Acciones"))
+                .set("#PlayersHeaderActions.Text", "")
                 .set("#PlayersEditorTitleLabel.Text", HordeConfigPage.t(language, english, "Player editor", "Editor de jugador"))
                 .set("#PlayerEditModeLabel.Text", HordeConfigPage.t(language, english, "Audience mode", "Modo de audiencia"))
                 .set("#PlayersSaveButton.Text", HordeConfigPage.t(language, english, "Save player mode", "Guardar modo jugador"))
@@ -2283,7 +2369,7 @@ extends CustomUIPage {
                 .set("#EnemyCatAddButton.Text", HordeConfigPage.t(language, english, "Add category", "Anadir categoria"))
                 .set("#EnemyCatHeaderName.Text", HordeConfigPage.t(language, english, "Category ID", "Categoria ID"))
                 .set("#EnemyCatHeaderPreview.Text", HordeConfigPage.t(language, english, "Enemy IDs", "Enemy IDs"))
-                .set("#EnemyCatHeaderActions.Text", HordeConfigPage.t(language, english, "Actions", "Acciones"))
+                .set("#EnemyCatHeaderActions.Text", "")
                 .set("#EnemyCatEditorTitleLabel.Text", HordeConfigPage.t(language, english, "Enemy category editor", "Editor de categoria de enemigos"))
                 .set("#EnemyCatEditIdLabel.Text", HordeConfigPage.t(language, english, "Category ID", "Categoria ID"))
                 .set("#EnemyCatRolePickerLabel.Text", HordeConfigPage.t(language, english, "Enemy ID", "Enemy ID"))
@@ -2300,7 +2386,7 @@ extends CustomUIPage {
                 .set("#RewardCatAddButton.Text", HordeConfigPage.t(language, english, "Add category", "Anadir categoria"))
                 .set("#RewardCatHeaderName.Text", HordeConfigPage.t(language, english, "Category ID", "Categoria ID"))
                 .set("#RewardCatHeaderPreview.Text", HordeConfigPage.t(language, english, "Items", "Items"))
-                .set("#RewardCatHeaderActions.Text", HordeConfigPage.t(language, english, "Actions", "Acciones"))
+                .set("#RewardCatHeaderActions.Text", "")
                 .set("#RewardCatEditorTitleLabel.Text", HordeConfigPage.t(language, english, "Reward category editor", "Editor de categoria de recompensa"))
                 .set("#RewardCatEditIdLabel.Text", HordeConfigPage.t(language, english, "Category ID", "Categoria ID"))
                 .set("#RewardCatItemPickerLabel.Text", HordeConfigPage.t(language, english, "Reward item ID", "Reward item ID"))
@@ -2318,7 +2404,7 @@ extends CustomUIPage {
                 .set("#HordeHeaderId.Text", HordeConfigPage.t(language, english, "Horde ID", "Horde ID"))
                 .set("#HordeHeaderType.Text", HordeConfigPage.t(language, english, "Enemy type", "Tipo enemigo"))
                 .set("#HordeHeaderRounds.Text", HordeConfigPage.t(language, english, "Rounds", "Rondas"))
-                .set("#HordeHeaderActions.Text", HordeConfigPage.t(language, english, "Actions", "Acciones"))
+                .set("#HordeHeaderActions.Text", "")
                 .set("#HordeEditorTitleLabel.Text", HordeConfigPage.t(language, english, "Horde editor", "Editor de horda"))
                 .set("#HordeEditIdLabel.Text", HordeConfigPage.t(language, english, "Horde ID", "Horde ID"))
                 .set("#HordePagePrevButton.Text", "<")
@@ -2348,14 +2434,14 @@ extends CustomUIPage {
                 .set("#RoundVictorySoundLabel.Text", HordeConfigPage.t(language, english, "Round victory sound", "Sonido victoria ronda"))
                 .set("#RoundStartVolumeLabel.Text", HordeConfigPage.t(language, english, "Start volume (%)", "Volumen inicio (%)"))
                 .set("#RoundVictoryVolumeLabel.Text", HordeConfigPage.t(language, english, "Victory volume (%)", "Volumen victoria (%)"))
-                .set("#RoundSoundHelpLabel.Text", HordeConfigPage.t(language, english, "Tip: save sounds here or with Save config.", "Tip: guarda sonidos aqui o con Guardar config."))
+                .set("#RoundSoundHelpLabel.Text", "")
                 .set("#BossesTitleLabel.Text", HordeConfigPage.t(language, english, "Boss definitions", "Definiciones de bosses"))
                 .set("#BossAddButton.Text", HordeConfigPage.t(language, english, "Add boss", "Anadir boss"))
                 .set("#BossHeaderName.Text", HordeConfigPage.t(language, english, "Boss ID", "Boss ID"))
                 .set("#BossHeaderNpc.Text", HordeConfigPage.t(language, english, "Enemy ID", "Enemy ID"))
                 .set("#BossHeaderTier.Text", HordeConfigPage.t(language, english, "Tier", "Tier"))
                 .set("#BossHeaderAmount.Text", HordeConfigPage.t(language, english, "Amt", "Cant"))
-                .set("#BossHeaderActions.Text", HordeConfigPage.t(language, english, "Actions", "Acciones"))
+                .set("#BossHeaderActions.Text", "")
                 .set("#BossEditorTitleLabel.Text", HordeConfigPage.t(language, english, "Boss editor", "Editor de boss"))
                 .set("#BossEditNameLabel.Text", HordeConfigPage.t(language, english, "Boss ID", "Boss ID"))
                 .set("#BossEditNpcIdLabel.Text", HordeConfigPage.t(language, english, "Enemy ID", "Enemy ID"))
@@ -2372,7 +2458,7 @@ extends CustomUIPage {
                 .set("#ArenaAddButton.Text", HordeConfigPage.t(language, english, "Add arena", "Anadir arena"))
                 .set("#ArenaHeaderName.Text", HordeConfigPage.t(language, english, "Arena ID", "Arena ID"))
                 .set("#ArenaHeaderCoords.Text", HordeConfigPage.t(language, english, "Coordinates", "Coordenadas"))
-                .set("#ArenaHeaderActions.Text", HordeConfigPage.t(language, english, "Actions", "Acciones"))
+                .set("#ArenaHeaderActions.Text", "")
                 .set("#ArenaEditorTitleLabel.Text", HordeConfigPage.t(language, english, "Arena editor", "Editor de arena"))
                 .set("#ArenaEditIdLabel.Text", HordeConfigPage.t(language, english, "Arena ID", "Arena ID"))
                 .set("#ArenaEditXLabel.Text", "X")
@@ -2404,7 +2490,7 @@ extends CustomUIPage {
                 .set("#HelpReloadLabel.Text", HordeConfigPage.t(language, english, "Reload and deployment", "Recarga y despliegue"))
                 .set("#HelpReloadLine1.Text", HordeConfigPage.t(language, english, "'Reload config' or /hordareload config reloads all JSON config files without restart.", "'Recargar config' o /hordareload config recarga todos los JSON de configuracion sin reiniciar."))
                 .set("#HelpReloadLine2.Text", HordeConfigPage.t(language, english, "Replacing the mod .jar still requires a full server restart.", "Reemplazar el .jar del mod sigue requiriendo reinicio completo del servidor."))
-                .set("#HordeCloseButton.Text", HordeConfigPage.t(language, english, "Close", "Cerrar"));
+                .set("#HordeCloseButton.Text", "X");
     }
 
     private void applyTabVisibility(UICommandBuilder commandBuilder, String tab) {
@@ -2417,20 +2503,29 @@ extends CustomUIPage {
         boolean bossesTab = TAB_BOSSES.equals(tab);
         boolean arenasTab = TAB_ARENAS.equals(tab);
         boolean helpTab = TAB_HELP.equals(tab);
-        boolean twoColumnBackdrop = !helpTab;
+        boolean definitionsBackdrop = false;
+        boolean editorBackdrop = false;
 
         commandBuilder.set("#CategoryTabs.SelectedTab", tab);
-        this.setVisible(commandBuilder, twoColumnBackdrop, "#DefinitionsColumnBackdrop", "#EditorColumnBackdrop");
+        this.setVisible(commandBuilder, definitionsBackdrop, "#DefinitionsColumnBackdrop");
+        this.setVisible(commandBuilder, editorBackdrop, "#EditorColumnBackdrop");
         this.setVisible(commandBuilder, generalTab, "#GeneralArenaLabel", "#GeneralArenaId", "#GeneralBossLabel", "#GeneralBossId", "#GeneralHordeLabel", "#GeneralHordeId", "#GeneralRewardLabel", "#GeneralRewardId", "#FinalBossLabel", "#FinalBossEnabled", "#LanguageLabel", "#Language", "#AutoStartEnabledLabel", "#AutoStartEnabled", "#AutoStartIntervalLabel", "#AutoStartInterval", "#AutoStartApplyButton");
-        this.setVisible(commandBuilder, enemiesTab, "#EnemyCatTitleLabel", "#EnemyCatAddButton", "#EnemyCatHeaderName", "#EnemyCatHeaderPreview", "#EnemyCatHeaderActions", "#EnemyCatPagePrevButton", "#EnemyCatPageNextButton", "#EnemyCatPageLabel", "#EnemyCatEmptyLabel", "#EnemyCatOverflowLabel", "#EnemyCatEditorTitleLabel", "#EnemyCatEditIdLabel", "#EnemyCatEditId", "#EnemyCatRolePickerLabel", "#EnemyCatRolePicker", "#EnemyCatRoleAddButton", "#EnemyCatEditRolesLabel", "#EnemyCatRolesPagePrevButton", "#EnemyCatRolesPageNextButton", "#EnemyCatRolesPageLabel", "#EnemyCatSaveButton", "#EnemyCatRow1", "#EnemyCatRow2", "#EnemyCatRow3", "#EnemyCatRow4", "#EnemyCatRow5", "#EnemyCatRow6", "#EnemyCatRow7", "#EnemyCatRow8", "#EnemyCatRow9", "#EnemyCatRow10", "#EnemyCatRow11", "#EnemyCatRoleRow1", "#EnemyCatRoleRow2", "#EnemyCatRoleRow3", "#EnemyCatRoleRow4", "#EnemyCatRoleRow5", "#EnemyCatRoleRow6", "#EnemyCatRoleRow7", "#EnemyCatRoleRow8", "#EnemyCatRoleRow9", "#EnemyCatRoleRow10");
-        this.setVisible(commandBuilder, hordeTab, "#HordesTitleLabel", "#HordeAddButton", "#HordeHeaderId", "#HordeHeaderType", "#HordeHeaderRounds", "#HordeHeaderActions", "#HordePagePrevButton", "#HordePageNextButton", "#HordePageLabel", "#HordeEmptyLabel", "#HordeOverflowLabel", "#HordeEditorTitleLabel", "#HordeEditIdLabel", "#HordeEditId", "#RoleLabel", "#EnemyType", "#MaxRadiusLabel", "#MaxRadius", "#RoundLabel", "#Rounds", "#WaveDelayLabel", "#WaveDelay", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound", "#HordeSaveButton", "#HordeRow1", "#HordeRow2", "#HordeRow3", "#HordeRow4", "#HordeRow5", "#HordeRow6", "#HordeRow7", "#HordeRow8", "#HordeRow9", "#HordeRow10", "#HordeRow11");
-        this.setVisible(commandBuilder, playersTab, "#PlayersTitleLabel", "#PlayersAddButton", "#PlayersHeaderName", "#PlayersHeaderMode", "#PlayersHeaderActions", "#PlayersPagePrevButton", "#PlayersPageNextButton", "#PlayersPageLabel", "#PlayersEmptyLabel", "#PlayersOverflowLabel", "#PlayersEditorTitleLabel", "#PlayerSelected", "#PlayerEditModeLabel", "#PlayerEditMode", "#PlayersSaveButton", "#ArenaJoinRadiusLabel", "#ArenaJoinRadius", "#PlayerRow1", "#PlayerRow2", "#PlayerRow3", "#PlayerRow4", "#PlayerRow5", "#PlayerRow6", "#PlayerRow7", "#PlayerRow8", "#PlayerRow9", "#PlayerRow10", "#PlayerRow11");
-        this.setVisible(commandBuilder, soundsTab, "#SoundsTitleLabel", "#SoundsHeaderEvent", "#SoundsHeaderSound", "#SoundsHeaderVolume", "#SoundRowStart", "#SoundRowVictory", "#SoundsEditorTitleLabel", "#SoundsSaveButton", "#RoundStartSoundLabel", "#RoundStartSoundId", "#RoundStartVolumeLabel", "#RoundStartVolume", "#RoundVictorySoundLabel", "#RoundVictorySoundId", "#RoundVictoryVolumeLabel", "#RoundVictoryVolume", "#RoundSoundHelpLabel");
-        this.setVisible(commandBuilder, rewardsTab, "#RewardCatTitleLabel", "#RewardCatAddButton", "#RewardCatHeaderName", "#RewardCatHeaderPreview", "#RewardCatHeaderActions", "#RewardCatPagePrevButton", "#RewardCatPageNextButton", "#RewardCatPageLabel", "#RewardCatEmptyLabel", "#RewardCatOverflowLabel", "#RewardCatEditorTitleLabel", "#RewardCatEditIdLabel", "#RewardCatEditId", "#RewardCatItemPickerLabel", "#RewardCatItemPicker", "#RewardCatItemAddButton", "#RewardCatEditItemsLabel", "#RewardCatItemsPagePrevButton", "#RewardCatItemsPageNextButton", "#RewardCatItemsPageLabel", "#RewardCatSaveButton", "#RewardCatRow1", "#RewardCatRow2", "#RewardCatRow3", "#RewardCatRow4", "#RewardCatRow5", "#RewardCatRow6", "#RewardCatRow7", "#RewardCatRow8", "#RewardCatRow9", "#RewardCatRow10", "#RewardCatRow11", "#RewardCatItemRow1", "#RewardCatItemRow2", "#RewardCatItemRow3", "#RewardCatItemRow4", "#RewardCatItemRow5", "#RewardCatItemRow6", "#RewardCatItemRow7", "#RewardCatItemRow8", "#RewardCatItemRow9", "#RewardCatItemRow10");
-        this.setVisible(commandBuilder, bossesTab, "#BossesTitleLabel", "#BossAddButton", "#BossHeaderName", "#BossHeaderNpc", "#BossHeaderTier", "#BossHeaderAmount", "#BossHeaderActions", "#BossPagePrevButton", "#BossPageNextButton", "#BossPageLabel", "#BossEmptyLabel", "#BossOverflowLabel", "#BossEditorTitleLabel", "#BossEditNameLabel", "#BossEditName", "#BossEditNpcIdLabel", "#BossEditNpcId", "#BossEditTierLabel", "#BossEditTier", "#BossEditAmountLabel", "#BossEditAmount", "#BossEditHpLabel", "#BossEditHp", "#BossEditDamageLabel", "#BossEditDamage", "#BossEditSizeLabel", "#BossEditSize", "#BossEditAttackRateLabel", "#BossEditAttackRate", "#BossSaveButton", "#BossRow1", "#BossRow2", "#BossRow3", "#BossRow4", "#BossRow5", "#BossRow6", "#BossRow7", "#BossRow8", "#BossRow9", "#BossRow10", "#BossRow11");
-        this.setVisible(commandBuilder, arenasTab, "#ArenasTitleLabel", "#ArenaAddButton", "#ArenaHeaderName", "#ArenaHeaderCoords", "#ArenaHeaderActions", "#ArenaPagePrevButton", "#ArenaPageNextButton", "#ArenaPageLabel", "#ArenaEmptyLabel", "#ArenaOverflowLabel", "#ArenaEditorTitleLabel", "#ArenaEditIdLabel", "#ArenaEditId", "#ArenaEditXLabel", "#ArenaEditX", "#ArenaEditYLabel", "#ArenaEditY", "#ArenaEditZLabel", "#ArenaEditZ", "#ArenaUseCurrentPositionButton", "#ArenaSaveButton", "#ArenaRow1", "#ArenaRow2", "#ArenaRow3", "#ArenaRow4", "#ArenaRow5", "#ArenaRow6", "#ArenaRow7", "#ArenaRow8", "#ArenaRow9", "#ArenaRow10", "#ArenaRow11");
+        this.setVisible(commandBuilder, enemiesTab, "#EnemyCatTitleLabel", "#EnemyCatAddButton", "#EnemyCatHeaderName", "#EnemyCatHeaderPreview", "#EnemyCatHeaderActions", "#EnemyCatPagePrevButton", "#EnemyCatPageNextButton", "#EnemyCatPageLabel", "#EnemyCatEmptyLabel", "#EnemyCatOverflowLabel", "#EnemyCatRow1", "#EnemyCatRow2", "#EnemyCatRow3", "#EnemyCatRow4", "#EnemyCatRow5", "#EnemyCatRow6", "#EnemyCatRow7", "#EnemyCatRow8", "#EnemyCatRow9", "#EnemyCatRow10", "#EnemyCatRow11");
+        this.setVisible(commandBuilder, hordeTab, "#HordesTitleLabel", "#HordeAddButton", "#HordeHeaderId", "#HordeHeaderType", "#HordeHeaderRounds", "#HordeHeaderActions", "#HordePagePrevButton", "#HordePageNextButton", "#HordePageLabel", "#HordeEmptyLabel", "#HordeOverflowLabel", "#HordeRow1", "#HordeRow2", "#HordeRow3", "#HordeRow4", "#HordeRow5", "#HordeRow6", "#HordeRow7", "#HordeRow8", "#HordeRow9", "#HordeRow10", "#HordeRow11");
+        this.setVisible(commandBuilder, playersTab, "#PlayersTitleLabel", "#PlayersAddButton", "#PlayersHeaderName", "#PlayersHeaderMode", "#PlayersHeaderActions", "#PlayersPagePrevButton", "#PlayersPageNextButton", "#PlayersPageLabel", "#PlayersEmptyLabel", "#PlayersOverflowLabel", "#PlayerRow1", "#PlayerRow2", "#PlayerRow3", "#PlayerRow4", "#PlayerRow5", "#PlayerRow6", "#PlayerRow7", "#PlayerRow8", "#PlayerRow9", "#PlayerRow10", "#PlayerRow11");
+        this.setVisible(commandBuilder, soundsTab, "#SoundsTitleLabel", "#SoundsHeaderEvent", "#SoundsHeaderSound", "#SoundsHeaderVolume", "#SoundRowStart", "#SoundRowVictory");
+        this.setVisible(commandBuilder, rewardsTab, "#RewardCatTitleLabel", "#RewardCatAddButton", "#RewardCatHeaderName", "#RewardCatHeaderPreview", "#RewardCatHeaderActions", "#RewardCatPagePrevButton", "#RewardCatPageNextButton", "#RewardCatPageLabel", "#RewardCatEmptyLabel", "#RewardCatOverflowLabel", "#RewardCatRow1", "#RewardCatRow2", "#RewardCatRow3", "#RewardCatRow4", "#RewardCatRow5", "#RewardCatRow6", "#RewardCatRow7", "#RewardCatRow8", "#RewardCatRow9", "#RewardCatRow10", "#RewardCatRow11");
+        this.setVisible(commandBuilder, bossesTab, "#BossesTitleLabel", "#BossAddButton", "#BossHeaderName", "#BossHeaderNpc", "#BossHeaderTier", "#BossHeaderAmount", "#BossHeaderActions", "#BossPagePrevButton", "#BossPageNextButton", "#BossPageLabel", "#BossEmptyLabel", "#BossOverflowLabel", "#BossRow1", "#BossRow2", "#BossRow3", "#BossRow4", "#BossRow5", "#BossRow6", "#BossRow7", "#BossRow8", "#BossRow9", "#BossRow10", "#BossRow11");
+        this.setVisible(commandBuilder, arenasTab, "#ArenasTitleLabel", "#ArenaAddButton", "#ArenaHeaderName", "#ArenaHeaderCoords", "#ArenaHeaderActions", "#ArenaPagePrevButton", "#ArenaPageNextButton", "#ArenaPageLabel", "#ArenaEmptyLabel", "#ArenaOverflowLabel", "#ArenaRow1", "#ArenaRow2", "#ArenaRow3", "#ArenaRow4", "#ArenaRow5", "#ArenaRow6", "#ArenaRow7", "#ArenaRow8", "#ArenaRow9", "#ArenaRow10", "#ArenaRow11");
         this.setVisible(commandBuilder, helpTab, "#HelpIntroLabel", "#HelpCommandsLabel", "#HelpCommandsLine1", "#HelpCommandsLine2", "#HelpCommandsLine3", "#HelpConfigLabel", "#HelpConfigLine1", "#HelpConfigLine2", "#HelpConfigLine3", "#HelpExternalLabel", "#HelpExternalLine1", "#HelpExternalLine2", "#HelpExternalLine3", "#HelpReloadLabel", "#HelpReloadLine1", "#HelpReloadLine2");
-        this.setVisible(commandBuilder, false, "#SubTitleLabel", "#TabHintLabel", "#StatusTitleLabel", "#StatusPanel", "#StatusLabel", "#SpawnStateLabel", "#SpawnLabel", "#SpawnX", "#SpawnY", "#SpawnZ", "#SetSpawnButton", "#HordeSelected", "#BossSelectedLabel", "#BossSelected", "#ArenaSelectedLabel", "#ArenaSelected", "#BossStatusLabel", "#ArenaStatusLabel", "#RoleHelpLabel", "#RewardCommandsHelpLabel", "#PlayerMultiplierLabel", "#PlayerMultiplier", "#RadiusLabel", "#RoundConfigLabel", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel", "#EnemyLevelMin", "#EnemyLevelRangeSeparator", "#EnemyLevelMax", "#LanguagePrevButton", "#LanguageNextButton", "#FinalBossPrevButton", "#FinalBossNextButton", "#RoundStartSoundPrevButton", "#RoundStartSoundNextButton", "#RoundVictorySoundPrevButton", "#RoundVictorySoundNextButton", "#RewardCategoryPrevButton", "#RewardCategoryNextButton", "#RewardItemPrevButton", "#RewardItemNextButton", "#RewardEveryRoundsLabel", "#RewardEveryRounds", "#RewardCategoryLabel", "#RewardCategory", "#RewardCommandsLabel", "#RewardItemId", "#RewardItemQuantityLabel", "#RewardItemQuantity", "#PlayersListTitle", "#PlayersListHint", "#PlayersRefreshButton", "#AudiencePlayersRows", "#AudiencePlayersEmptyLabel", "#HelpDiscordButton", "#HelpCurseForgeButton", "#CategoryBar", "#CategoryOuterTop", "#CategoryOuterBottom", "#CategoryOuterLeft", "#CategoryOuterRight", "#CategoryInnerTop", "#CategoryInnerBottom", "#CategoryCornerTL", "#CategoryCornerTR", "#CategoryCornerBL", "#CategoryCornerBR", "#CategoryBarInset", "#CategoryBarBottomEdge", "#CategoryLine", "#TabGeneralPlate", "#TabArenasPlate", "#TabEnemiesPlate", "#TabHordePlate", "#TabBossesPlate", "#TabPlayersPlate", "#TabSoundsPlate", "#TabRewardsPlate", "#TabHelpPlate", "#TabGeneralActiveBack", "#TabArenasActiveBack", "#TabEnemiesActiveBack", "#TabHordeActiveBack", "#TabBossesActiveBack", "#TabPlayersActiveBack", "#TabSoundsActiveBack", "#TabRewardsActiveBack", "#TabHelpActiveBack", "#TabGeneralActiveTop", "#TabArenasActiveTop", "#TabEnemiesActiveTop", "#TabHordeActiveTop", "#TabBossesActiveTop", "#TabPlayersActiveTop", "#TabSoundsActiveTop", "#TabRewardsActiveTop", "#TabHelpActiveTop", "#TabGeneralActiveNotch", "#TabArenasActiveNotch", "#TabEnemiesActiveNotch", "#TabHordeActiveNotch", "#TabBossesActiveNotch", "#TabPlayersActiveNotch", "#TabSoundsActiveNotch", "#TabRewardsActiveNotch", "#TabHelpActiveNotch");
+        this.setVisible(commandBuilder, false, "#SubTitleLabel", "#TabHintLabel", "#StatusTitleLabel", "#StatusPanel", "#StatusLabel", "#SpawnStateLabel", "#SpawnLabel", "#SpawnX", "#SpawnY", "#SpawnZ", "#SetSpawnButton", "#HordeSelected", "#BossSelectedLabel", "#BossSelected", "#ArenaSelectedLabel", "#ArenaSelected", "#BossStatusLabel", "#ArenaStatusLabel", "#ArenaEditorTitleLabel", "#ArenaEditIdLabel", "#ArenaEditId", "#ArenaEditXLabel", "#ArenaEditX", "#ArenaEditYLabel", "#ArenaEditY", "#ArenaEditZLabel", "#ArenaEditZ", "#ArenaUseCurrentPositionButton", "#ArenaSaveButton", "#ArenaEditorModalShade", "#ArenaEditorModalFrame", "#ArenaEditorCloseButton", "#RoleHelpLabel", "#RewardCommandsHelpLabel", "#PlayerMultiplierLabel", "#PlayerMultiplier", "#RadiusLabel", "#RoundConfigLabel", "#EnemyLevelRangeLabel", "#EnemyLevelWipLabel", "#EnemyLevelMin", "#EnemyLevelRangeSeparator", "#EnemyLevelMax", "#LanguagePrevButton", "#LanguageNextButton", "#FinalBossPrevButton", "#FinalBossNextButton", "#RoundStartSoundPrevButton", "#RoundStartSoundNextButton", "#RoundVictorySoundPrevButton", "#RoundVictorySoundNextButton", "#RewardCategoryPrevButton", "#RewardCategoryNextButton", "#RewardItemPrevButton", "#RewardItemNextButton", "#RewardEveryRoundsLabel", "#RewardEveryRounds", "#RewardCategoryLabel", "#RewardCategory", "#RewardCommandsLabel", "#RewardItemId", "#RewardItemQuantityLabel", "#RewardItemQuantity", "#PlayersListTitle", "#PlayersListHint", "#PlayersRefreshButton", "#AudiencePlayersRows", "#AudiencePlayersEmptyLabel", "#HelpDiscordButton", "#HelpCurseForgeButton", "#CategoryBar", "#CategoryOuterTop", "#CategoryOuterBottom", "#CategoryOuterLeft", "#CategoryOuterRight", "#CategoryInnerTop", "#CategoryInnerBottom", "#CategoryCornerTL", "#CategoryCornerTR", "#CategoryCornerBL", "#CategoryCornerBR", "#CategoryBarInset", "#CategoryBarBottomEdge", "#CategoryLine", "#TabGeneralPlate", "#TabArenasPlate", "#TabEnemiesPlate", "#TabHordePlate", "#TabBossesPlate", "#TabPlayersPlate", "#TabSoundsPlate", "#TabRewardsPlate", "#TabHelpPlate", "#TabGeneralActiveBack", "#TabArenasActiveBack", "#TabEnemiesActiveBack", "#TabHordeActiveBack", "#TabBossesActiveBack", "#TabPlayersActiveBack", "#TabSoundsActiveBack", "#TabRewardsActiveBack", "#TabHelpActiveBack", "#TabGeneralActiveTop", "#TabArenasActiveTop", "#TabEnemiesActiveTop", "#TabHordeActiveTop", "#TabBossesActiveTop", "#TabPlayersActiveTop", "#TabSoundsActiveTop", "#TabRewardsActiveTop", "#TabHelpActiveTop", "#TabGeneralActiveNotch", "#TabArenasActiveNotch", "#TabEnemiesActiveNotch", "#TabHordeActiveNotch", "#TabBossesActiveNotch", "#TabPlayersActiveNotch", "#TabSoundsActiveNotch", "#TabRewardsActiveNotch", "#TabHelpActiveNotch");
+        this.applyPlayersEditorModalVisibility(commandBuilder, playersTab);
+        this.applyEnemyCategoryEditorModalVisibility(commandBuilder, enemiesTab);
+        this.applyRewardCategoryEditorModalVisibility(commandBuilder, rewardsTab);
+        this.applyHordeEditorModalVisibility(commandBuilder, hordeTab);
+        this.applyBossEditorModalVisibility(commandBuilder, bossesTab);
+        this.applySoundsEditorModalVisibility(commandBuilder, soundsTab);
+        this.applyArenaEditorModalVisibility(commandBuilder, arenasTab);
     }
 
     private void setVisible(UICommandBuilder commandBuilder, boolean visible, String ... elementIds) {
@@ -2441,6 +2536,41 @@ extends CustomUIPage {
             if (elementId == null || elementId.isBlank()) continue;
             commandBuilder.set(elementId + ".Visible", visible);
         }
+    }
+
+    private void applyArenaEditorModalVisibility(UICommandBuilder commandBuilder, boolean arenasTab) {
+        boolean visible = arenasTab && this.arenaEditorModalVisible;
+        this.setVisible(commandBuilder, visible, "#ArenaEditorModalShade", "#ArenaEditorModalFrame", "#ArenaEditorCloseButton", "#ArenaEditorTitleLabel", "#ArenaEditIdLabel", "#ArenaEditId", "#ArenaEditXLabel", "#ArenaEditX", "#ArenaEditYLabel", "#ArenaEditY", "#ArenaEditZLabel", "#ArenaEditZ", "#ArenaUseCurrentPositionButton", "#ArenaSaveButton", "#ArenaStatusLabel");
+    }
+
+    private void applyPlayersEditorModalVisibility(UICommandBuilder commandBuilder, boolean playersTab) {
+        boolean visible = playersTab && this.playerEditorModalVisible;
+        this.setVisible(commandBuilder, visible, "#PlayersEditorModalShade", "#PlayersEditorModalFrame", "#PlayersEditorCloseButton", "#PlayersEditorTitleLabel", "#PlayersSaveButton", "#PlayerSelected", "#PlayerEditModeLabel", "#PlayerEditMode", "#ArenaJoinRadiusLabel", "#ArenaJoinRadius", "#PlayersCountLabel", "#PlayersCountValue", "#PlayerStatusLabel");
+    }
+
+    private void applyEnemyCategoryEditorModalVisibility(UICommandBuilder commandBuilder, boolean enemiesTab) {
+        boolean visible = enemiesTab && this.enemyCategoryEditorModalVisible;
+        this.setVisible(commandBuilder, visible, "#EnemyCatEditorModalShade", "#EnemyCatEditorModalFrame", "#EnemyCatEditorCloseButton", "#EnemyCatEditorTitleLabel", "#EnemyCatEditIdLabel", "#EnemyCatEditId", "#EnemyCatRolePickerLabel", "#EnemyCatRolePicker", "#EnemyCatRoleAddButton", "#EnemyCatEditRolesLabel", "#EnemyCatRoleRow1", "#EnemyCatRoleRow2", "#EnemyCatRoleRow3", "#EnemyCatRoleRow4", "#EnemyCatRoleRow5", "#EnemyCatRoleRow6", "#EnemyCatRoleRow7", "#EnemyCatRoleRow8", "#EnemyCatRoleRow9", "#EnemyCatRoleRow10", "#EnemyCatRolesPagePrevButton", "#EnemyCatRolesPageNextButton", "#EnemyCatRolesPageLabel", "#EnemyCatSaveButton", "#EnemyCatStatusLabel");
+    }
+
+    private void applyRewardCategoryEditorModalVisibility(UICommandBuilder commandBuilder, boolean rewardsTab) {
+        boolean visible = rewardsTab && this.rewardCategoryEditorModalVisible;
+        this.setVisible(commandBuilder, visible, "#RewardCatEditorModalShade", "#RewardCatEditorModalFrame", "#RewardCatEditorCloseButton", "#RewardCatEditorTitleLabel", "#RewardCatEditIdLabel", "#RewardCatEditId", "#RewardCatItemPickerLabel", "#RewardCatItemPicker", "#RewardCatItemAddButton", "#RewardCatEditItemsLabel", "#RewardCatItemRow1", "#RewardCatItemRow2", "#RewardCatItemRow3", "#RewardCatItemRow4", "#RewardCatItemRow5", "#RewardCatItemRow6", "#RewardCatItemRow7", "#RewardCatItemRow8", "#RewardCatItemRow9", "#RewardCatItemRow10", "#RewardCatItemsPagePrevButton", "#RewardCatItemsPageNextButton", "#RewardCatItemsPageLabel", "#RewardCatSaveButton", "#RewardCatStatusLabel");
+    }
+
+    private void applyHordeEditorModalVisibility(UICommandBuilder commandBuilder, boolean hordeTab) {
+        boolean visible = hordeTab && this.hordeEditorModalVisible;
+        this.setVisible(commandBuilder, visible, "#HordeEditorModalShade", "#HordeEditorModalFrame", "#HordeEditorCloseButton", "#HordeEditorTitleLabel", "#HordeEditIdLabel", "#HordeEditId", "#RoleLabel", "#EnemyType", "#MaxRadiusLabel", "#MaxRadius", "#RoundLabel", "#Rounds", "#BaseEnemiesLabel", "#BaseEnemies", "#EnemiesPerRoundLabel", "#EnemiesPerRound", "#WaveDelayLabel", "#WaveDelay", "#HordeSaveButton", "#HordeStatusLabel");
+    }
+
+    private void applyBossEditorModalVisibility(UICommandBuilder commandBuilder, boolean bossesTab) {
+        boolean visible = bossesTab && this.bossEditorModalVisible;
+        this.setVisible(commandBuilder, visible, "#BossEditorModalShade", "#BossEditorModalFrame", "#BossEditorCloseButton", "#BossEditorTitleLabel", "#BossEditNameLabel", "#BossEditName", "#BossEditAmountLabel", "#BossEditAmount", "#BossEditNpcIdLabel", "#BossEditNpcId", "#BossEditTierLabel", "#BossEditTier", "#BossEditHpLabel", "#BossEditHp", "#BossEditDamageLabel", "#BossEditDamage", "#BossEditSizeLabel", "#BossEditSize", "#BossEditAttackRateLabel", "#BossEditAttackRate", "#BossSaveButton", "#BossStatusLabel");
+    }
+
+    private void applySoundsEditorModalVisibility(UICommandBuilder commandBuilder, boolean soundsTab) {
+        boolean visible = soundsTab && this.soundsEditorModalVisible;
+        this.setVisible(commandBuilder, visible, "#SoundsEditorModalShade", "#SoundsEditorModalFrame", "#SoundsEditorCloseButton", "#SoundsEditorTitleLabel", "#SoundsSaveButton", "#RoundStartSoundLabel", "#RoundStartSoundId", "#RoundStartVolumeLabel", "#RoundStartVolume", "#RoundVictorySoundLabel", "#RoundVictorySoundId", "#RoundVictoryVolumeLabel", "#RoundVictoryVolume");
     }
 
     private static String normalizeTab(String tab) {
