@@ -27,6 +27,7 @@ final class BossArenaCatalogService {
     private static final int MIN_NOTIFICATION_RADIUS = 10;
     private static final int MAX_NOTIFICATION_RADIUS = 500;
     private static final int DEFAULT_NOTIFICATION_RADIUS = 100;
+    private static final String DEFAULT_ARENA_ICON_ITEM_ID = "Ingredient_Bar_Gold";
     private static final int MAX_LEVEL_OVERRIDE = 300;
     private static final Set<String> BOSS_SPAWN_TRIGGERS = Set.of("before_boss", "on_spawn", "after_spawn_seconds", "since_last_wave", "boss_hp_percent");
     private static final List<String> BOSS_TIER_OPTIONS = List.of("common", "uncommon", "rare", "epic", "legendary");
@@ -203,6 +204,10 @@ final class BossArenaCatalogService {
         target.worldName = BossArenaCatalogService.clean(BossArenaCatalogService.firstNonBlank(values.get("arenaEditWorld"), target.worldName, fallbackWorldName));
         if (target.worldName.isBlank()) {
             target.worldName = "default";
+        }
+        target.iconItemId = BossArenaCatalogService.clean(BossArenaCatalogService.firstNonBlank(values.get("arenaEditIconItemId"), target.iconItemId, DEFAULT_ARENA_ICON_ITEM_ID));
+        if (target.iconItemId.isBlank()) {
+            target.iconItemId = DEFAULT_ARENA_ICON_ITEM_ID;
         }
         try {
             target.x = BossArenaCatalogService.parseDouble(values.get("arenaEditX"), target.x);
@@ -509,14 +514,16 @@ final class BossArenaCatalogService {
     static final class ArenaDefinitionSnapshot {
         final String arenaId;
         final String worldName;
+        final String iconItemId;
         final double x;
         final double y;
         final double z;
         final int notificationRadius;
 
-        private ArenaDefinitionSnapshot(String arenaId, String worldName, double x, double y, double z, int notificationRadius) {
+        private ArenaDefinitionSnapshot(String arenaId, String worldName, String iconItemId, double x, double y, double z, int notificationRadius) {
             this.arenaId = arenaId;
             this.worldName = worldName;
+            this.iconItemId = iconItemId;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -525,7 +532,7 @@ final class BossArenaCatalogService {
 
         private static ArenaDefinitionSnapshot from(ArenaDefinition source) {
             ArenaDefinition clean = ArenaDefinition.sanitize(source);
-            return new ArenaDefinitionSnapshot(clean.arenaId, clean.worldName, clean.x, clean.y, clean.z, clean.notificationRadius);
+            return new ArenaDefinitionSnapshot(clean.arenaId, clean.worldName, clean.iconItemId, clean.x, clean.y, clean.z, clean.notificationRadius);
         }
     }
 
@@ -744,6 +751,7 @@ final class BossArenaCatalogService {
     private static final class ArenaDefinition {
         private String arenaId;
         private String worldName;
+        private String iconItemId;
         private double x;
         private double y;
         private double z;
@@ -756,6 +764,7 @@ final class BossArenaCatalogService {
             if (row.worldName.isBlank()) {
                 row.worldName = "default";
             }
+            row.iconItemId = DEFAULT_ARENA_ICON_ITEM_ID;
             row.x = 0.0;
             row.y = 64.0;
             row.z = 0.0;
@@ -767,6 +776,7 @@ final class BossArenaCatalogService {
             ArenaDefinition copy = new ArenaDefinition();
             copy.arenaId = this.arenaId;
             copy.worldName = this.worldName;
+            copy.iconItemId = this.iconItemId;
             copy.x = this.x;
             copy.y = this.y;
             copy.z = this.z;
@@ -783,6 +793,10 @@ final class BossArenaCatalogService {
             clean.worldName = BossArenaCatalogService.clean(clean.worldName);
             if (clean.worldName.isBlank()) {
                 clean.worldName = "default";
+            }
+            clean.iconItemId = BossArenaCatalogService.clean(clean.iconItemId);
+            if (clean.iconItemId.isBlank()) {
+                clean.iconItemId = DEFAULT_ARENA_ICON_ITEM_ID;
             }
             clean.notificationRadius = BossArenaCatalogService.clamp(clean.notificationRadius, MIN_NOTIFICATION_RADIUS, MAX_NOTIFICATION_RADIUS);
             return clean;

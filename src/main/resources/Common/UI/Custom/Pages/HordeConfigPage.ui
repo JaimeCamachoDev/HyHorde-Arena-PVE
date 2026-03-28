@@ -46,11 +46,19 @@ $C = "../Common.ui";
 );
 
 @ListRowHitboxButtonStyle = TextButtonStyle(
-  Default: (Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #8ea1bb(0.16)), LabelStyle: (FontSize: 1, TextColor: #000000(0))),
-  Hovered: (Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #d6e3f5(0.30)), LabelStyle: (FontSize: 1, TextColor: #000000(0))),
-  Pressed: (Background: (TexturePath: "../Common/TabSelectedOverlay.png", Border: 3, Color: #f3f8ff(0.44)), LabelStyle: (FontSize: 1, TextColor: #000000(0)))
+  Default: (Background: (TexturePath: "../Common/Tab.png", Border: 3, Color: #8ea1bb(0.34)), LabelStyle: (FontSize: 1, TextColor: #000000(0))),
+  Hovered: (Background: (TexturePath: "../Common/Tab.png", Border: 3, Color: #d6e3f5(0.58)), LabelStyle: (FontSize: 1, TextColor: #000000(0))),
+  Pressed: (Background: (TexturePath: "../Common/Tab.png", Border: 3, Color: #f3f8ff(0.76)), LabelStyle: (FontSize: 1, TextColor: #000000(0)))
 );
 
+@ArenaListRowHitboxStyle = TextButtonStyle(
+  Default: (Background: #000000(0), LabelStyle: (FontSize: 1, TextColor: #000000(0))),
+  Hovered: (Background: #ffffff(0.08), LabelStyle: (FontSize: 1, TextColor: #000000(0))),
+  Pressed: (Background: #ffffff(0.14), LabelStyle: (FontSize: 1, TextColor: #000000(0)))
+);
+
+@ArenaNameLabelStyle = (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #ecf4ff, RenderBold: true, VerticalAlignment: Center);
+@ArenaCoordsLabelStyle = (...$C.@DefaultLabelStyle, FontSize: 11, TextColor: #b8cbe5, VerticalAlignment: Center);
 Group {
   Anchor: (Full: 0);
 
@@ -63,7 +71,7 @@ Group {
   }
 
   TabNavigation #CategoryTabs {
-    Anchor: (Left: 452, Top: 12, Width: 724, Height: 64);
+    Anchor: (Left: 452, Top: 32, Width: 724, Height: 64);
     Style: @OfficialTextTopTabsStyle;
     SelectedTab: "general";
 
@@ -114,7 +122,7 @@ Group {
   }
 
   $C.@DecoratedContainer #OfficialFrame {
-    Anchor: (Left: 430, Top: 80, Width: 1060, Height: 930);
+    Anchor: (Left: 430, Top: 92, Width: 1060, Height: 900);
 
     #Title {
       Label #OfficialFrameTitle {
@@ -570,13 +578,13 @@ Group {
   }
 
   Label #TitleLabel {
-    Anchor: (Left: 456, Top: 124, Width: 1008, Height: 40);
+    Anchor: (Left: 456, Top: 154, Width: 1008, Height: 40);
     Text: "Horda PVE Config";
     Style: (FontSize: 30, TextColor: #f1f7ff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
   }
 
   Label #SubTitleLabel {
-    Anchor: (Left: 456, Top: 130, Width: 760, Height: 24);
+    Anchor: (Left: 456, Top: 160, Width: 760, Height: 24);
     Text: "";
     Visible: false;
     Style: (FontSize: 14, TextColor: #b8cadf, VerticalAlignment: Center);
@@ -595,14 +603,14 @@ Group {
   }
 
   Label #TabHintLabel {
-    Anchor: (Left: 954, Top: 132, Width: 536, Height: 22);
+    Anchor: (Left: 954, Top: 162, Width: 536, Height: 22);
     Text: "";
     Visible: false;
     Style: (FontSize: 11, TextColor: #a8bdd8, VerticalAlignment: Center);
   }
 
   Label #SpawnStateLabel {
-    Anchor: (Left: 456, Top: 194, Width: 1008, Height: 24);
+    Anchor: (Left: 456, Top: 222, Width: 1008, Height: 24);
     Text: "";
     Style: (FontSize: 13, TextColor: #cfe0f3, RenderBold: true, VerticalAlignment: Center);
   }
@@ -740,7 +748,7 @@ Group {
   }
 
   TextButton #ReloadModButton {
-    Anchor: (Left: 660, Top: 936, Width: 192, Height: 46);
+    Anchor: (Left: 660, Top: 914, Width: 192, Height: 46);
     Text: "Recargar config";
     Style: $C.@TertiaryTextButtonStyle;
   }
@@ -2201,182 +2209,46 @@ Group {
   }
 
   Label #ArenasTitleLabel {
-    Anchor: (Left: 456, Top: 232, Width: 500, Height: 28);
+    Anchor: (Left: 456, Top: 232, Width: 420, Height: 24);
     Text: "Definiciones de arenas";
     Visible: false;
     Style: (FontSize: 18, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
   }
 
   TextButton #ArenaAddButton {
-    Anchor: (Left: 456, Top: 264, Width: 1008, Height: 34);
+    Anchor: (Left: 1238, Top: 232, Width: 226, Height: 32);
     Text: "Anadir arena";
     Visible: false;
     Style: $C.@SmallSecondaryTextButtonStyle;
   }
 
-  Label #ArenaHeaderName { Anchor: (Left: 466, Top: 308, Width: 300, Height: 22); Text: "Arena ID"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #ArenaHeaderCoords { Anchor: (Left: 786, Top: 308, Width: 620, Height: 22); Text: "Coordenadas"; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, VerticalAlignment: Center); }
-  Label #ArenaHeaderActions { Anchor: (Left: 1426, Top: 308, Width: 34, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #a9bed9, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-
-  Panel #ArenaRow1 {
-    Anchor: (Left: 456, Top: 336, Width: 1008, Height: 34);
-    Background: #000000(0);
+  Panel #ArenaListBackdrop {
+    Anchor: (Left: 456, Top: 274, Width: 1008, Height: 618);
+    Background: #0a1421(0.95);
     Visible: false;
-    TextButton #ArenaOpen1 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
-    Label #ArenaName1 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords1 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaDelete1 {
-      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
-      Text: "X";
-      Style: $C.@CancelTextButtonStyle;
-    }
   }
 
-  Panel #ArenaRow2 {
-    Anchor: (Left: 456, Top: 374, Width: 1008, Height: 34);
-    Background: #000000(0);
+  Panel #ArenaListInset {
+    Anchor: (Left: 456, Top: 274, Width: 1008, Height: 618);
+    Background: #122238(0.92);
     Visible: false;
-    TextButton #ArenaOpen2 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
-    Label #ArenaName2 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords2 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaDelete2 {
-      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
-      Text: "X";
-      Style: $C.@CancelTextButtonStyle;
-    }
   }
 
-  Panel #ArenaRow3 {
-    Anchor: (Left: 456, Top: 412, Width: 1008, Height: 34);
+  Label #ArenaHeaderName { Anchor: (Left: 468, Top: 282, Width: 496, Height: 22); Text: "Arena ID"; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
+  Label #ArenaHeaderCoords { Anchor: (Left: 952, Top: 282, Width: 490, Height: 22); Text: "Coordenadas"; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
+  Label #ArenaHeaderActions { Anchor: (Left: 1426, Top: 282, Width: 34, Height: 22); Text: ""; Visible: false; Style: (FontSize: 1, TextColor: #000000(0)); }
+
+  Panel #ArenaRowsList {
+    Anchor: (Left: 468, Top: 286, Width: 984, Height: 594);
+    LayoutMode: TopScrolling;
+    ScrollbarStyle: $C.@DefaultScrollbarStyle;
+    Padding: (Top: 10, Left: 12, Right: 12, Bottom: 10);
     Background: #000000(0);
     Visible: false;
-    TextButton #ArenaOpen3 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
-    Label #ArenaName3 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords3 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaDelete3 {
-      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
-      Text: "X";
-      Style: $C.@CancelTextButtonStyle;
-    }
   }
 
-  Panel #ArenaRow4 {
-    Anchor: (Left: 456, Top: 450, Width: 1008, Height: 34);
-    Background: #000000(0);
-    Visible: false;
-    TextButton #ArenaOpen4 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
-    Label #ArenaName4 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords4 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaDelete4 {
-      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
-      Text: "X";
-      Style: $C.@CancelTextButtonStyle;
-    }
-  }
-
-  Panel #ArenaRow5 {
-    Anchor: (Left: 456, Top: 488, Width: 1008, Height: 34);
-    Background: #000000(0);
-    Visible: false;
-    TextButton #ArenaOpen5 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
-    Label #ArenaName5 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords5 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaDelete5 {
-      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
-      Text: "X";
-      Style: $C.@CancelTextButtonStyle;
-    }
-  }
-
-  Panel #ArenaRow6 {
-    Anchor: (Left: 456, Top: 526, Width: 1008, Height: 34);
-    Background: #000000(0);
-    Visible: false;
-    TextButton #ArenaOpen6 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
-    Label #ArenaName6 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords6 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaDelete6 {
-      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
-      Text: "X";
-      Style: $C.@CancelTextButtonStyle;
-    }
-  }
-
-  Panel #ArenaRow7 {
-    Anchor: (Left: 456, Top: 564, Width: 1008, Height: 34);
-    Background: #000000(0);
-    Visible: false;
-    TextButton #ArenaOpen7 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
-    Label #ArenaName7 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords7 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaDelete7 {
-      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
-      Text: "X";
-      Style: $C.@CancelTextButtonStyle;
-    }
-  }
-
-  Panel #ArenaRow8 {
-    Anchor: (Left: 456, Top: 602, Width: 1008, Height: 34);
-    Background: #000000(0);
-    Visible: false;
-    TextButton #ArenaOpen8 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
-    Label #ArenaName8 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords8 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaDelete8 {
-      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
-      Text: "X";
-      Style: $C.@CancelTextButtonStyle;
-    }
-  }
-
-  Panel #ArenaRow9 {
-    Anchor: (Left: 456, Top: 640, Width: 1008, Height: 34);
-    Background: #000000(0);
-    Visible: false;
-    TextButton #ArenaOpen9 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
-    Label #ArenaName9 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords9 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaDelete9 {
-      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
-      Text: "X";
-      Style: $C.@CancelTextButtonStyle;
-    }
-  }
-
-  Panel #ArenaRow10 {
-    Anchor: (Left: 456, Top: 678, Width: 1008, Height: 34);
-    Background: #000000(0);
-    Visible: false;
-    TextButton #ArenaOpen10 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
-    Label #ArenaName10 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords10 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaDelete10 {
-      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
-      Text: "X";
-      Style: $C.@CancelTextButtonStyle;
-    }
-  }
-
-  Panel #ArenaRow11 {
-    Anchor: (Left: 456, Top: 716, Width: 1008, Height: 34);
-    Background: #000000(0);
-    Visible: false;
-    TextButton #ArenaOpen11 { Anchor: (Left: 0, Top: 0, Width: 966, Height: 34); Text: ""; Style: @ListRowHitboxButtonStyle; }
-    Label #ArenaName11 { Anchor: (Left: 10, Top: 6, Width: 300, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center); }
-    Label #ArenaCoords11 { Anchor: (Left: 330, Top: 6, Width: 620, Height: 22); Text: ""; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-    TextButton #ArenaDelete11 {
-      Anchor: (Left: 970, Top: 3, Width: 34, Height: 28);
-      Text: "X";
-      Style: $C.@CancelTextButtonStyle;
-    }
-  }
-
-  TextButton #ArenaPagePrevButton { Anchor: (Left: 872, Top: 760, Width: 32, Height: 28); Text: "<"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #ArenaPageLabel { Anchor: (Left: 908, Top: 762, Width: 104, Height: 24); Text: "0/0"; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  TextButton #ArenaPageNextButton { Anchor: (Left: 1016, Top: 760, Width: 32, Height: 28); Text: ">"; Visible: false; Style: $C.@SmallSecondaryTextButtonStyle; }
-  Label #ArenaEmptyLabel { Anchor: (Left: 456, Top: 754, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
-  Label #ArenaOverflowLabel { Anchor: (Left: 456, Top: 778, Width: 1008, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
+  Label #ArenaEmptyLabel { Anchor: (Left: 468, Top: 560, Width: 984, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center); }
+  Label #ArenaOverflowLabel { Anchor: (Left: 468, Top: 584, Width: 984, Height: 22); Text: ""; Visible: false; Style: (FontSize: 12, TextColor: #f2c48b, VerticalAlignment: Center); }
 
   Panel #ArenaEditorModalShade {
     Anchor: (Full: 0);
@@ -2404,49 +2276,124 @@ Group {
   }
 
   Label #ArenaSelectedLabel {
-    Anchor: (Left: 480, Top: 266, Width: 180, Height: 22);
+    Anchor: (Left: 0, Top: 0, Width: 1, Height: 1);
     Text: "Arena seleccionada";
+    Visible: false;
+    Style: (FontSize: 1, TextColor: #000000(0));
+  }
+
+  TextField #ArenaSelected {
+    Anchor: (Left: 0, Top: 0, Width: 1, Height: 1);
+    Value: "";
+    Visible: false;
+    Style: (FontSize: 1, TextColor: #000000(0));
+    Padding: (Left: 0);
+    Background: #000000(0);
+  }
+
+  Label #ArenaEditIdLabel { Anchor: (Left: 480, Top: 290, Width: 960, Height: 16); Text: "Arena ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #ArenaEditId { @Anchor = (Left: 480, Top: 312, Width: 960); Value: ""; }
+  $C.@TextField #ArenaEditIconItemId { @Anchor = (Left: 0, Top: 0, Width: 1); Value: "Ingredient_Bar_Gold"; Visible: false; }
+
+  Label #ArenaIconSelectorLabel {
+    Anchor: (Left: 480, Top: 356, Width: 960, Height: 16);
+    Text: "Icono";
     Visible: false;
     Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center);
   }
 
-  TextField #ArenaSelected {
-    Anchor: (Left: 668, Top: 262, Width: 772, Height: 30);
-    Value: "";
+  Panel #ArenaIconSelectorCard {
+    Anchor: (Left: 480, Top: 378, Width: 960, Height: 72);
+    Background: #0f1825(0.92);
     Visible: false;
-    Style: (FontSize: 12, TextColor: #9cb4d1);
-    Padding: (Left: 8);
-    Background: #0f1825;
   }
 
-  Label #ArenaEditIdLabel { Anchor: (Left: 480, Top: 306, Width: 960, Height: 16); Text: "Arena ID"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #ArenaEditId { @Anchor = (Left: 480, Top: 328, Width: 960); Value: ""; }
-  Label #ArenaEditXLabel { Anchor: (Left: 480, Top: 370, Width: 960, Height: 16); Text: "X"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #ArenaEditX { @Anchor = (Left: 480, Top: 392, Width: 960); Value: "0"; }
-  Label #ArenaEditYLabel { Anchor: (Left: 480, Top: 434, Width: 960, Height: 16); Text: "Y"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #ArenaEditY { @Anchor = (Left: 480, Top: 456, Width: 960); Value: "64"; }
-  Label #ArenaEditZLabel { Anchor: (Left: 480, Top: 498, Width: 960, Height: 16); Text: "Z"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
-  $C.@TextField #ArenaEditZ { @Anchor = (Left: 480, Top: 520, Width: 960); Value: "0"; }
+  ItemIcon #ArenaEditIconPreview {
+    Anchor: (Left: 492, Top: 388, Width: 52, Height: 52);
+    Visible: false;
+  }
+
+  Label #ArenaEditIconCurrentLabel {
+    Anchor: (Left: 556, Top: 402, Width: 624, Height: 24);
+    Text: "";
+    Visible: false;
+    Style: (FontSize: 12, TextColor: #d8e3f4, VerticalAlignment: Center);
+  }
+
+  TextButton #ArenaIconPickerOpenButton {
+    Anchor: (Left: 1192, Top: 394, Width: 232, Height: 40);
+    Text: "Elegir icono";
+    Visible: false;
+    Style: $C.@SmallSecondaryTextButtonStyle;
+  }
+
+  Label #ArenaCoordsTitleLabel {
+    Anchor: (Left: 480, Top: 474, Width: 960, Height: 16);
+    Text: "Coordenadas";
+    Visible: false;
+    Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  Label #ArenaEditXLabel { Anchor: (Left: 480, Top: 498, Width: 304, Height: 16); Text: "X"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #ArenaEditX { @Anchor = (Left: 480, Top: 520, Width: 304); Value: "0"; }
+  Label #ArenaEditYLabel { Anchor: (Left: 808, Top: 498, Width: 304, Height: 16); Text: "Y"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #ArenaEditY { @Anchor = (Left: 808, Top: 520, Width: 304); Value: "64"; }
+  Label #ArenaEditZLabel { Anchor: (Left: 1136, Top: 498, Width: 304, Height: 16); Text: "Z"; Visible: false; Style: (FontSize: 12, TextColor: #9cb4d1, RenderBold: true, VerticalAlignment: Center); }
+  $C.@TextField #ArenaEditZ { @Anchor = (Left: 1136, Top: 520, Width: 304); Value: "0"; }
 
   TextButton #ArenaUseCurrentPositionButton {
-    Anchor: (Left: 480, Top: 564, Width: 960, Height: 34);
+    Anchor: (Left: 480, Top: 576, Width: 960, Height: 34);
     Text: "Usar mi posicion actual";
     Visible: false;
     Style: $C.@SecondaryTextButtonStyle;
   }
 
   TextButton #ArenaSaveButton {
-    Anchor: (Left: 480, Top: 264, Width: 960, Height: 34);
+    Anchor: (Left: 480, Top: 632, Width: 960, Height: 34);
     Text: "Guardar arena";
     Visible: false;
     Style: $C.@SecondaryTextButtonStyle;
   }
 
   Label #ArenaStatusLabel {
-    Anchor: (Left: 480, Top: 636, Width: 960, Height: 56);
+    Anchor: (Left: 480, Top: 746, Width: 520, Height: 30);
     Text: "";
     Visible: false;
     Style: (FontSize: 12, TextColor: #bcd0e8, VerticalAlignment: Center);
+  }
+
+  Panel #ArenaIconPickerShade {
+    Anchor: (Full: 0);
+    Background: #02060f(0.62);
+    Visible: false;
+  }
+
+  $C.@DecoratedContainer #ArenaIconPickerFrame {
+    Anchor: (Left: 556, Top: 292, Width: 824, Height: 446);
+    Visible: false;
+  }
+
+  TextButton #ArenaIconPickerCloseButton {
+    Anchor: (Left: 1338, Top: 300, Width: 34, Height: 28);
+    Text: "X";
+    Visible: false;
+    Style: $C.@CancelTextButtonStyle;
+  }
+
+  Label #ArenaIconPickerTitleLabel {
+    Anchor: (Left: 580, Top: 300, Width: 752, Height: 24);
+    Text: "Selecciona un icono";
+    Visible: false;
+    Style: (FontSize: 16, TextColor: #f4f7fc, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  Panel #ArenaIconPickerGrid {
+    Anchor: (Left: 580, Top: 338, Width: 780, Height: 336);
+    LayoutMode: TopScrolling;
+    ScrollbarStyle: $C.@DefaultScrollbarStyle;
+    Padding: (Top: 4, Right: 2, Bottom: 4);
+    Background: #000000(0);
+    Visible: false;
   }
 
   Label #HelpIntroLabel {
@@ -2596,33 +2543,33 @@ Group {
   }
 
   TextButton #SaveButton {
-    Anchor: (Left: 456, Top: 936, Width: 192, Height: 46);
+    Anchor: (Left: 456, Top: 914, Width: 192, Height: 46);
     Text: "Guardar config";
     Style: $C.@DefaultTextButtonStyle;
   }
 
   TextButton #StartButton {
-    Anchor: (Left: 864, Top: 936, Width: 192, Height: 46);
+    Anchor: (Left: 864, Top: 914, Width: 192, Height: 46);
     Text: "Iniciar horda";
     Style: $C.@DefaultTextButtonStyle;
   }
 
   TextButton #StopButton {
-    Anchor: (Left: 864, Top: 936, Width: 192, Height: 46);
+    Anchor: (Left: 864, Top: 914, Width: 192, Height: 46);
     Text: "Detener horda";
     Visible: false;
     Style: $C.@CancelTextButtonStyle;
   }
 
   TextButton #SkipRoundButton {
-    Anchor: (Left: 1068, Top: 936, Width: 192, Height: 46);
+    Anchor: (Left: 1068, Top: 914, Width: 192, Height: 46);
     Text: "Pasar ronda";
     Visible: false;
     Style: $C.@TertiaryTextButtonStyle;
   }
 
   TextButton #HordeCloseButton {
-    Anchor: (Left: 1450, Top: 88, Width: 34, Height: 28);
+    Anchor: (Left: 1450, Top: 108, Width: 34, Height: 28);
     Text: "X";
     Style: $C.@CancelTextButtonStyle;
   }

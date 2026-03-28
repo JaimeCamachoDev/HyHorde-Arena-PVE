@@ -2,6 +2,23 @@
 
 Este documento recoge errores reales vistos en logs y las reglas para evitarlos al tocar `HordeConfigPage.ui`.
 
+## Error actual (2026-03-28)
+
+Firma en cliente (`C:\Users\Jaime\AppData\Roaming\Hytale\UserData\Logs\2026-03-28_22-32-18_client.log`):
+
+- `Failed to load CustomUI documents`
+- `Failed to parse file Pages/HordeConfigPage.ui (2251:226)`
+- `Could not resolve expression for property HorizontalAlignment to type LabelAlignment`
+
+Causa:
+
+- En `Label #ArenaHeaderCoords` se anadio `HorizontalAlignment: Center` dentro del estilo inline y este runtime fallo al resolver ese valor en ese punto del documento.
+
+Solucion aplicada:
+
+- Quitar `HorizontalAlignment` de `#ArenaHeaderCoords` y dejar solo `VerticalAlignment: Center`.
+- Mantener alineaciones horizontales en headers criticos usando estilos ya probados, o validar en cliente tras cada cambio de enum/alineacion.
+
 ## Error actual (2026-03-27)
 
 Firma en cliente (`C:\Users\Jaime\AppData\Roaming\Hytale\UserData\Logs\2026-03-27_18-57-04_client.log`):
@@ -59,6 +76,20 @@ Solucion:
 4. Texturas de tabs con cruces rojas
 - Causa: rutas de textura incorrectas.
 - Regla: usar rutas relativas `../Common/...` para recursos compartidos de tabs.
+
+5. Listas `TopScrolling` con filas desalineadas
+- Firma visual: mas padding a derecha que a izquierda, filas "finas/largas", boton `X` deformado.
+- Causa: filas append con `Width` fijo dentro de un contenedor con scrollbar/padding.
+- Regla: en filas dinamicas (`Pages/HordeArenaRow.ui`), usar `Anchor: (Left: 0, Right: 0, ...)` y definir tamanos de icono/boton en px cuadrados.
+
+6. Nuevo campo en editor no persiste
+- Firma: el valor aparece en UI pero se pierde al guardar/reabrir.
+- Causa: agregar `#Campo.Value` en `.ui` sin sincronizar Java/catalogo.
+- Regla: para cada campo nuevo de editor, sincronizar siempre:
+- `SNAPSHOT_FIELDS` + `shouldCaptureFieldFromPayload(...)`
+- `build().set(...)` + `extract...ValuesForSave()`
+- `ensure...DraftDefaults(...)` + `apply...DraftFromSnapshot(...)`
+- `...Definition`/`...Snapshot` del catalogo y guardado JSON
 
 ## No confundir con errores de servidor no-CustomUI
 

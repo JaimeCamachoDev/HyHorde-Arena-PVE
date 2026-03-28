@@ -101,7 +101,7 @@ public final class HordeService {
     private static Map<String, List<String>> REWARD_CATEGORY_ITEMS = HordeService.copyRewardCategoryItems(DEFAULT_REWARD_CATEGORY_ITEMS);
     private static List<String> REWARD_CATEGORY_OPTIONS = HordeService.buildRewardCategoryOptions();
     private static List<String> RANDOM_ENEMY_TYPE_OPTIONS = HordeService.buildRandomEnemyTypePool();
-    private static final int MAX_REWARD_SUGGESTIONS = 72;
+    private static final int MAX_REWARD_SUGGESTIONS = 160;
     private static String[] BLOCKED_ENEMY_ROLE_HINTS = DEFAULT_BLOCKED_ENEMY_ROLE_HINTS.clone();
     private static final int START_COUNTDOWN_SECONDS = 3;
     private static final int START_COUNTDOWN_EXTRA_DELAY_SECONDS = 0;
@@ -4353,6 +4353,11 @@ public final class HordeService {
         categories.put("mithril", List.of(
                 "Ingredient_Bar_Mithril",
                 "Ore_Mithril",
+                "Ore_Mithril_Basalt",
+                "Ore_Mithril_Magma",
+                "Ore_Mithril_Slate",
+                "Ore_Mithril_Stone",
+                "Ore_Mithril_Volcanic",
                 "Armor_Mithril_Head",
                 "Armor_Mithril_Chest",
                 "Armor_Mithril_Hands",
@@ -4364,11 +4369,21 @@ public final class HordeService {
                 "Weapon_Daggers_Mithril",
                 "Weapon_Battleaxe_Mithril",
                 "Weapon_Mace_Mithril",
-                "Weapon_Shortbow_Mithril"
+                "Weapon_Shortbow_Mithril",
+                "Weapon_Axe_Mithril",
+                "Weapon_Club_Mithril",
+                "Weapon_Spear_Mithril",
+                "Weapon_Staff_Mithril",
+                "Weapon_Shield_Mithril"
         ));
         categories.put("onyxium", List.of(
                 "Ingredient_Bar_Onyxium",
                 "Ore_Onyxium",
+                "Ore_Onyxium_Basalt",
+                "Ore_Onyxium_Sandstone",
+                "Ore_Onyxium_Shale",
+                "Ore_Onyxium_Stone",
+                "Ore_Onyxium_Volcanic",
                 "Armor_Onyxium_Head",
                 "Armor_Onyxium_Chest",
                 "Armor_Onyxium_Hands",
@@ -4380,14 +4395,32 @@ public final class HordeService {
                 "Weapon_Daggers_Onyxium",
                 "Weapon_Battleaxe_Onyxium",
                 "Weapon_Mace_Onyxium",
-                "Weapon_Shortbow_Onyxium"
+                "Weapon_Shortbow_Onyxium",
+                "Weapon_Axe_Onyxium",
+                "Weapon_Club_Onyxium",
+                "Weapon_Spear_Onyxium",
+                "Weapon_Staff_Onyxium",
+                "Weapon_Shield_Onyxium"
         ));
         categories.put("gemas", List.of(
                 "Ingredient_Crystal_Red",
                 "Ingredient_Crystal_Green",
                 "Ingredient_Crystal_Blue",
                 "Ingredient_Crystal_Yellow",
-                "Ingredient_Crystal_Purple"
+                "Ingredient_Crystal_Purple",
+                "Ingredient_Crystal_Cyan",
+                "Ingredient_Crystal_White",
+                "Rock_Gem_Diamond",
+                "Rock_Gem_Emerald",
+                "Rock_Gem_Ruby",
+                "Rock_Gem_Sapphire",
+                "Rock_Gem_Topaz",
+                "Rock_Gem_Voidstone",
+                "Rock_Gem_Zephyr",
+                "Weapon_Staff_Crystal_Flame",
+                "Weapon_Staff_Crystal_Ice",
+                "Weapon_Staff_Crystal_Purple",
+                "Weapon_Staff_Crystal_Red"
         ));
         categories.put("metales", List.of(
                 "Ingredient_Bar_Bronze",
@@ -4398,48 +4431,106 @@ public final class HordeService {
                 "Ingredient_Bar_Cobalt",
                 "Ingredient_Bar_Thorium",
                 "Ingredient_Bar_Adamantite",
+                "Ingredient_Bar_Prisma",
                 "Ore_Copper",
                 "Ore_Iron",
                 "Ore_Silver",
                 "Ore_Gold",
                 "Ore_Cobalt",
                 "Ore_Thorium",
-                "Ore_Mithril",
-                "Ore_Onyxium",
-                "Ore_Adamantite"
+                "Ore_Adamantite",
+                "Ore_Prisma",
+                "Armor_Copper_Chest",
+                "Armor_Iron_Chest",
+                "Armor_Steel_Chest",
+                "Armor_Cobalt_Chest",
+                "Armor_Thorium_Chest",
+                "Armor_Adamantite_Chest",
+                "Tool_Pickaxe_Copper",
+                "Tool_Pickaxe_Iron",
+                "Tool_Pickaxe_Cobalt",
+                "Tool_Pickaxe_Thorium",
+                "Tool_Pickaxe_Adamantite",
+                "Tool_Hatchet_Copper",
+                "Tool_Hatchet_Iron",
+                "Tool_Hatchet_Cobalt",
+                "Tool_Hatchet_Thorium",
+                "Tool_Hatchet_Adamantite"
         ));
         categories.put("materiales_raros", List.of(
                 "Ingredient_Voidheart",
+                "Ingredient_Void_Essence",
+                "Ingredient_Fire_Essence",
+                "Ingredient_Ice_Essence",
+                "Ingredient_Lightning_Essence",
+                "Ingredient_Water_Essence",
                 "Ingredient_Leather_Heavy",
                 "Ingredient_Leather_Medium",
                 "Ingredient_Leather_Light",
                 "Ingredient_Leather_Storm",
-                "Ingredient_Ice_Essence",
+                "Ingredient_Leather_Prismic",
+                "Ingredient_Leather_Scaled",
+                "Ingredient_Hide_Scaled",
+                "Ingredient_Bolt_Stormsilk",
+                "Ingredient_Bolt_Silk",
+                "Ingredient_Fabric_Scrap_Stormsilk",
+                "Ingredient_Fabric_Scrap_Silk",
+                "Ingredient_Feathers_Blue",
+                "Ingredient_Feathers_Dark",
+                "Ingredient_Feathers_Light",
+                "Ingredient_Feathers_Red",
+                "Ingredient_Life_Essence",
                 "Ingredient_Crystal_Purple"
         ));
         categories.put("armas_especiales", List.of(
                 "Weapon_Daggers_Thorium",
-                "Weapon_Hammer_Thorium",
+                "Weapon_Daggers_Adamantite",
+                "Weapon_Daggers_Adamantite_Saurian",
+                "Weapon_Daggers_Bone",
                 "Weapon_Longsword_Flame",
                 "Weapon_Longsword_Spectral",
+                "Weapon_Longsword_Void",
+                "Weapon_Longsword_Adamantite",
                 "Weapon_Sword_Bone",
+                "Weapon_Sword_Runic",
+                "Weapon_Sword_Silversteel",
+                "Weapon_Sword_Steel_Incandescent",
                 "Weapon_Crossbow_Ancient_Steel",
-                "Weapon_Hammer_Ancient_Steel",
-                "Weapon_Halberd_Ancient_Steel"
+                "Weapon_Spear_Bone",
+                "Weapon_Spear_Adamantite",
+                "Weapon_Spear_Adamantite_Saurian",
+                "Weapon_Staff_Crystal_Flame",
+                "Weapon_Staff_Crystal_Ice",
+                "Weapon_Staff_Adamantite",
+                "Weapon_Shield_Orbis_Knight",
+                "Weapon_Shield_Orbis_Incandescent",
+                "Weapon_Shield_Praetorian"
         ));
         categories.put("items_especiales", List.of(
                 "Armor_Steel_Ancient_Head",
                 "Armor_Steel_Ancient_Chest",
                 "Armor_Steel_Ancient_Hands",
                 "Armor_Steel_Ancient_Legs",
-                "Armor_Bone_Head",
-                "Armor_Bone_Chest",
-                "Armor_Bone_Hands",
-                "Armor_Bone_Legs",
-                "Armor_Bandit_Head",
-                "Armor_Bandit_Chest",
-                "Armor_Bandit_Hands",
-                "Armor_Bandit_Legs"
+                "Armor_Prisma_Head",
+                "Armor_Prisma_Chest",
+                "Armor_Prisma_Hands",
+                "Armor_Prisma_Legs",
+                "Armor_Trork_Head",
+                "Armor_Trork_Chest",
+                "Armor_Trork_Hands",
+                "Armor_Trork_Legs",
+                "Armor_Trooper_Head",
+                "Armor_Trooper_Chest",
+                "Armor_Trooper_Legs",
+                "Armor_Leather_Raven_Head",
+                "Armor_Leather_Raven_Chest",
+                "Armor_Leather_Raven_Hands",
+                "Armor_Leather_Raven_Legs",
+                "Potion_Signature_Greater",
+                "Potion_Signature_Lesser",
+                "Potion_Regen_Health_Large",
+                "Potion_Regen_Mana_Large",
+                "Food_Fish_Raw_Legendary"
         ));
         return categories;
     }
