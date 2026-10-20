@@ -2,6 +2,7 @@
 .gradle/
 build/
 out/
+/tmp/
 
 # IntelliJ / JetBrains
 .idea/
